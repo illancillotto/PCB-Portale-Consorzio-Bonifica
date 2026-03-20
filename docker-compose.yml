@@ -1,0 +1,54 @@
+services:
+  pcb-postgres:
+    image: postgis/postgis:16-3.4
+    container_name: pcb-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PCB_POSTGRES_DB:-pcb}
+      POSTGRES_USER: ${PCB_POSTGRES_USER:-pcb}
+      POSTGRES_PASSWORD: ${PCB_POSTGRES_PASSWORD:-pcb}
+    ports:
+      - "${PCB_POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pcb-postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PCB_POSTGRES_USER:-pcb} -d ${PCB_POSTGRES_DB:-pcb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pcb-redis:
+    image: redis:7-alpine
+    container_name: pcb-redis
+    restart: unless-stopped
+    ports:
+      - "${PCB_REDIS_PORT:-6379}:6379"
+    volumes:
+      - pcb-redis-data:/data
+
+  pcb-keycloak:
+    image: quay.io/keycloak/keycloak:26.1
+    container_name: pcb-keycloak
+    restart: unless-stopped
+    command: ["start-dev"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+
+  pcb-qgis-server:
+    image: qgis/qgis-server:latest
+    container_name: pcb-qgis-server
+    restart: unless-stopped
+    environment:
+      QGIS_PROJECT_FILE: /io/projects/pcb-placeholder.qgz
+    ports:
+      - "8090:80"
+    volumes:
+      - ./infra/qgis/projects:/io/projects
+
+volumes:
+  pcb-postgres-data:
+  pcb-redis-data:

@@ -1,48 +1,63 @@
 # PCB – Portale Consorzio Bonifica
 
-Pacchetto documentale in formato Markdown per avviare lo sviluppo del progetto **PCB – Portale Consorzio Bonifica** con Codex in autonomia operativa.
+Bootstrap iniziale del repository per la piattaforma interna PCB, coerente con la documentazione in `docs/`.
 
-## Contenuto del pacchetto
+## Sintesi architetturale
 
-- `docs/00-project-brief.md` — sintesi esecutiva del progetto
-- `docs/01-prd.md` — Product Requirements Document completo
-- `docs/02-architecture.md` — architettura logica e tecnica
-- `docs/03-data-model.md` — modello dati iniziale e linee guida DB
-- `docs/04-connectors-and-ingestion.md` — strategia connettori e scraping/ingestion
-- `docs/05-modules.md` — mappa completa dei moduli PCB
-- `docs/06-api-guidelines.md` — linee guida API e naming
-- `docs/07-frontend-guidelines.md` — linee guida frontend Next.js
-- `docs/08-security-and-audit.md` — sicurezza, ruoli, audit e logging
-- `docs/09-delivery-roadmap.md` — roadmap e milestone
-- `docs/10-codex-instructions.md` — istruzioni operative da dare a Codex
-- `docs/11-prompts-for-codex.md` — prompt pronti per far partire il lavoro
-- `docs/12-definition-of-done.md` — criteri di completamento
-- `docs/13-open-questions-and-risks.md` — rischi e questioni aperte
+- modular monolith backend con NestJS
+- frontend Next.js per operatori interni
+- PostgreSQL + PostGIS come database principale
+- Redis per supporto runtime e job orchestration futura
+- Keycloak come identity provider esterno
+- QGIS Server come componente GIS infrastrutturale
+- connettori separati in Node.js + Playwright
+- anagrafe unica centrata sul CUUA
+- separazione obbligatoria tra raw ingest, normalized data e master data
 
-## Obiettivo
+## Struttura repository
 
-Questo materiale serve a dare a Codex:
+- `backend/` API NestJS e moduli PCB
+- `frontend/` applicazione Next.js
+- `connectors/` package separato per connettori e ingestion services
+- `infra/` bootstrap infrastrutturale locale
+- `docs/` documentazione di progetto
 
-- contesto funzionale solido
-- vincoli architetturali chiari
-- priorità corrette
-- struttura tecnica coerente
-- modalità di esecuzione progressiva
+## Avvio locale
 
-## Decisioni già fissate
+1. Copiare `.env.example` in `.env` e adattare i valori necessari.
+2. Avviare i servizi base:
 
-- Nome progetto: **PCB – Portale Consorzio Bonifica**
-- Architettura: **modular monolith**
-- Frontend: **Next.js**
-- Backend: **NestJS**
-- Database: **PostgreSQL + PostGIS**
-- Auth: **Keycloak**
-- Queue/Cache: **Redis**
-- GIS publishing: **QGIS Server**
-- Connettori web: **Node.js + Playwright**
-- Logica master data: **anagrafe unica centrata sul CUUA**
+```bash
+docker compose up -d
+```
 
-## Nota importante
+3. Installare le dipendenze workspace:
 
-Il progetto non parte come sostituzione totale dei sistemi esterni. Parte come **piattaforma interna di governo del dato**, integrazione, consultazione e collegamento con GIS e storico documentale.
+```bash
+npm install
+```
 
+4. Avviare backend e frontend in sessioni separate:
+
+```bash
+npm run dev --workspace backend
+npm run dev --workspace frontend
+```
+
+## Stato del bootstrap
+
+La milestone corrente prepara:
+
+- skeleton backend con moduli `auth`, `anagrafiche`, `ingest`, `audit`, `catasto`, `gis`, `search`
+- placeholder integrazione Keycloak
+- compose base con PostGIS, Redis, Keycloak e QGIS Server
+- package separato `connectors` per Playwright
+- documentazione tecnica minima per backend e frontend
+
+Non include ancora:
+
+- persistenza applicativa reale
+- matching engine
+- scheda soggetto completa
+- connector NAS operativo
+- autenticazione Keycloak end-to-end
