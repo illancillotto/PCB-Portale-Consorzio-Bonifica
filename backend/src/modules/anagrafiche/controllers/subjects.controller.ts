@@ -46,4 +46,18 @@ export class SubjectsController {
 
     return history;
   }
+
+  @Get(':id/parcels')
+  async getParcels(@Param('id') id: string) {
+    const parcels = await this.anagraficheService.getParcels(id);
+
+    if (!parcels) {
+      throw new NotFoundException(`Subject parcels not found for id ${id}`);
+    }
+
+    return {
+      subjectId: id,
+      parcels,
+    };
+  }
 }

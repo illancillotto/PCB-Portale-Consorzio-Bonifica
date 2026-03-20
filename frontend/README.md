@@ -17,4 +17,15 @@ npm run dev
 
 ## Note
 
-La prima milestone non include ancora autenticazione reale, chiamate backend o mappa GIS integrata.
+Configurazione utile:
+
+- `PCB_API_BASE_URL` per puntare il frontend alle API backend
+
+Stato attuale:
+
+- ricerca reale collegata al backend
+- lista soggetti
+- scheda soggetto base
+- lista e vista particella base
+- ingestion monitor iniziale
+- autenticazione reale e mappa GIS ancora non integrate

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../core/database/database.service';
 import { ListSubjectsQueryDto } from './dto/list-subjects-query.dto';
+import { SubjectParcelResponseDto } from './dto/subject-parcel-response.dto';
 import { SubjectResponseDto } from './dto/subject-response.dto';
 
 interface SubjectRow {
@@ -22,6 +23,17 @@ interface SubjectNameHistoryRow {
   source_system: string;
   valid_from: Date | string | null;
   valid_to: Date | string | null;
+}
+
+interface SubjectParcelRow {
+  parcel_id: string;
+  comune: string;
+  foglio: string;
+  particella: string;
+  subalterno: string | null;
+  relation_type: string;
+  title: string | null;
+  quota: number | string | null;
 }
 
 @Injectable()
@@ -187,6 +199,45 @@ export class AnagraficheService {
       subjectId: id,
       nameHistory: subject.nameHistory,
     };
+  }
+
+  async getParcels(id: string): Promise<SubjectParcelResponseDto[] | null> {
+    const subject = await this.getById(id);
+
+    if (!subject) {
+      return null;
+    }
+
+    const parcelsResult = await this.databaseService.query<SubjectParcelRow>(
+      `
+        SELECT
+          spr.parcel_id,
+          p.comune,
+          p.foglio,
+          p.particella,
+          p.subalterno,
+          spr.relation_type,
+          spr.title,
+          spr.quota
+        FROM catasto.subject_parcel_relation spr
+        INNER JOIN catasto.parcel p
+          ON p.id = spr.parcel_id
+        WHERE spr.subject_id = $1
+        ORDER BY p.comune, p.foglio, p.particella, p.subalterno NULLS FIRST
+      `,
+      [id],
+    );
+
+    return parcelsResult.rows.map((parcel) => ({
+      parcelId: parcel.parcel_id,
+      comune: parcel.comune,
+      foglio: parcel.foglio,
+      particella: parcel.particella,
+      subalterno: parcel.subalterno,
+      relationType: parcel.relation_type,
+      title: parcel.title,
+      quota: parcel.quota !== null ? Number(parcel.quota) : null,
+    }));
   }
 
   private async buildSubjectResponse(subject: SubjectRow): Promise<SubjectResponseDto> {

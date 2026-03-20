@@ -38,6 +38,7 @@ npm run dev
 - `GET /api/v1/subjects/{id}`
 - `GET /api/v1/subjects/by-cuua/{cuua}`
 - `GET /api/v1/subjects/{id}/history`
+- `GET /api/v1/subjects/{id}/parcels`
 - `GET /api/v1/ingestion/runs`
 - `GET /api/v1/ingestion/runs/{id}`
 - `POST /api/v1/ingestion/connectors/{connectorName}/run`
