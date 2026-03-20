@@ -42,3 +42,7 @@ npm run dev
 - `GET /api/v1/ingestion/runs/{id}`
 - `POST /api/v1/ingestion/connectors/{connectorName}/run`
 - `GET /api/v1/audit/events`
+- `GET /api/v1/parcels`
+- `GET /api/v1/parcels/{id}`
+- `GET /api/v1/parcels/{id}/subjects`
+- `GET /api/v1/search?q=...`
