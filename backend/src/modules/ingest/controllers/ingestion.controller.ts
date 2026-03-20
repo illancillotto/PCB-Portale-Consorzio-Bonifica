@@ -11,13 +11,13 @@ export class IngestionController {
   constructor(private readonly ingestService: IngestService) {}
 
   @Get('runs')
-  listRuns(): { items: IngestionRunResponseDto[]; total: number } {
+  async listRuns(): Promise<{ items: IngestionRunResponseDto[]; total: number }> {
     return this.ingestService.listRuns();
   }
 
   @Get('runs/:id')
-  getRunById(@Param('id') id: string): IngestionRunResponseDto {
-    const run = this.ingestService.getRunById(id);
+  async getRunById(@Param('id') id: string): Promise<IngestionRunResponseDto> {
+    const run = await this.ingestService.getRunById(id);
 
     if (!run) {
       throw new NotFoundException(`Ingestion run not found for id ${id}`);
@@ -27,7 +27,9 @@ export class IngestionController {
   }
 
   @Post('connectors/:connectorName/run')
-  startRun(@Param('connectorName') connectorName: string): StartIngestionRunResponseDto {
+  async startRun(
+    @Param('connectorName') connectorName: string,
+  ): Promise<StartIngestionRunResponseDto> {
     return this.ingestService.startManualRun(connectorName);
   }
 }

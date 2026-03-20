@@ -10,13 +10,13 @@ export class SubjectsController {
   constructor(private readonly anagraficheService: AnagraficheService) {}
 
   @Get()
-  listSubjects(@Query() query: ListSubjectsQueryDto) {
+  async listSubjects(@Query() query: ListSubjectsQueryDto) {
     return this.anagraficheService.listSubjects(query);
   }
 
   @Get('by-cuua/:cuua')
-  getByCuua(@Param('cuua') cuua: string) {
-    const subject = this.anagraficheService.getByCuua(cuua);
+  async getByCuua(@Param('cuua') cuua: string) {
+    const subject = await this.anagraficheService.getByCuua(cuua);
 
     if (!subject) {
       throw new NotFoundException(`Subject not found for CUUA ${cuua}`);
@@ -26,8 +26,8 @@ export class SubjectsController {
   }
 
   @Get(':id')
-  getById(@Param('id') id: string) {
-    const subject = this.anagraficheService.getById(id);
+  async getById(@Param('id') id: string) {
+    const subject = await this.anagraficheService.getById(id);
 
     if (!subject) {
       throw new NotFoundException(`Subject not found for id ${id}`);
@@ -37,8 +37,8 @@ export class SubjectsController {
   }
 
   @Get(':id/history')
-  getHistory(@Param('id') id: string) {
-    const history = this.anagraficheService.getHistory(id);
+  async getHistory(@Param('id') id: string) {
+    const history = await this.anagraficheService.getHistory(id);
 
     if (!history) {
       throw new NotFoundException(`Subject history not found for id ${id}`);

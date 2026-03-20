@@ -20,6 +20,7 @@ Backend NestJS organizzato come modular monolith.
 - placeholder Keycloak isolato nel modulo `auth`
 - nessuna logica connector nel backend applicativo
 - predisposizione per separazione `raw` / `normalized` / `master`
+- accesso DB esplicito con `pg`, senza ORM in questa fase
 
 ## Comandi
 
