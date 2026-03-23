@@ -103,6 +103,11 @@ export default async function GisPage({ searchParams }: GisPageProps) {
                   <p className="mt-1 break-all text-xs text-[var(--pcb-muted)]">
                     {publicationStatus.serviceUrl || 'non configurato'}
                   </p>
+                  {publicationStatus.projectFile ? (
+                    <p className="mt-1 break-all text-[11px] text-[var(--pcb-muted)]">
+                      Progetto {publicationStatus.projectFile}
+                    </p>
+                  ) : null}
                 </div>
                 <StatusChip label={publicationStatus.statusLabel} />
               </div>
@@ -113,6 +118,14 @@ export default async function GisPage({ searchParams }: GisPageProps) {
                     ? 'QGIS Server non ancora raggiungibile o non pronto'
                     : 'QGIS Server non configurato'}
               </p>
+              {publicationStatus.statusDetail ? (
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">{publicationStatus.statusDetail}</p>
+              ) : null}
+              {publicationStatus.capabilitiesUrl ? (
+                <p className="mt-2 break-all text-[11px] text-[var(--pcb-muted)]">
+                  Capabilities {publicationStatus.capabilitiesUrl}
+                </p>
+              ) : null}
             </div>
             <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4 text-sm text-[var(--pcb-muted)]">
               Feature mappate: <strong className="text-[var(--pcb-ink)]">{displayedFeatures.length}</strong>

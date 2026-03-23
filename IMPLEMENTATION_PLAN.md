@@ -210,7 +210,7 @@ Obiettivo:
 
 Stato:
 
-- in corso
+- completata
 
 Deliverable previsti:
 
@@ -218,6 +218,20 @@ Deliverable previsti:
 - endpoint GIS base
 - prima vista mappa frontend
 - linking tra particelle e soggetti
+- publication status QGIS verificato su route pubblico `/ows/`
+
+Stato attuale:
+
+- completato catalogo layer
+- completati endpoint GIS protetti
+- completata vista mappa frontend reale
+- completati deep-link contestuali soggetto/particella
+- completato monitoraggio publication target QGIS con `GetCapabilities` reale sul progetto bootstrap
+
+Dipendenze:
+
+- M2 completata
+- Keycloak operativo per route protette
 
 Stato attuale:
 

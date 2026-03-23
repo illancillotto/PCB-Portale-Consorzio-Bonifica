@@ -53,15 +53,21 @@ export class GisService {
 
   async getPublicationStatus(): Promise<GisPublicationStatusResponseDto> {
     const serviceUrl = process.env.PCB_QGIS_SERVER_URL ?? '';
+    const projectFile = process.env.PCB_QGIS_PROJECT_FILE ?? '';
 
-    if (!serviceUrl) {
+    if (!serviceUrl || !projectFile) {
       return {
         publicationTarget: 'qgis-server',
         serviceUrl,
+        capabilitiesUrl: null,
+        projectFile: projectFile || null,
         configured: false,
         available: false,
         statusCode: null,
         statusLabel: 'not_configured',
+        statusDetail: !serviceUrl
+          ? 'PCB_QGIS_SERVER_URL non configurato'
+          : 'PCB_QGIS_PROJECT_FILE non configurato',
         checkedAt: new Date().toISOString(),
       };
     }
@@ -69,6 +75,7 @@ export class GisService {
     const requestUrl = new URL(serviceUrl);
     requestUrl.searchParams.set('SERVICE', 'WMS');
     requestUrl.searchParams.set('REQUEST', 'GetCapabilities');
+    requestUrl.searchParams.set('MAP', projectFile);
 
     try {
       const response = await fetch(requestUrl, {
@@ -80,20 +87,26 @@ export class GisService {
       return {
         publicationTarget: 'qgis-server',
         serviceUrl,
+        capabilitiesUrl: requestUrl.toString(),
+        projectFile,
         configured: true,
         available: response.ok,
         statusCode: response.status,
         statusLabel: response.ok ? 'ok' : 'unavailable',
+        statusDetail: response.ok ? 'GetCapabilities raggiungibile' : 'GetCapabilities non disponibile',
         checkedAt: new Date().toISOString(),
       };
     } catch {
       return {
         publicationTarget: 'qgis-server',
         serviceUrl,
+        capabilitiesUrl: requestUrl.toString(),
+        projectFile,
         configured: true,
         available: false,
         statusCode: null,
         statusLabel: 'unavailable',
+        statusDetail: 'Errore di connessione verso QGIS Server',
         checkedAt: new Date().toISOString(),
       };
     }

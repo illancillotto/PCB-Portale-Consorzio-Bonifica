@@ -50,6 +50,7 @@ services:
       - "${PCB_QGIS_PORT:-8090}:80"
     volumes:
       - ./infra/qgis/projects:/io/projects
+      - ./infra/qgis/plugins:/io/plugins
 
 volumes:
   pcb-postgres-data:

@@ -196,13 +196,14 @@ Nota:
 - Audit passaggi automatici ingest: completato
 - Redis operativo backend: completato
 - Keycloak realm import + JWT verification backend: completato
-- Keycloak protezione applicativa estesa: non iniziato
+- Keycloak protezione applicativa estesa: completato
+- QGIS publication target: operativo con `GetCapabilities` verificato
 
 ## Blocchi aperti
 
-- Keycloak e QGIS Server ancora predisposti ma non operativi
 - matching ancora rule-based, ma ora con priorita` `CUUA/identifier`, `source-link` e `canonical-name`
-- viewer cartografico GIS non ancora implementato
+- manca ancora una pubblicazione QGIS con layer tematici reali oltre al bootstrap project
+- manca ancora un collegamento frontend diretto a servizi QGIS pubblicati oltre al monitoraggio dello stato
 
 ### 2026-03-20 – Frontend M3 prima integrazione reale
 
@@ -665,3 +666,29 @@ Verifiche eseguite:
   - `recordsPersisted = 7`
   - `ingest.ingestion_run` da `3` a `4`
   - `ingest.ingestion_record_raw` da `0` a `7`
+
+### 2026-03-23 – QGIS publication target operativo
+
+Completato:
+
+- allineamento del route pubblico QGIS a `/ows/`
+- verifica backend `gis/publication-status` con `MAP=/io/projects/pcb.qgs`
+- progetto bootstrap `infra/qgis/projects/pcb.qgs` pubblicabile
+- volume `infra/qgis/plugins` versionato per eliminare warning runtime del container
+- diagnostica frontend/backend arricchita con:
+  - `capabilitiesUrl`
+  - `projectFile`
+  - `statusDetail`
+
+Verifiche eseguite:
+
+- `docker compose up -d --force-recreate pcb-qgis-server`
+- `curl http://127.0.0.1:8090/ows/?SERVICE=WMS&REQUEST=GetCapabilities&MAP=/io/projects/pcb.qgs`
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
+- `GET /api/v1/gis/publication-status` verificato con token Keycloak reale:
+  - `statusLabel = ok`
+  - `statusCode = 200`
+  - `available = true`

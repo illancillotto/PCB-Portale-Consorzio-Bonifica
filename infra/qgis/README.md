@@ -8,5 +8,6 @@ Stato corrente:
 - la vista frontend `/gis` mostra lo stato del publication target `qgis-server`
 - il container `pcb-qgis-server` puo` richiedere un pull iniziale molto pesante
 - il progetto minimo pubblicabile e` `infra/qgis/projects/pcb.qgs`
+- il publication target pubblico previsto e` `http://localhost:8090/ows/` con parametro `MAP=/io/projects/pcb.qgs`
 
 Il progetto QGIS ufficiale resta ancora da consolidare; per ora il publication target usa un progetto minimale di bootstrap, sufficiente per chiudere il wiring compose/backend/frontend.

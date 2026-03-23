@@ -28,7 +28,7 @@
           <value>Consorzio Bonifica</value>
           <value>GIS</value>
         </KeywordList>
-        <OnlineResource xlink:href="http://localhost:8090/cgi-bin/qgis_mapserv.fcgi" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+        <OnlineResource xlink:href="http://localhost:8090/ows/" xmlns:xlink="http://www.w3.org/1999/xlink"/>
         <ContactInformation>
           <ContactPersonPrimary>
             <ContactPerson>PCB Technical Team</ContactPerson>
