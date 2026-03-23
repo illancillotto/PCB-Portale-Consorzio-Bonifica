@@ -1023,3 +1023,15 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Filtri stage nel monitor ingestion
+
+Completato:
+
+- filtri URL-shareable per stage `acquisition` e `post-processing` nella lista run
+- preservazione dei filtri esistenti su `status` e `connector`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

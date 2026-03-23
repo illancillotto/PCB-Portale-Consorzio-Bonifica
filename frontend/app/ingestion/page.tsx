@@ -16,6 +16,10 @@ interface IngestionPageProps {
   searchParams?: Promise<{
     status?: string;
     connector?: string;
+    acquisitionStage?: 'queued' | 'running' | 'completed' | 'failed';
+    postProcessingStage?: 'not_configured' | 'queued' | 'running' | 'completed' | 'failed';
+    normalizationStage?: 'not_started' | 'running' | 'completed' | 'failed';
+    matchingStage?: 'not_started' | 'running' | 'completed' | 'failed';
     connectorOperationalStatus?: 'healthy' | 'warning' | 'critical';
     connectorTriggerMode?: 'manual' | 'scheduled';
     issueConnector?: string;
@@ -24,7 +28,14 @@ interface IngestionPageProps {
   }>;
 }
 
-function buildRunsFilterHref(filters: { status?: string; connector?: string }) {
+function buildRunsFilterHref(filters: {
+  status?: string;
+  connector?: string;
+  acquisitionStage?: 'queued' | 'running' | 'completed' | 'failed';
+  postProcessingStage?: 'not_configured' | 'queued' | 'running' | 'completed' | 'failed';
+  normalizationStage?: 'not_started' | 'running' | 'completed' | 'failed';
+  matchingStage?: 'not_started' | 'running' | 'completed' | 'failed';
+}) {
   const params = new URLSearchParams();
 
   if (filters.status) {
@@ -33,6 +44,22 @@ function buildRunsFilterHref(filters: { status?: string; connector?: string }) {
 
   if (filters.connector) {
     params.set('connector', filters.connector);
+  }
+
+  if (filters.acquisitionStage) {
+    params.set('acquisitionStage', filters.acquisitionStage);
+  }
+
+  if (filters.postProcessingStage) {
+    params.set('postProcessingStage', filters.postProcessingStage);
+  }
+
+  if (filters.normalizationStage) {
+    params.set('normalizationStage', filters.normalizationStage);
+  }
+
+  if (filters.matchingStage) {
+    params.set('matchingStage', filters.matchingStage);
   }
 
   const queryString = params.toString();
@@ -107,6 +134,28 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
     }
 
     if (filters.connector && run.connectorName !== filters.connector) {
+      return false;
+    }
+
+    if (filters.acquisitionStage && run.stages.acquisition.status !== filters.acquisitionStage) {
+      return false;
+    }
+
+    if (
+      filters.postProcessingStage &&
+      run.stages.postProcessing.status !== filters.postProcessingStage
+    ) {
+      return false;
+    }
+
+    if (
+      filters.normalizationStage &&
+      run.stages.normalization.status !== filters.normalizationStage
+    ) {
+      return false;
+    }
+
+    if (filters.matchingStage && run.stages.matching.status !== filters.matchingStage) {
       return false;
     }
 
@@ -573,7 +622,13 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
       <SectionCard title="Run disponibili" eyebrow="Ingestion">
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
-            href={buildRunsFilterHref({ connector: filters.connector })}
+            href={buildRunsFilterHref({
+              connector: filters.connector,
+              acquisitionStage: filters.acquisitionStage,
+              postProcessingStage: filters.postProcessingStage,
+              normalizationStage: filters.normalizationStage,
+              matchingStage: filters.matchingStage,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.status
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -585,7 +640,14 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
           {['queued', 'completed', 'failed'].map((status) => (
             <Link
               key={status}
-              href={buildRunsFilterHref({ status, connector: filters.connector })}
+              href={buildRunsFilterHref({
+                status,
+                connector: filters.connector,
+                acquisitionStage: filters.acquisitionStage,
+                postProcessingStage: filters.postProcessingStage,
+                normalizationStage: filters.normalizationStage,
+                matchingStage: filters.matchingStage,
+              })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.status === status
                   ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -598,7 +660,13 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
         </div>
         <div className="mb-6 flex flex-wrap gap-3">
           <Link
-            href={buildRunsFilterHref({ status: filters.status })}
+            href={buildRunsFilterHref({
+              status: filters.status,
+              acquisitionStage: filters.acquisitionStage,
+              postProcessingStage: filters.postProcessingStage,
+              normalizationStage: filters.normalizationStage,
+              matchingStage: filters.matchingStage,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.connector
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -610,7 +678,14 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
           {availableConnectors.map((connectorName) => (
             <Link
               key={connectorName}
-              href={buildRunsFilterHref({ status: filters.status, connector: connectorName })}
+              href={buildRunsFilterHref({
+                status: filters.status,
+                connector: connectorName,
+                acquisitionStage: filters.acquisitionStage,
+                postProcessingStage: filters.postProcessingStage,
+                normalizationStage: filters.normalizationStage,
+                matchingStage: filters.matchingStage,
+              })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.connector === connectorName
                   ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -618,6 +693,82 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
               }`}
             >
               {connectorName}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildRunsFilterHref({
+              status: filters.status,
+              connector: filters.connector,
+              postProcessingStage: filters.postProcessingStage,
+              normalizationStage: filters.normalizationStage,
+              matchingStage: filters.matchingStage,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.acquisitionStage
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Acquisition tutti
+          </Link>
+          {(['queued', 'running', 'completed', 'failed'] as const).map((stage) => (
+            <Link
+              key={stage}
+              href={buildRunsFilterHref({
+                status: filters.status,
+                connector: filters.connector,
+                acquisitionStage: stage,
+                postProcessingStage: filters.postProcessingStage,
+                normalizationStage: filters.normalizationStage,
+                matchingStage: filters.matchingStage,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.acquisitionStage === stage
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              acq {stage}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildRunsFilterHref({
+              status: filters.status,
+              connector: filters.connector,
+              acquisitionStage: filters.acquisitionStage,
+              normalizationStage: filters.normalizationStage,
+              matchingStage: filters.matchingStage,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.postProcessingStage
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Post tutti
+          </Link>
+          {(['not_configured', 'queued', 'running', 'completed', 'failed'] as const).map((stage) => (
+            <Link
+              key={stage}
+              href={buildRunsFilterHref({
+                status: filters.status,
+                connector: filters.connector,
+                acquisitionStage: filters.acquisitionStage,
+                postProcessingStage: stage,
+                normalizationStage: filters.normalizationStage,
+                matchingStage: filters.matchingStage,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.postProcessingStage === stage
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              post {stage}
             </Link>
           ))}
         </div>

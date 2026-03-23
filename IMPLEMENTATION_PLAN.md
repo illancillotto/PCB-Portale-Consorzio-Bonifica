@@ -463,6 +463,7 @@ Estensioni completate:
 - chaining opzionale `run -> normalize -> match` orchestrato dal backend sulla stessa run
 - il trigger frontend apre direttamente il dettaglio della run per seguire il chaining asincrono
 - monitor e dettaglio run mostrano esplicitamente gli stage di pipeline della singola run
+- il monitor run supporta filtri stage URL-shareable per lettura operativa piu` rapida
 
 ## Criteri di done per ogni milestone
 
