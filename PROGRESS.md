@@ -996,3 +996,15 @@ Verifiche eseguite:
 
 - `npm run lint --workspace backend`
 - `npm run build --workspace backend`
+
+### 2026-03-23 – Redirect frontend al dettaglio run
+
+Completato:
+
+- il trigger manuale frontend porta direttamente alla run appena creata
+- il redirect sfrutta l'auto-refresh gia` presente sul dettaglio per seguire acquisition, normalization e matching
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

@@ -461,6 +461,7 @@ Estensioni completate:
 - trigger manuale backend collegato al CLI reale del connector NAS con riuso della stessa `ingestion_run`
 - auto-refresh delle viste operative `ingestion` per run asincrone `queued/running`
 - chaining opzionale `run -> normalize -> match` orchestrato dal backend sulla stessa run
+- il trigger frontend apre direttamente il dettaglio della run per seguire il chaining asincrono
 
 ## Criteri di done per ogni milestone
 

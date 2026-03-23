@@ -9,6 +9,19 @@ interface IngestionRunTriggerProps {
   disabledReason?: string;
 }
 
+interface StartIngestionRunResponse {
+  id: string;
+  connectorName: string;
+  sourceSystem: string;
+  status: string;
+  startedAt: string;
+  executionMode: 'manual';
+  postProcessing?: {
+    autoNormalize: boolean;
+    autoMatch: boolean;
+  };
+}
+
 export function IngestionRunTrigger({
   connectorName,
   disabled = false,
@@ -38,6 +51,8 @@ export function IngestionRunTrigger({
         throw new Error(`Run request failed with status ${response.status}`);
       }
 
+      const run = (await response.json()) as StartIngestionRunResponse;
+      router.push(`/ingestion/${run.id}`);
       router.refresh();
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : 'Run request failed');
