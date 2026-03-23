@@ -4,6 +4,7 @@ import { AuditService } from '../audit/audit.service';
 import { DatabaseService } from '../core/database/database.service';
 import { RedisService } from '../core/redis/redis.service';
 import { IngestionRunResponseDto } from './dto/ingestion-run-response.dto';
+import { IngestionConnectorCatalogResponseDto } from './dto/connector-catalog-response.dto';
 import { MatchingResultResponseDto } from './dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from './dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from './dto/normalized-record-response.dto';
@@ -62,6 +63,26 @@ interface MatchingCandidateRow {
   source_url: string | null;
 }
 
+interface ConnectorCatalogEntry {
+  connectorName: string;
+  sourceSystem: string;
+  displayName: string;
+  domain: string;
+  triggerMode: 'manual' | 'scheduled';
+  capabilities: Array<'acquisition' | 'raw_ingest' | 'normalization' | 'matching'>;
+}
+
+const connectorCatalog: ConnectorCatalogEntry[] = [
+  {
+    connectorName: 'connector-nas-catasto',
+    sourceSystem: 'nas-catasto',
+    displayName: 'NAS Catasto',
+    domain: 'catasto-documentale',
+    triggerMode: 'manual',
+    capabilities: ['acquisition', 'raw_ingest', 'normalization', 'matching'],
+  },
+];
+
 @Injectable()
 export class IngestService {
   constructor(
@@ -99,6 +120,58 @@ export class IngestService {
     };
   }
 
+  async listConnectorCatalog(): Promise<{
+    items: IngestionConnectorCatalogResponseDto[];
+    total: number;
+  }> {
+    const latestRunsResult = await this.databaseService.query<IngestionRunRow>(
+      `
+        SELECT DISTINCT ON (connector_name)
+          id,
+          connector_name,
+          source_system,
+          status,
+          started_at,
+          ended_at,
+          records_total,
+          records_success,
+          records_error,
+          log_excerpt
+        FROM ingest.ingestion_run
+        ORDER BY connector_name ASC, started_at DESC
+      `,
+    );
+
+    const latestRunByConnector = new Map(
+      latestRunsResult.rows.map((row) => [row.connector_name, row] as const),
+    );
+
+    return {
+      items: connectorCatalog.map((connector) => {
+        const latestRun = latestRunByConnector.get(connector.connectorName);
+
+        return {
+          connectorName: connector.connectorName,
+          sourceSystem: connector.sourceSystem,
+          displayName: connector.displayName,
+          domain: connector.domain,
+          triggerMode: connector.triggerMode,
+          capabilities: connector.capabilities,
+          writesToMasterData: false,
+          latestRun: latestRun
+            ? {
+                id: latestRun.id,
+                status: latestRun.status,
+                startedAt: new Date(latestRun.started_at).toISOString(),
+                endedAt: latestRun.ended_at ? new Date(latestRun.ended_at).toISOString() : null,
+              }
+            : null,
+        };
+      }),
+      total: connectorCatalog.length,
+    };
+  }
+
   async getRunById(id: string) {
     const result = await this.databaseService.query<IngestionRunRow>(
       `
@@ -125,6 +198,10 @@ export class IngestService {
   }
 
   async startManualRun(connectorName: string): Promise<StartIngestionRunResponseDto> {
+    if (!this.isSupportedConnector(connectorName)) {
+      throw new Error(`Unsupported connector ${connectorName}`);
+    }
+
     const runId = randomUUID();
     const sourceSystem = this.resolveSourceSystem(connectorName);
     const startedAt = new Date();
@@ -633,6 +710,10 @@ export class IngestService {
     }
 
     return 'external-system';
+  }
+
+  private isSupportedConnector(connectorName: string) {
+    return connectorCatalog.some((connector) => connector.connectorName === connectorName);
   }
 
   private mapRun(row: IngestionRunRow): IngestionRunResponseDto {

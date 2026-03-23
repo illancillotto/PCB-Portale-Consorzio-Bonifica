@@ -11,6 +11,7 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
 import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
 import { IngestService } from '../ingest.service';
+import { IngestionConnectorCatalogResponseDto } from '../dto/connector-catalog-response.dto';
 import { IngestionRunResponseDto } from '../dto/ingestion-run-response.dto';
 import { MatchingResultResponseDto } from '../dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from '../dto/normalize-run-response.dto';
@@ -26,6 +27,11 @@ import { StartIngestionRunResponseDto } from '../dto/start-ingestion-run-respons
 @Roles('pcb-operator')
 export class IngestionController {
   constructor(private readonly ingestService: IngestService) {}
+
+  @Get('connectors')
+  async listConnectors(): Promise<{ items: IngestionConnectorCatalogResponseDto[]; total: number }> {
+    return this.ingestService.listConnectorCatalog();
+  }
 
   @Get('runs')
   async listRuns(): Promise<{ items: IngestionRunResponseDto[]; total: number }> {

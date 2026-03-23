@@ -4,7 +4,7 @@ import { PageShell } from '../../components/page-shell';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
-import { getIngestionRuns } from '../../lib/api';
+import { getIngestionConnectors, getIngestionRuns } from '../../lib/api';
 
 interface IngestionPageProps {
   searchParams?: Promise<{
@@ -32,7 +32,10 @@ function buildRunsFilterHref(filters: { status?: string; connector?: string }) {
 export default async function IngestionPage({ searchParams }: IngestionPageProps) {
   const session = await requireOperatorSession();
   const filters = (await searchParams) ?? {};
-  const runs = await getIngestionRuns(session.accessToken);
+  const [runs, connectors] = await Promise.all([
+    getIngestionRuns(session.accessToken),
+    getIngestionConnectors(session.accessToken),
+  ]);
   const availableConnectors = Array.from(new Set(runs.items.map((run) => run.connectorName))).sort();
   const filteredRuns = runs.items.filter((run) => {
     if (filters.status && run.status !== filters.status) {
@@ -79,6 +82,44 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
               </p>
             ) : null}
           </article>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Catalogo connector" eyebrow="Orchestration">
+        <div className="grid gap-4 xl:grid-cols-2">
+          {connectors.items.map((connector) => (
+            <article
+              key={connector.connectorName}
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+            >
+              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">{connector.displayName}</h3>
+                  <p className="mt-1 text-sm text-[var(--pcb-muted)]">
+                    {connector.connectorName} · {connector.sourceSystem}
+                  </p>
+                </div>
+                <StatusChip label={connector.latestRun?.status ?? 'idle'} />
+              </div>
+              <p className="mt-3 text-sm text-[var(--pcb-muted)]">
+                Dominio {connector.domain} · trigger {connector.triggerMode}
+              </p>
+              <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+                Capacita`: {connector.capabilities.join(', ')}
+              </p>
+              <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+                Master data: {connector.writesToMasterData ? 'scrittura diretta' : 'mai scrittura diretta'}
+              </p>
+              {connector.latestRun ? (
+                <p className="mt-3 text-xs text-[var(--pcb-muted)]">
+                  Ultima run {new Date(connector.latestRun.startedAt).toLocaleString('it-IT')} ·{' '}
+                  <Link href={`/ingestion/${connector.latestRun.id}`} className="font-semibold text-[var(--pcb-accent)]">
+                    apri dettaglio
+                  </Link>
+                </p>
+              ) : null}
+            </article>
+          ))}
         </div>
       </SectionCard>
 

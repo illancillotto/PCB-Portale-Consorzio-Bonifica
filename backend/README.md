@@ -45,6 +45,7 @@ npm run dev
 - `GET /api/v1/subjects/{id}/parcels`
 - `GET /api/v1/subjects/{id}` include source links e documenti collegati
 - `GET /api/v1/ingestion/runs`
+- `GET /api/v1/ingestion/connectors`
 - `GET /api/v1/ingestion/runs/{id}`
 - `POST /api/v1/ingestion/runs/{id}/normalize`
 - `GET /api/v1/ingestion/runs/{id}/normalized-records`

@@ -99,6 +99,22 @@ export interface IngestionRun {
   logExcerpt: string;
 }
 
+export interface IngestionConnectorCatalogItem {
+  connectorName: string;
+  sourceSystem: string;
+  displayName: string;
+  domain: string;
+  triggerMode: 'manual' | 'scheduled';
+  capabilities: Array<'acquisition' | 'raw_ingest' | 'normalization' | 'matching'>;
+  writesToMasterData: false;
+  latestRun: {
+    id: string;
+    status: string;
+    startedAt: string;
+    endedAt: string | null;
+  } | null;
+}
+
 export interface NormalizedRecord {
   id: string;
   ingestionRunId: string;
@@ -293,6 +309,12 @@ export async function searchAll(query: string) {
 
 export async function getIngestionRuns(accessToken: string) {
   return apiFetch<PaginatedResponse<IngestionRun>>('/ingestion/runs', {
+    accessToken,
+  });
+}
+
+export async function getIngestionConnectors(accessToken: string) {
+  return apiFetch<PaginatedResponse<IngestionConnectorCatalogItem>>('/ingestion/connectors', {
     accessToken,
   });
 }
