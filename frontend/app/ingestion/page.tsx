@@ -15,6 +15,8 @@ interface IngestionPageProps {
   searchParams?: Promise<{
     status?: string;
     connector?: string;
+    issueSeverity?: 'warning' | 'critical';
+    issueType?: string;
   }>;
 }
 
@@ -34,13 +36,45 @@ function buildRunsFilterHref(filters: { status?: string; connector?: string }) {
   return queryString ? `/ingestion?${queryString}` : '/ingestion';
 }
 
+function buildIssueFilterHref(filters: {
+  status?: string;
+  connector?: string;
+  issueSeverity?: 'warning' | 'critical';
+  issueType?: string;
+}) {
+  const params = new URLSearchParams();
+
+  if (filters.status) {
+    params.set('status', filters.status);
+  }
+
+  if (filters.connector) {
+    params.set('connector', filters.connector);
+  }
+
+  if (filters.issueSeverity) {
+    params.set('issueSeverity', filters.issueSeverity);
+  }
+
+  if (filters.issueType) {
+    params.set('issueType', filters.issueType);
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `/ingestion?${queryString}` : '/ingestion';
+}
+
 export default async function IngestionPage({ searchParams }: IngestionPageProps) {
   const session = await requireOperatorSession();
   const filters = (await searchParams) ?? {};
   const [runs, connectors, connectorIssues, orchestrationSummary] = await Promise.all([
     getIngestionRuns(session.accessToken),
     getIngestionConnectors(session.accessToken),
-    getIngestionConnectorIssues(session.accessToken),
+    getIngestionConnectorIssues(session.accessToken, {
+      severity: filters.issueSeverity,
+      issueType: filters.issueType,
+    }),
     getIngestionOrchestrationSummary(session.accessToken),
   ]);
   const availableConnectors = Array.from(new Set(runs.items.map((run) => run.connectorName))).sort();
@@ -225,6 +259,72 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
       </SectionCard>
 
       <SectionCard title="Issue operative connector" eyebrow="Attention">
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildIssueFilterHref({ status: filters.status, connector: filters.connector })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.issueSeverity
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutte le severity
+          </Link>
+          {(['critical', 'warning'] as const).map((severity) => (
+            <Link
+              key={severity}
+              href={buildIssueFilterHref({
+                status: filters.status,
+                connector: filters.connector,
+                issueSeverity: severity,
+                issueType: filters.issueType,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.issueSeverity === severity
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {severity}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-6 flex flex-wrap gap-3">
+          <Link
+            href={buildIssueFilterHref({
+              status: filters.status,
+              connector: filters.connector,
+              issueSeverity: filters.issueSeverity,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.issueType
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti i tipi
+          </Link>
+          {['not_configured', 'not_runnable', 'dry_run_only', 'latest_run_failed', 'no_completed_runs'].map(
+            (issueType) => (
+              <Link
+                key={issueType}
+                href={buildIssueFilterHref({
+                  status: filters.status,
+                  connector: filters.connector,
+                  issueSeverity: filters.issueSeverity,
+                  issueType,
+                })}
+                className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                  filters.issueType === issueType
+                    ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                    : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+                }`}
+              >
+                {issueType}
+              </Link>
+            ),
+          )}
+        </div>
         {connectorIssues.total === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">
             Nessuna issue operativa rilevata sui connector registrati.

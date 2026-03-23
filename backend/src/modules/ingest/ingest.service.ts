@@ -333,6 +333,35 @@ export class IngestService {
     };
   }
 
+  async listConnectorOperationalIssuesFiltered(filters?: {
+    severity?: 'warning' | 'critical';
+    issueType?: string;
+  }): Promise<{
+    items: IngestionConnectorIssueResponseDto[];
+    total: number;
+  }> {
+    const issues = await this.listConnectorOperationalIssues();
+    const severity = filters?.severity?.trim();
+    const issueType = filters?.issueType?.trim();
+
+    const items = issues.items.filter((item) => {
+      if (severity && item.severity !== severity) {
+        return false;
+      }
+
+      if (issueType && item.issueType !== issueType) {
+        return false;
+      }
+
+      return true;
+    });
+
+    return {
+      items,
+      total: items.length,
+    };
+  }
+
   async getConnectorDetail(
     connectorName: string,
   ): Promise<IngestionConnectorDetailResponseDto | null> {

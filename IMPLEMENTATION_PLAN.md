@@ -258,6 +258,7 @@ Stato attuale:
 - completato filtro `status` sulle run per singolo connector
 - completato elenco issue operative dei connector nel monitor ingestion
 - completata esposizione cross-domain delle issue connector in `operations`
+- completati filtri operativi sulle issue connector nel monitor ingestion
 - completato riepilogo audit con filtri operativi dedicati
 - completata osservabilita` cross-domain nella vista `operations`
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella

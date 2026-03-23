@@ -229,6 +229,7 @@ Nota:
 - filtro `status` sulle run del singolo connector, applicato lato backend e frontend: completato
 - endpoint e vista per issue operative dei connector nel monitor ingestion: completato
 - vista `operations` estesa con issue connector cross-domain: completato
+- filtri backend/frontend sulle issue operative dei connector nel monitor ingestion: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

@@ -408,10 +408,31 @@ export async function getIngestionConnectors(accessToken: string) {
   });
 }
 
-export async function getIngestionConnectorIssues(accessToken: string) {
-  return apiFetch<PaginatedResponse<IngestionConnectorIssue>>('/ingestion/connectors/issues', {
-    accessToken,
-  });
+export async function getIngestionConnectorIssues(
+  accessToken: string,
+  filters?: {
+    severity?: 'warning' | 'critical';
+    issueType?: string;
+  },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.severity) {
+    params.set('severity', filters.severity);
+  }
+
+  if (filters?.issueType) {
+    params.set('issueType', filters.issueType);
+  }
+
+  const queryString = params.toString();
+
+  return apiFetch<PaginatedResponse<IngestionConnectorIssue>>(
+    `/ingestion/connectors/issues${queryString ? `?${queryString}` : ''}`,
+    {
+      accessToken,
+    },
+  );
 }
 
 export async function getIngestionConnectorDetail(connectorName: string, accessToken: string) {

@@ -50,6 +50,7 @@ npm run dev
 - `GET /api/v1/ingestion/connectors/{connectorName}/runs`
   supporta filtro query `status`
 - `GET /api/v1/ingestion/connectors/issues`
+  supporta filtri query `severity` e `issueType`
 - `GET /api/v1/ingestion/orchestration-summary`
 - `GET /api/v1/ingestion/runs/{id}`
 - `POST /api/v1/ingestion/runs/{id}/normalize`
