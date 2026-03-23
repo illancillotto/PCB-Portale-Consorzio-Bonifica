@@ -235,6 +235,7 @@ Nota:
 - filtro `connectorName` sulle issue connector, esposto in backend e nelle viste `ingestion` e `operations`: completato
 - catalogo e dettaglio connector arricchiti con contatori issue aperte: completato
 - dettaglio connector arricchito con elenco issue aperte e filtro per severity: completato
+- endpoint dettaglio connector esteso con elenco issue aperte, eliminando il fetch frontend separato: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

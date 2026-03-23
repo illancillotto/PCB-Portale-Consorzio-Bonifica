@@ -183,6 +183,7 @@ export interface IngestionConnectorDetail {
     critical: number;
     warning: number;
   };
+  issues: IngestionConnectorIssue[];
 }
 
 export interface IngestionConnectorIssue {

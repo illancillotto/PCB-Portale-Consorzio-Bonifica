@@ -80,6 +80,7 @@ Note matching:
 - `GET /api/v1/ingestion/orchestration-summary` espone anche conteggi sintetici su issue connector (`critical`, `warning`, `blocked`, `dry-run`)
 - `GET /api/v1/ingestion/connectors/{connectorName}` espone anche storico operativo sintetico (`lastCompletedRun`, `lastFailedRun`, contatori record)
 - `GET /api/v1/ingestion/connectors` e `GET /api/v1/ingestion/connectors/{connectorName}` espongono anche contatori di issue aperte
+- `GET /api/v1/ingestion/connectors/{connectorName}` espone anche l’elenco issue del singolo connector
 - `GET /api/v1/parcels`
 - `GET /api/v1/parcels/{id}`
 - `GET /api/v1/parcels/{id}/subjects`

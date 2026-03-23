@@ -485,6 +485,7 @@ export class IngestService {
         recordsErroredTotal: runsResult.rows.reduce((total, row) => total + row.records_error, 0),
       },
       issueCounters,
+      issues: connectorIssues.items,
     };
   }
 

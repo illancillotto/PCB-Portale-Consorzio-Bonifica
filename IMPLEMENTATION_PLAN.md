@@ -264,6 +264,7 @@ Stato attuale:
 - completato filtro per singolo connector sulle issue operative cross-domain
 - completati contatori issue per singolo connector nel catalogo e nel dettaglio ingestion
 - completato elenco issue aperte nel dettaglio connector con filtro per severity
+- completato consolidamento del payload `connector detail` con issue aperte incluse
 - completato riepilogo audit con filtri operativi dedicati
 - completata osservabilita` cross-domain nella vista `operations`
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella

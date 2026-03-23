@@ -7,7 +7,6 @@ import { StatusChip } from '../../../../components/status-chip';
 import { requireOperatorSession } from '../../../../lib/auth';
 import {
   getIngestionConnectorDetail,
-  getIngestionConnectorIssues,
   getIngestionConnectorRuns,
 } from '../../../../lib/api';
 
@@ -64,9 +63,12 @@ export default async function ConnectorDetailPage({
   const runs = await getIngestionConnectorRuns(connector.connectorName, session.accessToken, {
     status: filters.status,
   });
-  const connectorIssues = await getIngestionConnectorIssues(session.accessToken, {
-    connectorName: connector.connectorName,
-    severity: filters.issueSeverity,
+  const connectorIssues = connector.issues.filter((issue) => {
+    if (filters.issueSeverity && issue.severity !== filters.issueSeverity) {
+      return false;
+    }
+
+    return true;
   });
   const connectorRuns = runs.items;
 
@@ -231,11 +233,11 @@ export default async function ConnectorDetailPage({
             </Link>
           ))}
         </div>
-        {connectorIssues.total === 0 ? (
+        {connectorIssues.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">Nessuna issue aperta per il connector corrente.</p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {connectorIssues.items.map((issue, index) => (
+            {connectorIssues.map((issue, index) => (
               <article
                 key={`${issue.issueType}-${index}`}
                 className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
