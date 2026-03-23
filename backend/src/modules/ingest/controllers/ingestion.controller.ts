@@ -14,6 +14,7 @@ import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
 import { IngestService } from '../ingest.service';
 import { IngestionConnectorCatalogResponseDto } from '../dto/connector-catalog-response.dto';
 import { IngestionConnectorDetailResponseDto } from '../dto/connector-detail-response.dto';
+import { IngestionConnectorIssueResponseDto } from '../dto/connector-issue-response.dto';
 import { IngestionRunResponseDto } from '../dto/ingestion-run-response.dto';
 import { MatchingResultResponseDto } from '../dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from '../dto/normalize-run-response.dto';
@@ -35,6 +36,14 @@ export class IngestionController {
   @Get('connectors')
   async listConnectors(): Promise<{ items: IngestionConnectorCatalogResponseDto[]; total: number }> {
     return this.ingestService.listConnectorCatalog();
+  }
+
+  @Get('connectors/issues')
+  async listConnectorOperationalIssues(): Promise<{
+    items: IngestionConnectorIssueResponseDto[];
+    total: number;
+  }> {
+    return this.ingestService.listConnectorOperationalIssues();
   }
 
   @Get('connectors/:connectorName')

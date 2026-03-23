@@ -227,6 +227,7 @@ Nota:
 - dettaglio connector con storico operativo sintetico su esecuzioni e volumi: completato
 - endpoint backend dedicato alle run del singolo connector e dettaglio frontend disaccoppiato dal fetch globale delle run: completato
 - filtro `status` sulle run del singolo connector, applicato lato backend e frontend: completato
+- endpoint e vista per issue operative dei connector nel monitor ingestion: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

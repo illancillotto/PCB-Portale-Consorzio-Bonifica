@@ -7,6 +7,7 @@ import { RedisService } from '../core/redis/redis.service';
 import { IngestionRunResponseDto } from './dto/ingestion-run-response.dto';
 import { IngestionConnectorCatalogResponseDto } from './dto/connector-catalog-response.dto';
 import { IngestionConnectorDetailResponseDto } from './dto/connector-detail-response.dto';
+import { IngestionConnectorIssueResponseDto } from './dto/connector-issue-response.dto';
 import { MatchingResultResponseDto } from './dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from './dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from './dto/normalized-record-response.dto';
@@ -224,6 +225,111 @@ export class IngestService {
         };
       }),
       total: connectorCatalog.length,
+    };
+  }
+
+  async listConnectorOperationalIssues(): Promise<{
+    items: IngestionConnectorIssueResponseDto[];
+    total: number;
+  }> {
+    const latestRunsResult = await this.databaseService.query<IngestionRunRow>(
+      `
+        SELECT DISTINCT ON (connector_name)
+          id,
+          connector_name,
+          source_system,
+          status,
+          started_at,
+          ended_at,
+          records_total,
+          records_success,
+          records_error,
+          log_excerpt
+        FROM ingest.ingestion_run
+        ORDER BY connector_name ASC, started_at DESC
+      `,
+    );
+
+    const latestRunByConnector = new Map(
+      latestRunsResult.rows.map((row) => [row.connector_name, row] as const),
+    );
+
+    const items: IngestionConnectorIssueResponseDto[] = [];
+
+    for (const connector of connectorCatalog) {
+      const readiness = this.getConnectorExecutionReadiness(connector.connectorName);
+      const latestRun = latestRunByConnector.get(connector.connectorName) ?? null;
+
+      if (!readiness.configured) {
+        items.push({
+          connectorName: connector.connectorName,
+          sourceSystem: connector.sourceSystem,
+          displayName: connector.displayName,
+          severity: 'critical',
+          issueType: 'not_configured',
+          detail: readiness.detail,
+          latestRunId: latestRun?.id ?? null,
+          latestRunStatus: latestRun?.status ?? null,
+        });
+        continue;
+      }
+
+      if (!readiness.runnable) {
+        items.push({
+          connectorName: connector.connectorName,
+          sourceSystem: connector.sourceSystem,
+          displayName: connector.displayName,
+          severity: 'critical',
+          issueType: 'not_runnable',
+          detail: readiness.detail,
+          latestRunId: latestRun?.id ?? null,
+          latestRunStatus: latestRun?.status ?? null,
+        });
+      }
+
+      if (readiness.runnable && !readiness.persistenceEnabled) {
+        items.push({
+          connectorName: connector.connectorName,
+          sourceSystem: connector.sourceSystem,
+          displayName: connector.displayName,
+          severity: 'warning',
+          issueType: 'dry_run_only',
+          detail: 'Connector eseguibile ma in sola modalita` dry-run.',
+          latestRunId: latestRun?.id ?? null,
+          latestRunStatus: latestRun?.status ?? null,
+        });
+      }
+
+      if (latestRun?.status === 'failed') {
+        items.push({
+          connectorName: connector.connectorName,
+          sourceSystem: connector.sourceSystem,
+          displayName: connector.displayName,
+          severity: 'critical',
+          issueType: 'latest_run_failed',
+          detail: latestRun.log_excerpt ?? 'Ultima run terminata con stato failed.',
+          latestRunId: latestRun.id,
+          latestRunStatus: latestRun.status,
+        });
+      }
+
+      if (!latestRun || latestRun.status !== 'completed') {
+        items.push({
+          connectorName: connector.connectorName,
+          sourceSystem: connector.sourceSystem,
+          displayName: connector.displayName,
+          severity: 'warning',
+          issueType: 'no_completed_runs',
+          detail: 'Nessuna run completata disponibile per il connector corrente.',
+          latestRunId: latestRun?.id ?? null,
+          latestRunStatus: latestRun?.status ?? null,
+        });
+      }
+    }
+
+    return {
+      items,
+      total: items.length,
     };
   }
 

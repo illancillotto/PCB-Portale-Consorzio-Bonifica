@@ -6,6 +6,7 @@ import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
 import {
   getIngestionConnectors,
+  getIngestionConnectorIssues,
   getIngestionOrchestrationSummary,
   getIngestionRuns,
 } from '../../lib/api';
@@ -36,9 +37,10 @@ function buildRunsFilterHref(filters: { status?: string; connector?: string }) {
 export default async function IngestionPage({ searchParams }: IngestionPageProps) {
   const session = await requireOperatorSession();
   const filters = (await searchParams) ?? {};
-  const [runs, connectors, orchestrationSummary] = await Promise.all([
+  const [runs, connectors, connectorIssues, orchestrationSummary] = await Promise.all([
     getIngestionRuns(session.accessToken),
     getIngestionConnectors(session.accessToken),
+    getIngestionConnectorIssues(session.accessToken),
     getIngestionOrchestrationSummary(session.accessToken),
   ]);
   const availableConnectors = Array.from(new Set(runs.items.map((run) => run.connectorName))).sort();
@@ -220,6 +222,54 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
             </article>
           ))}
         </div>
+      </SectionCard>
+
+      <SectionCard title="Issue operative connector" eyebrow="Attention">
+        {connectorIssues.total === 0 ? (
+          <p className="text-sm text-[var(--pcb-muted)]">
+            Nessuna issue operativa rilevata sui connector registrati.
+          </p>
+        ) : (
+          <div className="grid gap-4">
+            {connectorIssues.items.map((issue, index) => (
+              <article
+                key={`${issue.connectorName}-${issue.issueType}-${index}`}
+                className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+              >
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">{issue.displayName}</h3>
+                    <p className="mt-1 text-sm text-[var(--pcb-muted)]">
+                      {issue.connectorName} · {issue.sourceSystem}
+                    </p>
+                  </div>
+                  <StatusChip label={issue.severity} />
+                </div>
+                <p className="mt-3 text-sm text-[var(--pcb-muted)]">{issue.detail}</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  {issue.issueType}
+                  {issue.latestRunStatus ? ` · latest ${issue.latestRunStatus}` : ''}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-4 text-sm">
+                  <Link
+                    href={`/ingestion/connectors/${issue.connectorName}`}
+                    className="font-semibold text-[var(--pcb-accent)]"
+                  >
+                    Apri connector
+                  </Link>
+                  {issue.latestRunId ? (
+                    <Link
+                      href={`/ingestion/${issue.latestRunId}`}
+                      className="font-semibold text-[var(--pcb-accent)]"
+                    >
+                      Apri ultima run
+                    </Link>
+                  ) : null}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </SectionCard>
 
       <SectionCard title="Run disponibili" eyebrow="Ingestion">
