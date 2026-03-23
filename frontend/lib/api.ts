@@ -351,6 +351,27 @@ export async function getGisSubjectParcelLinks(accessToken: string) {
   });
 }
 
+export async function getFilteredGisSubjectParcelLinks(
+  accessToken: string,
+  filters?: { subjectId?: string; parcelId?: string },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.subjectId) {
+    params.set('subjectId', filters.subjectId);
+  }
+
+  if (filters?.parcelId) {
+    params.set('parcelId', filters.parcelId);
+  }
+
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+
+  return apiFetch<PaginatedResponse<GisSubjectParcelLink>>(`/gis/subject-parcel-links${suffix}`, {
+    accessToken,
+  });
+}
+
 export async function getSystemIntegrations(accessToken: string) {
   return apiFetch<IntegrationStatus>('/system/integrations', {
     accessToken,

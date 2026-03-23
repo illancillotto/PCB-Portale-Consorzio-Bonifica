@@ -3,6 +3,7 @@ import { DatabaseService } from '../core/database/database.service';
 import { GisFeatureLinkResponseDto } from './dto/feature-link-response.dto';
 import { GisLayerResponseDto } from './dto/layer-response.dto';
 import { GisMapFeatureResponseDto } from './dto/map-feature-response.dto';
+import { ListGisSubjectParcelLinksQueryDto } from './dto/list-subject-parcel-links-query.dto';
 import { GisPublicationStatusResponseDto } from './dto/publication-status-response.dto';
 import { GisSubjectParcelLinkResponseDto } from './dto/subject-parcel-link-response.dto';
 
@@ -241,7 +242,23 @@ export class GisService {
     };
   }
 
-  async listSubjectParcelLinks(): Promise<{ items: GisSubjectParcelLinkResponseDto[]; total: number }> {
+  async listSubjectParcelLinks(
+    query: ListGisSubjectParcelLinksQueryDto = {},
+  ): Promise<{ items: GisSubjectParcelLinkResponseDto[]; total: number }> {
+    const filters: string[] = [];
+    const values: string[] = [];
+
+    if (query.subjectId) {
+      values.push(query.subjectId);
+      filters.push(`subject_id = $${values.length}`);
+    }
+
+    if (query.parcelId) {
+      values.push(query.parcelId);
+      filters.push(`parcel_id = $${values.length}`);
+    }
+
+    const whereClause = filters.length > 0 ? `WHERE ${filters.join(' AND ')}` : '';
     const result = await this.databaseService.query<GisSubjectParcelLinkRow>(
       `
         SELECT
@@ -260,8 +277,10 @@ export class GisService {
           valid_from,
           valid_to
         FROM gis.v_qgis_subject_parcel_links
+        ${whereClause}
         ORDER BY subject_display_name NULLS LAST, comune, foglio, particella
       `,
+      values,
     );
 
     return {

@@ -6,10 +6,10 @@ import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
 import {
   getGisFeatureLinks,
+  getFilteredGisSubjectParcelLinks,
   getGisLayers,
   getGisMapFeatures,
   getGisPublicationStatus,
-  getGisSubjectParcelLinks,
 } from '../../lib/api';
 
 interface GisPageProps {
@@ -29,7 +29,10 @@ export default async function GisPage({ searchParams }: GisPageProps) {
     getGisFeatureLinks(session.accessToken),
     getGisMapFeatures(session.accessToken),
     getGisPublicationStatus(session.accessToken),
-    getGisSubjectParcelLinks(session.accessToken),
+    getFilteredGisSubjectParcelLinks(session.accessToken, {
+      subjectId: selectedSubjectId,
+      parcelId: selectedParcelId,
+    }),
   ]);
   const focusedFeatures = mapFeatures.items.filter(
     (feature) =>

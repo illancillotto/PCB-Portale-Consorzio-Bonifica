@@ -237,11 +237,12 @@ Stato attuale:
 - completato sync inverso tra selezione mappa e pannello risultati
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella
 - completato endpoint GIS applicativo dedicato alle relazioni soggetto-particella
+- completati filtri `subjectId` e `parcelId` sull'endpoint GIS relazionale
 
 Prossimo passo naturale:
 
 - introdurre interrogazione più precisa del layer relazionale via `GetFeatureInfo`
-- oppure estendere il backend GIS con filtri per soggetto/particella sulle relazioni
+- oppure introdurre filtri analoghi su `map-features` per ridurre il carico lato client
 
 Dipendenze:
 

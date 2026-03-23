@@ -208,6 +208,7 @@ Nota:
 - sync inverso viewer-pannello GIS: completato
 - layer relazioni soggetto-particella pubblicato: completato
 - endpoint GIS applicativo relazioni soggetto-particella: completato
+- filtri GIS relazioni per soggetto/particella: completato
 
 ## Blocchi aperti
 
@@ -876,6 +877,21 @@ Completato:
 - endpoint backend protetto `GET /api/v1/gis/subject-parcel-links`
 - integrazione frontend della vista GIS con elenco relazioni applicative
 - allineamento tra publication target QGIS e API applicativa PCB sullo stesso layer di relazione
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
+
+### 2026-03-23 – Filtri GIS relazioni per soggetto e particella
+
+Completato:
+
+- filtro `subjectId` su `GET /api/v1/gis/subject-parcel-links`
+- filtro `parcelId` su `GET /api/v1/gis/subject-parcel-links`
+- integrazione frontend GIS per usare i filtri del focus corrente
 
 Verifiche eseguite:
 
