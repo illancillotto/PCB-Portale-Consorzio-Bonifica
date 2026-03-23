@@ -9,6 +9,7 @@ from qgis.core import (
     QgsDataSourceUri,
     QgsFillSymbol,
     QgsLayerTreeLayer,
+    QgsMarkerSymbol,
     QgsProject,
     QgsSingleSymbolRenderer,
     QgsVectorLayer,
@@ -54,6 +55,38 @@ def build_parcels_layer() -> QgsVectorLayer:
     return layer
 
 
+def build_subjects_layer() -> QgsVectorLayer:
+    uri = QgsDataSourceUri()
+    uri.setConnection(
+        POSTGRES_HOST,
+        POSTGRES_PORT,
+        POSTGRES_DB,
+        POSTGRES_USER,
+        POSTGRES_PASSWORD,
+    )
+    uri.setDataSource("gis", "v_qgis_subjects", "geometry", "", "id")
+
+    layer = QgsVectorLayer(uri.uri(False), "Soggetti georiferiti", "postgres")
+
+    if not layer.isValid():
+        raise RuntimeError("Impossibile caricare il layer PostGIS gis.v_qgis_subjects")
+
+    symbol = QgsMarkerSymbol.createSimple(
+        {
+          "name": "circle",
+          "color": "200,93,58,220",
+          "outline_color": "113,39,20,255",
+          "outline_width": "0.6",
+          "size": "4",
+        }
+    )
+    layer.setRenderer(QgsSingleSymbolRenderer(symbol))
+    layer.setShortName("pcb_subjects")
+    layer.setCrs(QgsCoordinateReferenceSystem("EPSG:4326"))
+
+    return layer
+
+
 def main() -> int:
     QgsApplication.setPrefixPath(QGIS_PREFIX_PATH, True)
     app = QgsApplication([], False)
@@ -67,11 +100,14 @@ def main() -> int:
     project.setCrs(QgsCoordinateReferenceSystem("EPSG:4326"))
 
     parcels_layer = build_parcels_layer()
+    subjects_layer = build_subjects_layer()
     project.addMapLayer(parcels_layer)
+    project.addMapLayer(subjects_layer)
 
     root = project.layerTreeRoot()
     root.removeAllChildren()
     root.addChildNode(QgsLayerTreeLayer(parcels_layer))
+    root.addChildNode(QgsLayerTreeLayer(subjects_layer))
 
     if not project.write(PROJECT_PATH):
         raise RuntimeError(f"Impossibile scrivere il progetto QGIS: {PROJECT_PATH}")
@@ -79,6 +115,7 @@ def main() -> int:
     print(f"QGIS project updated: {PROJECT_PATH}")
     print(f"Project layers: {len(project.mapLayers())}")
     print(f"Layer published: pcb_parcels -> {parcels_layer.name()}")
+    print(f"Layer published: pcb_subjects -> {subjects_layer.name()}")
     app.exitQgis()
     return 0
 

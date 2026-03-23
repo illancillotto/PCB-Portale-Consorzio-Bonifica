@@ -200,6 +200,7 @@ Nota:
 - QGIS publication target: operativo con `GetCapabilities` verificato
 - operations view centralizzata integrazioni: completata
 - primo layer tematico QGIS reale: completato
+- secondo layer tematico QGIS reale: completato
 
 ## Blocchi aperti
 
@@ -753,3 +754,24 @@ Verifiche eseguite:
 - `GetCapabilities` verificato con layer:
   - `pcb_parcels`
   - `Particelle consortili`
+
+### 2026-03-23 – Secondo layer tematico QGIS reale
+
+Completato:
+
+- vista PostGIS dedicata `gis.v_qgis_subjects`
+- progetto `infra/qgis/projects/pcb.qgs` rigenerato con secondo layer pubblicato:
+  - `pcb_subjects`
+  - titolo `Soggetti georiferiti`
+- script QGIS aggiornato per pubblicare sia particelle sia soggetti georiferiti
+
+Verifiche eseguite:
+
+- `docker exec -i pcb-postgres psql -U pcb -d pcb < infra/postgres/init/060-gis-qgis-views.sql`
+- `docker exec pcb-qgis-server python3 /io/scripts/generate_project.py`
+- `SELECT ... FROM gis.v_qgis_subjects`
+- `GET http://127.0.0.1:8090/ows/?SERVICE=WMS&REQUEST=GetCapabilities&MAP=/io/projects/pcb.qgs`
+- `GET http://127.0.0.1:8090/ows/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&MAP=/io/projects/pcb.qgs&LAYERS=pcb_subjects...`
+- `GetCapabilities` verificato con layer:
+  - `pcb_subjects`
+  - `Soggetti georiferiti`

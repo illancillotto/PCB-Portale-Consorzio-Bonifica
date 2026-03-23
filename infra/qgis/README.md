@@ -15,6 +15,9 @@ Layer tematico reale pubblicato:
 - `gis.v_qgis_parcels`
 - nome WMS pubblicato: `pcb_parcels`
 - titolo layer: `Particelle consortili`
+- `gis.v_qgis_subjects`
+- nome WMS pubblicato: `pcb_subjects`
+- titolo layer: `Soggetti georiferiti`
 
 Rigenerazione progetto QGIS dal container:
 
