@@ -37,6 +37,20 @@ export default async function ParcelDetailPage({ params }: ParcelDetailPageProps
           >
             Apri focus GIS
           </Link>
+          <div className="mt-4 grid gap-2">
+            <Link
+              href={`/gis?parcelId=${parcel.id}&preset=catasto&layers=pcb_subject_parcel_links,pcb_parcels`}
+              className="inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+            >
+              Preset catasto
+            </Link>
+            <Link
+              href={`/gis?parcelId=${parcel.id}&preset=relazioni&layers=pcb_subject_parcel_links`}
+              className="inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+            >
+              Preset relazioni
+            </Link>
+          </div>
         </div>
       }
     >

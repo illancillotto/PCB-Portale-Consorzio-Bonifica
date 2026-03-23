@@ -212,6 +212,7 @@ Nota:
 - legenda cartografica esplicita nel viewer GIS: completato
 - layer attivi del viewer GIS sincronizzati con URL: completato
 - preset operativi GIS condivisibili: completato
+- quick link ai preset GIS da viste operative: completato
 - layer relazioni soggetto-particella pubblicato: completato
 - endpoint GIS applicativo relazioni soggetto-particella: completato
 - filtri GIS relazioni per soggetto/particella: completato

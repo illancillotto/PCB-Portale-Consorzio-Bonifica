@@ -42,6 +42,20 @@ export default async function SubjectDetailPage({ params }: SubjectDetailPagePro
           >
             Apri focus GIS
           </Link>
+          <div className="mt-4 grid gap-2">
+            <Link
+              href={`/gis?subjectId=${subject.id}&preset=relazioni&layers=pcb_subject_parcel_links`}
+              className="inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+            >
+              Preset relazioni
+            </Link>
+            <Link
+              href={`/gis?subjectId=${subject.id}&preset=soggetti&layers=pcb_subjects`}
+              className="inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+            >
+              Preset soggetti
+            </Link>
+          </div>
         </div>
       }
     >
