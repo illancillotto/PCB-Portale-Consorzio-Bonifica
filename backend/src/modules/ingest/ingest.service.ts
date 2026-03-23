@@ -252,6 +252,9 @@ export class IngestService {
   }
 
   async getOrchestrationSummary(): Promise<IngestionOrchestrationSummaryResponseDto> {
+    const readinessByConnector = connectorCatalog.map((connector) =>
+      this.getConnectorExecutionReadiness(connector.connectorName),
+    );
     const [queuedRunsResult, failedRunsResult, normalizedRecordsResult, reviewQueueResult, latestRunResult] =
       await Promise.all([
         this.databaseService.query<NumericCountRow>(
@@ -274,6 +277,11 @@ export class IngestService {
     return {
       registeredConnectors: connectorCatalog.length,
       manualConnectors: connectorCatalog.filter((connector) => connector.triggerMode === 'manual').length,
+      configuredConnectors: readinessByConnector.filter((item) => item.configured).length,
+      runnableConnectors: readinessByConnector.filter((item) => item.runnable).length,
+      persistentConnectors: readinessByConnector.filter(
+        (item) => item.runnable && item.persistenceEnabled,
+      ).length,
       queuedRuns: Number(queuedRunsResult.rows[0]?.total ?? 0),
       failedRuns: Number(failedRunsResult.rows[0]?.total ?? 0),
       normalizedRecords: Number(normalizedRecordsResult.rows[0]?.total ?? 0),

@@ -72,6 +72,7 @@ Note matching:
   - stato effimero di normalizzazione e matching
 - il catalogo connector ingestion espone anche readiness runtime locale
 - il trigger manuale backend rifiuta connector supportati ma non eseguibili nel contesto corrente
+- `GET /api/v1/ingestion/orchestration-summary` espone anche conteggi readiness runtime (`configured`, `runnable`, `persistent`)
 - `GET /api/v1/parcels`
 - `GET /api/v1/parcels/{id}`
 - `GET /api/v1/parcels/{id}/subjects`

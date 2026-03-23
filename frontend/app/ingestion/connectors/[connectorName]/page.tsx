@@ -37,7 +37,11 @@ export default async function ConnectorDetailPage({ params }: ConnectorDetailPag
       description="Dettaglio operativo del connector registrato nel dominio ingestion."
       actions={
         connector.triggerMode === 'manual' ? (
-          <IngestionRunTrigger connectorName={connector.connectorName} />
+          <IngestionRunTrigger
+            connectorName={connector.connectorName}
+            disabled={!connector.executionReadiness.runnable}
+            disabledReason={connector.executionReadiness.detail}
+          />
         ) : null
       }
     >
@@ -70,6 +74,10 @@ export default async function ConnectorDetailPage({ params }: ConnectorDetailPag
           </div>
         </dl>
         <div className="mt-4 rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]">
+          <p>
+            <strong className="text-[var(--pcb-ink)]">Eseguibile:</strong>{' '}
+            {connector.executionReadiness.runnable ? 'si' : 'no'}
+          </p>
           <p>
             <strong className="text-[var(--pcb-ink)]">Runtime:</strong> {connector.executionReadiness.detail}
           </p>

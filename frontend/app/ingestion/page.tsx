@@ -69,6 +69,8 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
             <IngestionRunTrigger
               key={connector.connectorName}
               connectorName={connector.connectorName}
+              disabled={!connector.executionReadiness.runnable}
+              disabledReason={connector.executionReadiness.detail}
             />
           ))}
         </div>
@@ -115,9 +117,13 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
             </p>
           </article>
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Record normalizzati</p>
+            <p className="text-sm text-[var(--pcb-muted)]">Connector eseguibili</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {orchestrationSummary.normalizedRecords}
+              {orchestrationSummary.runnableConnectors}
+            </p>
+            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+              configurati {orchestrationSummary.configuredConnectors} · persistenti{' '}
+              {orchestrationSummary.persistentConnectors}
             </p>
           </article>
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
@@ -130,6 +136,23 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
               {orchestrationSummary.latestRunAt
                 ? new Date(orchestrationSummary.latestRunAt).toLocaleString('it-IT')
                 : 'n/d'}
+            </p>
+          </article>
+        </div>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Record normalizzati</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.normalizedRecords}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Connector non eseguibili</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.registeredConnectors - orchestrationSummary.runnableConnectors}
+            </p>
+            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+              da correggere prima del trigger manuale
             </p>
           </article>
         </div>
@@ -150,6 +173,16 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                   </p>
                 </div>
                 <StatusChip label={connector.latestRun?.status ?? 'idle'} />
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <StatusChip
+                  label={connector.executionReadiness.runnable ? 'runnable' : 'not-runnable'}
+                />
+                <StatusChip
+                  label={
+                    connector.executionReadiness.persistenceEnabled ? 'persist-enabled' : 'dry-run'
+                  }
+                />
               </div>
               <p className="mt-3 text-sm text-[var(--pcb-muted)]">
                 Dominio {connector.domain} · trigger {connector.triggerMode}
