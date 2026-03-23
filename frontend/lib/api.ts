@@ -172,6 +172,24 @@ export interface GisFeatureLink {
   validTo: string | null;
 }
 
+export interface GisMapFeature {
+  id: string;
+  type: 'Feature';
+  geometry: {
+    type: string;
+    coordinates: unknown;
+  };
+  properties: {
+    layerCode: string;
+    layerName: string;
+    featureExternalId: string;
+    subjectId: string | null;
+    parcelId: string | null;
+    validFrom: string | null;
+    validTo: string | null;
+  };
+}
+
 interface PaginatedResponse<T> {
   items: T[];
   total: number;
@@ -267,6 +285,12 @@ export async function getGisLayers(accessToken: string) {
 
 export async function getGisFeatureLinks(accessToken: string) {
   return apiFetch<PaginatedResponse<GisFeatureLink>>('/gis/feature-links', {
+    accessToken,
+  });
+}
+
+export async function getGisMapFeatures(accessToken: string) {
+  return apiFetch<PaginatedResponse<GisMapFeature>>('/gis/map-features', {
     accessToken,
   });
 }

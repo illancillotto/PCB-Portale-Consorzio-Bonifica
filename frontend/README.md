@@ -35,4 +35,5 @@ Stato attuale:
 - login frontend reale via Keycloak locale
 - protezione selettiva delle viste operative `ingestion` e `gis`
 - proxy frontend autenticato per le azioni operative `ingestion`
+- viewer GIS reale con Leaflet e feature PostGIS esposte dal backend
 - mappa GIS completa ancora non integrata

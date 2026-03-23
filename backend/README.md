@@ -72,6 +72,7 @@ Note matching:
 - `GET /api/v1/search?q=...`
 - `GET /api/v1/gis/layers`
 - `GET /api/v1/gis/feature-links`
+- `GET /api/v1/gis/map-features`
 
 API protette da ruolo `pcb-operator`:
 

@@ -1,21 +1,27 @@
 import { PageShell } from '../../components/page-shell';
+import { GisMap } from '../../components/gis-map';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
-import { getGisFeatureLinks, getGisLayers } from '../../lib/api';
+import { getGisFeatureLinks, getGisLayers, getGisMapFeatures } from '../../lib/api';
 
 export default async function GisPage() {
   const session = await requireOperatorSession();
-  const [layers, featureLinks] = await Promise.all([
+  const [layers, featureLinks, mapFeatures] = await Promise.all([
     getGisLayers(session.accessToken),
     getGisFeatureLinks(session.accessToken),
+    getGisMapFeatures(session.accessToken),
   ]);
 
   return (
     <PageShell
-      title="GIS foundation"
-      description="Prima vista GIS applicativa basata su catalogo layer e feature links reali dal database. Non sostituisce ancora il viewer cartografico completo."
+      title="GIS operativo"
+      description="Viewer cartografico iniziale basato su PostGIS reale, catalogo layer PCB e feature georiferite esposte dal backend protetto."
     >
+      <SectionCard title="Viewer mappa" eyebrow="Map">
+        <GisMap features={mapFeatures.items} />
+      </SectionCard>
+
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <SectionCard title="Catalogo layer" eyebrow="GIS">
           <div className="grid gap-4">
@@ -54,6 +60,9 @@ export default async function GisPage() {
 
         <SectionCard title="Feature links" eyebrow="Relations">
           <div className="grid gap-3">
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4 text-sm text-[var(--pcb-muted)]">
+              Feature mappate: <strong className="text-[var(--pcb-ink)]">{mapFeatures.total}</strong>
+            </div>
             {featureLinks.items.map((link) => (
               <article key={link.id} className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
                 <p className="text-sm font-semibold text-[var(--pcb-ink)]">{link.layerCode}</p>

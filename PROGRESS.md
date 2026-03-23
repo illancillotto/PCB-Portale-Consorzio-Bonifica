@@ -329,6 +329,23 @@ Verifiche eseguite:
 - `GET /audit` senza sessione -> redirect `/login`
 - `GET /audit` con sessione frontend -> contenuto operativo visibile
 
+### 2026-03-23 – Viewer GIS reale
+
+Completato:
+
+- migrazione PostGIS `050-gis-map-features.sql` con geometrie su `gis.feature_link`
+- endpoint backend `GET /api/v1/gis/map-features`
+- viewer frontend reale su `/gis` con Leaflet
+- overlay di feature point/polygon reali dal backend protetto
+
+Verifiche eseguite:
+
+- applicazione migrazione SQL locale
+- lint e build backend
+- lint e build frontend
+- `GET /api/v1/gis/map-features` con token valido
+- `/gis` verificata con viewer mappa e feature renderizzate
+
 ### 2026-03-23 – Redis operativo backend
 
 Completato:

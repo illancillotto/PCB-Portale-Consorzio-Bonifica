@@ -222,7 +222,7 @@ Deliverable previsti:
 Stato attuale:
 
 - completati catalogo layer, endpoint GIS base e vista frontend GIS foundation
-- il viewer cartografico reale non è ancora implementato
+- completato viewer cartografico iniziale con feature PostGIS reali
 
 Dipendenze:
 
