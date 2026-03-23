@@ -234,6 +234,7 @@ Nota:
 - vista `operations` estesa con filtri URL-shareable sulle issue connector: completato
 - filtro `connectorName` sulle issue connector, esposto in backend e nelle viste `ingestion` e `operations`: completato
 - catalogo e dettaglio connector arricchiti con contatori issue aperte: completato
+- dettaglio connector arricchito con elenco issue aperte e filtro per severity: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

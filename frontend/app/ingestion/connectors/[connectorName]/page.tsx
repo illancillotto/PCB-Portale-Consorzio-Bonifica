@@ -7,6 +7,7 @@ import { StatusChip } from '../../../../components/status-chip';
 import { requireOperatorSession } from '../../../../lib/auth';
 import {
   getIngestionConnectorDetail,
+  getIngestionConnectorIssues,
   getIngestionConnectorRuns,
 } from '../../../../lib/api';
 
@@ -16,6 +17,7 @@ interface ConnectorDetailPageProps {
   }>;
   searchParams?: Promise<{
     status?: string;
+    issueSeverity?: 'warning' | 'critical';
   }>;
 }
 
@@ -23,12 +25,17 @@ function buildConnectorRunsFilterHref(
   connectorName: string,
   filters: {
     status?: string;
+    issueSeverity?: 'warning' | 'critical';
   },
 ) {
   const params = new URLSearchParams();
 
   if (filters.status) {
     params.set('status', filters.status);
+  }
+
+  if (filters.issueSeverity) {
+    params.set('issueSeverity', filters.issueSeverity);
   }
 
   const queryString = params.toString();
@@ -56,6 +63,10 @@ export default async function ConnectorDetailPage({
 
   const runs = await getIngestionConnectorRuns(connector.connectorName, session.accessToken, {
     status: filters.status,
+  });
+  const connectorIssues = await getIngestionConnectorIssues(session.accessToken, {
+    connectorName: connector.connectorName,
+    severity: filters.issueSeverity,
   });
   const connectorRuns = runs.items;
 
@@ -191,10 +202,76 @@ export default async function ConnectorDetailPage({
         </div>
       </SectionCard>
 
+      <SectionCard title="Issue operative" eyebrow="Attention">
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildConnectorRunsFilterHref(connector.connectorName, { status: filters.status })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.issueSeverity
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutte le severity
+          </Link>
+          {(['critical', 'warning'] as const).map((severity) => (
+            <Link
+              key={severity}
+              href={buildConnectorRunsFilterHref(connector.connectorName, {
+                status: filters.status,
+                issueSeverity: severity,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.issueSeverity === severity
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {severity}
+            </Link>
+          ))}
+        </div>
+        {connectorIssues.total === 0 ? (
+          <p className="text-sm text-[var(--pcb-muted)]">Nessuna issue aperta per il connector corrente.</p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {connectorIssues.items.map((issue, index) => (
+              <article
+                key={`${issue.issueType}-${index}`}
+                className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">{issue.issueType}</h3>
+                    <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                      {issue.connectorName}
+                    </p>
+                  </div>
+                  <StatusChip label={issue.severity} />
+                </div>
+                <p className="mt-4 text-sm text-[var(--pcb-muted)]">{issue.detail}</p>
+                {issue.latestRunId ? (
+                  <div className="mt-4">
+                    <Link
+                      href={`/ingestion/${issue.latestRunId}`}
+                      className="text-sm font-semibold text-[var(--pcb-accent)]"
+                    >
+                      Apri run correlata
+                    </Link>
+                  </div>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        )}
+      </SectionCard>
+
       <SectionCard title="Run recenti" eyebrow="History">
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
-            href={buildConnectorRunsFilterHref(connector.connectorName, {})}
+            href={buildConnectorRunsFilterHref(connector.connectorName, {
+              issueSeverity: filters.issueSeverity,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.status
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -206,7 +283,10 @@ export default async function ConnectorDetailPage({
           {['queued', 'completed', 'failed'].map((status) => (
             <Link
               key={status}
-              href={buildConnectorRunsFilterHref(connector.connectorName, { status })}
+              href={buildConnectorRunsFilterHref(connector.connectorName, {
+                status,
+                issueSeverity: filters.issueSeverity,
+              })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.status === status
                   ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
