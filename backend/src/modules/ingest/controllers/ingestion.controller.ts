@@ -16,6 +16,7 @@ import { IngestionRunResponseDto } from '../dto/ingestion-run-response.dto';
 import { MatchingResultResponseDto } from '../dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from '../dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from '../dto/normalized-record-response.dto';
+import { IngestionOrchestrationSummaryResponseDto } from '../dto/orchestration-summary-response.dto';
 import { RunMatchingResponseDto } from '../dto/run-matching-response.dto';
 import { StartIngestionRunResponseDto } from '../dto/start-ingestion-run-response.dto';
 
@@ -31,6 +32,11 @@ export class IngestionController {
   @Get('connectors')
   async listConnectors(): Promise<{ items: IngestionConnectorCatalogResponseDto[]; total: number }> {
     return this.ingestService.listConnectorCatalog();
+  }
+
+  @Get('orchestration-summary')
+  async getOrchestrationSummary(): Promise<IngestionOrchestrationSummaryResponseDto> {
+    return this.ingestService.getOrchestrationSummary();
   }
 
   @Get('runs')

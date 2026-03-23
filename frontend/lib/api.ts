@@ -115,6 +115,16 @@ export interface IngestionConnectorCatalogItem {
   } | null;
 }
 
+export interface IngestionOrchestrationSummary {
+  registeredConnectors: number;
+  manualConnectors: number;
+  queuedRuns: number;
+  failedRuns: number;
+  normalizedRecords: number;
+  reviewQueue: number;
+  latestRunAt: string | null;
+}
+
 export interface NormalizedRecord {
   id: string;
   ingestionRunId: string;
@@ -315,6 +325,12 @@ export async function getIngestionRuns(accessToken: string) {
 
 export async function getIngestionConnectors(accessToken: string) {
   return apiFetch<PaginatedResponse<IngestionConnectorCatalogItem>>('/ingestion/connectors', {
+    accessToken,
+  });
+}
+
+export async function getIngestionOrchestrationSummary(accessToken: string) {
+  return apiFetch<IngestionOrchestrationSummary>('/ingestion/orchestration-summary', {
     accessToken,
   });
 }

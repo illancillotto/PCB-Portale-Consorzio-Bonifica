@@ -248,6 +248,7 @@ Stato attuale:
 - completato riepilogo operativo ingestion in lista e dettaglio run
 - completati filtri operativi ingestion in lista e dettaglio run
 - completato catalogo connector orchestrato nel dominio ingestion
+- completato summary backend di orchestration ingestion
 - completato riepilogo audit con filtri operativi dedicati
 - completata osservabilita` cross-domain nella vista `operations`
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella
@@ -259,7 +260,7 @@ Stato attuale:
 Prossimo passo naturale:
 
 - usare il layer relazionale per popup/cartigli ancora piu` mirati nel viewer
-- oppure introdurre nel backend una view sintetica di health orchestration per connector
+- oppure iniziare il consolidamento del dominio connectors sul lato esecuzione reale
 
 Dipendenze:
 

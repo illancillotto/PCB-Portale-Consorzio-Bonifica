@@ -8,6 +8,7 @@ import { IngestionConnectorCatalogResponseDto } from './dto/connector-catalog-re
 import { MatchingResultResponseDto } from './dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from './dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from './dto/normalized-record-response.dto';
+import { IngestionOrchestrationSummaryResponseDto } from './dto/orchestration-summary-response.dto';
 import { RunMatchingResponseDto } from './dto/run-matching-response.dto';
 import { StartIngestionRunResponseDto } from './dto/start-ingestion-run-response.dto';
 
@@ -70,6 +71,14 @@ interface ConnectorCatalogEntry {
   domain: string;
   triggerMode: 'manual' | 'scheduled';
   capabilities: Array<'acquisition' | 'raw_ingest' | 'normalization' | 'matching'>;
+}
+
+interface NumericCountRow {
+  total: string | number;
+}
+
+interface TimestampRow {
+  latest_run_at: Date | string | null;
 }
 
 const connectorCatalog: ConnectorCatalogEntry[] = [
@@ -169,6 +178,39 @@ export class IngestService {
         };
       }),
       total: connectorCatalog.length,
+    };
+  }
+
+  async getOrchestrationSummary(): Promise<IngestionOrchestrationSummaryResponseDto> {
+    const [queuedRunsResult, failedRunsResult, normalizedRecordsResult, reviewQueueResult, latestRunResult] =
+      await Promise.all([
+        this.databaseService.query<NumericCountRow>(
+          `SELECT COUNT(*)::text AS total FROM ingest.ingestion_run WHERE status = 'queued'`,
+        ),
+        this.databaseService.query<NumericCountRow>(
+          `SELECT COUNT(*)::text AS total FROM ingest.ingestion_run WHERE status = 'failed'`,
+        ),
+        this.databaseService.query<NumericCountRow>(
+          `SELECT COUNT(*)::text AS total FROM ingest.ingestion_record_normalized`,
+        ),
+        this.databaseService.query<NumericCountRow>(
+          `SELECT COUNT(*)::text AS total FROM ingest.matching_result WHERE decision_status = 'review'`,
+        ),
+        this.databaseService.query<TimestampRow>(
+          `SELECT MAX(started_at) AS latest_run_at FROM ingest.ingestion_run`,
+        ),
+      ]);
+
+    return {
+      registeredConnectors: connectorCatalog.length,
+      manualConnectors: connectorCatalog.filter((connector) => connector.triggerMode === 'manual').length,
+      queuedRuns: Number(queuedRunsResult.rows[0]?.total ?? 0),
+      failedRuns: Number(failedRunsResult.rows[0]?.total ?? 0),
+      normalizedRecords: Number(normalizedRecordsResult.rows[0]?.total ?? 0),
+      reviewQueue: Number(reviewQueueResult.rows[0]?.total ?? 0),
+      latestRunAt: latestRunResult.rows[0]?.latest_run_at
+        ? new Date(latestRunResult.rows[0].latest_run_at).toISOString()
+        : null,
     };
   }
 

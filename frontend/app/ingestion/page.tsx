@@ -4,7 +4,11 @@ import { PageShell } from '../../components/page-shell';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
-import { getIngestionConnectors, getIngestionRuns } from '../../lib/api';
+import {
+  getIngestionConnectors,
+  getIngestionOrchestrationSummary,
+  getIngestionRuns,
+} from '../../lib/api';
 
 interface IngestionPageProps {
   searchParams?: Promise<{
@@ -32,9 +36,10 @@ function buildRunsFilterHref(filters: { status?: string; connector?: string }) {
 export default async function IngestionPage({ searchParams }: IngestionPageProps) {
   const session = await requireOperatorSession();
   const filters = (await searchParams) ?? {};
-  const [runs, connectors] = await Promise.all([
+  const [runs, connectors, orchestrationSummary] = await Promise.all([
     getIngestionRuns(session.accessToken),
     getIngestionConnectors(session.accessToken),
+    getIngestionOrchestrationSummary(session.accessToken),
   ]);
   const availableConnectors = Array.from(new Set(runs.items.map((run) => run.connectorName))).sort();
   const filteredRuns = runs.items.filter((run) => {
@@ -81,6 +86,41 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                 {failedRuns} run con errori
               </p>
             ) : null}
+          </article>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Stato orchestration" eyebrow="Backend">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Connector registrati</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.registeredConnectors}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Trigger manuali</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.manualConnectors}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Record normalizzati</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.normalizedRecords}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Review queue</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.reviewQueue}
+            </p>
+            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+              Ultima run{' '}
+              {orchestrationSummary.latestRunAt
+                ? new Date(orchestrationSummary.latestRunAt).toLocaleString('it-IT')
+                : 'n/d'}
+            </p>
           </article>
         </div>
       </SectionCard>
