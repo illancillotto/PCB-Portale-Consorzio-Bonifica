@@ -230,6 +230,7 @@ Nota:
 - endpoint e vista per issue operative dei connector nel monitor ingestion: completato
 - vista `operations` estesa con issue connector cross-domain: completato
 - filtri backend/frontend sulle issue operative dei connector nel monitor ingestion: completato
+- orchestration summary arricchito con contatori sintetici sulle issue connector, usati da ingestion e operations: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

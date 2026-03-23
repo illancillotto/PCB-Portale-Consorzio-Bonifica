@@ -7,6 +7,7 @@ import {
   getGisPublicationStatus,
   getGisSubjectParcelLinks,
   getIngestionConnectorIssues,
+  getIngestionOrchestrationSummary,
   getIngestionRuns,
   getSystemIntegrations,
 } from '../../lib/api';
@@ -14,20 +15,18 @@ import Link from 'next/link';
 
 export default async function OperationsPage() {
   const session = await requireOperatorSession();
-  const [integrations, ingestionRuns, connectorIssues, auditEvents, publicationStatus, subjectParcelLinks] =
+  const [integrations, ingestionRuns, connectorIssues, orchestrationSummary, auditEvents, publicationStatus, subjectParcelLinks] =
     await Promise.all([
       getSystemIntegrations(session.accessToken),
       getIngestionRuns(session.accessToken),
       getIngestionConnectorIssues(session.accessToken),
+      getIngestionOrchestrationSummary(session.accessToken),
       getAuditEvents(session.accessToken),
       getGisPublicationStatus(session.accessToken),
       getGisSubjectParcelLinks(session.accessToken),
     ]);
   const queuedRuns = ingestionRuns.items.filter((run) => run.status === 'queued').length;
   const failedRuns = ingestionRuns.items.filter((run) => run.status === 'failed').length;
-  const criticalConnectorIssues = connectorIssues.items.filter(
-    (issue) => issue.severity === 'critical',
-  ).length;
   const systemOperatorAuditEvents = auditEvents.items.filter(
     (event) => event.actorType === 'system_operator',
   ).length;
@@ -64,9 +63,9 @@ export default async function OperationsPage() {
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Issue connector</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{connectorIssues.total}</p>
-            {criticalConnectorIssues > 0 ? (
+            {orchestrationSummary.criticalConnectorIssues > 0 ? (
               <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
-                {criticalConnectorIssues} critiche
+                {orchestrationSummary.criticalConnectorIssues} critiche
               </p>
             ) : null}
           </article>
@@ -139,6 +138,26 @@ export default async function OperationsPage() {
       </SectionCard>
 
       <SectionCard title="Connector attention" eyebrow="Ingestion">
+        <div className="mb-4 grid gap-4 md:grid-cols-3">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Issue critiche</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.criticalConnectorIssues}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Issue warning</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.warningConnectorIssues}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Connector bloccati</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.blockedConnectors}
+            </p>
+          </article>
+        </div>
         {connectorIssues.total === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">Nessuna issue aperta sui connector registrati.</p>
         ) : (

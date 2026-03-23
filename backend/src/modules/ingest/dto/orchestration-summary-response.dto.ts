@@ -4,6 +4,10 @@ export interface IngestionOrchestrationSummaryResponseDto {
   configuredConnectors: number;
   runnableConnectors: number;
   persistentConnectors: number;
+  criticalConnectorIssues: number;
+  warningConnectorIssues: number;
+  blockedConnectors: number;
+  dryRunConnectors: number;
   queuedRuns: number;
   failedRuns: number;
   normalizedRecords: number;

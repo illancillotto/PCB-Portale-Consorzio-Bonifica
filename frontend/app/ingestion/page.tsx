@@ -185,10 +185,27 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Connector non eseguibili</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {orchestrationSummary.registeredConnectors - orchestrationSummary.runnableConnectors}
+              {orchestrationSummary.blockedConnectors}
             </p>
             <p className="mt-2 text-xs text-[var(--pcb-muted)]">
               da correggere prima del trigger manuale
+            </p>
+          </article>
+        </div>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Issue critiche connector</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.criticalConnectorIssues}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Connector dry-run</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.dryRunConnectors}
+            </p>
+            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+              warning aperti {orchestrationSummary.warningConnectorIssues}
             </p>
           </article>
         </div>

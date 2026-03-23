@@ -77,6 +77,7 @@ Note matching:
 - il catalogo connector ingestion espone anche readiness runtime locale
 - il trigger manuale backend rifiuta connector supportati ma non eseguibili nel contesto corrente
 - `GET /api/v1/ingestion/orchestration-summary` espone anche conteggi readiness runtime (`configured`, `runnable`, `persistent`)
+- `GET /api/v1/ingestion/orchestration-summary` espone anche conteggi sintetici su issue connector (`critical`, `warning`, `blocked`, `dry-run`)
 - `GET /api/v1/ingestion/connectors/{connectorName}` espone anche storico operativo sintetico (`lastCompletedRun`, `lastFailedRun`, contatori record)
 - `GET /api/v1/parcels`
 - `GET /api/v1/parcels/{id}`
