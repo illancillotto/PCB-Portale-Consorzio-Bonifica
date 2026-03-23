@@ -208,6 +208,7 @@ Nota:
 - sync inverso viewer-pannello GIS: completato
 - cartiglio `GetFeatureInfo` arricchito con contesto PCB: completato
 - risultati `GetFeatureInfo` raffinati sul layer relazionale: completato
+- controllo layer operativo nel viewer GIS: completato
 - layer relazioni soggetto-particella pubblicato: completato
 - endpoint GIS applicativo relazioni soggetto-particella: completato
 - filtri GIS relazioni per soggetto/particella: completato

@@ -17,7 +17,13 @@ interface QgisFeatureInfoResponse {
   features: QgisFeatureInfoFeature[];
 }
 
-const qgisQueryableLayers = 'pcb_subject_parcel_links,pcb_parcels,pcb_subjects';
+const defaultQgisLayers = ['pcb_subject_parcel_links', 'pcb_parcels', 'pcb_subjects'] as const;
+
+const qgisLayerLabels: Record<(typeof defaultQgisLayers)[number], string> = {
+  pcb_subject_parcel_links: 'Relazioni soggetto-particella',
+  pcb_parcels: 'Particelle',
+  pcb_subjects: 'Soggetti',
+};
 
 function toFeatureInfoFeature(feature: GisMapFeature): QgisFeatureInfoFeature {
   return {
@@ -164,7 +170,10 @@ export function GisMap({
   wmsProjectFile,
 }: GisMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const wmsLayerRef = useRef<import('leaflet').TileLayer.WMS | null>(null);
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string | null>(null);
+  const [activeQgisLayers, setActiveQgisLayers] =
+    useState<Array<(typeof defaultQgisLayers)[number]>>([...defaultQgisLayers]);
   const [featureInfoState, setFeatureInfoState] = useState<{
     loading: boolean;
     error: string | null;
@@ -199,30 +208,30 @@ export function GisMap({
         const wmsUrl = new URL(wmsServiceUrl);
         wmsUrl.searchParams.set('MAP', wmsProjectFile);
 
-        leaflet
-          .tileLayer
-          .wms(wmsUrl.toString(), {
-            layers: 'pcb_subject_parcel_links,pcb_parcels,pcb_subjects',
-            format: 'image/png',
-            transparent: true,
-            version: '1.3.0',
-            opacity: 0.72,
-          })
-          .addTo(map);
+        wmsLayerRef.current = leaflet.tileLayer.wms(wmsUrl.toString(), {
+          layers: activeQgisLayers.join(','),
+          format: 'image/png',
+          transparent: true,
+          version: '1.3.0',
+          opacity: 0.72,
+        });
+
+        wmsLayerRef.current.addTo(map);
       }
 
       map.on('click', async (event) => {
         const size = map?.getSize();
         const bounds = map?.getBounds();
 
-        if (!map || !size || !bounds || !wmsServiceUrl || !wmsProjectFile) {
+        if (!map || !size || !bounds || !wmsServiceUrl || !wmsProjectFile || activeQgisLayers.length === 0) {
           return;
         }
 
         const point = map.latLngToContainerPoint(event.latlng);
+        const activeLayers = activeQgisLayers.join(',');
         const params = new URLSearchParams({
-          layers: qgisQueryableLayers,
-          queryLayers: qgisQueryableLayers,
+          layers: activeLayers,
+          queryLayers: activeLayers,
           styles: 'default,default,default',
           crs: 'EPSG:4326',
           bbox: `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`,
@@ -383,8 +392,35 @@ export function GisMap({
       if (map) {
         map.remove();
       }
+      wmsLayerRef.current = null;
     };
-  }, [features, selectedSubjectId, selectedParcelId, selectedFeatureKey, wmsServiceUrl, wmsProjectFile]);
+  }, [
+    activeQgisLayers,
+    features,
+    selectedSubjectId,
+    selectedParcelId,
+    selectedFeatureKey,
+    wmsServiceUrl,
+    wmsProjectFile,
+  ]);
+
+  function toggleQgisLayer(layerCode: (typeof defaultQgisLayers)[number]) {
+    setActiveQgisLayers((currentLayers) => {
+      if (currentLayers.includes(layerCode)) {
+        return currentLayers.filter((currentLayer) => currentLayer !== layerCode);
+      }
+
+      return [...currentLayers, layerCode].sort(
+        (left, right) => defaultQgisLayers.indexOf(left) - defaultQgisLayers.indexOf(right),
+      );
+    });
+    setFeatureInfoState((currentState) => ({
+      ...currentState,
+      error: null,
+      features: [],
+    }));
+    setSelectedFeatureKey(null);
+  }
 
   return (
     <div className="grid gap-4">
@@ -393,16 +429,49 @@ export function GisMap({
         className="h-[480px] overflow-hidden rounded-[28px] border border-[var(--pcb-line)] shadow-[0_20px_60px_rgba(31,41,51,0.12)]"
       />
       <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
+        <div className="mb-4 grid gap-3 rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+            Layer operativi
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {defaultQgisLayers.map((layerCode) => {
+              const isActive = activeQgisLayers.includes(layerCode);
+
+              return (
+                <button
+                  key={layerCode}
+                  type="button"
+                  onClick={() => toggleQgisLayer(layerCode)}
+                  className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                    isActive
+                      ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                      : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+                  }`}
+                >
+                  {qgisLayerLabels[layerCode]}
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-xs text-[var(--pcb-muted)]">
+            I layer attivi controllano sia l&apos;overlay WMS sia l&apos;interrogazione `GetFeatureInfo`.
+          </p>
+        </div>
         <p className="text-sm font-semibold text-[var(--pcb-ink)]">Interrogazione mappa</p>
         <p className="mt-1 text-xs text-[var(--pcb-muted)]">
           Clicca sul viewer per interrogare il publication target QGIS con `GetFeatureInfo`.
         </p>
         <p className="mt-1 text-xs text-[var(--pcb-muted)]">
-          Layer interrogati: `pcb_subject_parcel_links`, `pcb_parcels`, `pcb_subjects`.
+          Layer interrogati: {activeQgisLayers.length > 0 ? activeQgisLayers.join(', ') : 'nessuno'}.
         </p>
         <p className="mt-1 text-xs text-[var(--pcb-muted)]">
           I risultati sono ordinati con priorita` al layer relazionale e, se c'e` un focus attivo, ristretti alle feature coerenti con soggetto o particella correnti quando disponibili.
         </p>
+        {activeQgisLayers.length === 0 ? (
+          <p className="mt-3 text-sm text-[var(--pcb-muted)]">
+            Nessun layer QGIS attivo. Riattiva almeno un layer per overlay e interrogazione.
+          </p>
+        ) : null}
         {featureInfoState.loading ? (
           <p className="mt-3 text-sm text-[var(--pcb-muted)]">Caricamento feature info...</p>
         ) : null}

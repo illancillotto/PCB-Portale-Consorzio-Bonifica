@@ -46,5 +46,6 @@ Stato attuale:
 - evidenziazione automatica nel viewer della feature selezionata da `GetFeatureInfo`
 - cartiglio `GetFeatureInfo` arricchito con feature links e relazioni soggetto-particella PCB
 - risultati `GetFeatureInfo` ordinati con priorita` al layer relazionale e al focus attivo
+- controllo layer operativo nel viewer GIS per overlay WMS e `GetFeatureInfo`
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata
