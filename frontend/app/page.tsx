@@ -3,9 +3,11 @@ import { PageShell } from '../components/page-shell';
 import { SearchForm } from '../components/search-form';
 import { SectionCard } from '../components/section-card';
 import {
+  getAuditEvents,
   getGisLayers,
   getGisPublicationStatus,
   getGisSubjectParcelLinks,
+  getIngestionRuns,
   getParcels,
   getSubjects,
 } from '../lib/api';
@@ -56,7 +58,7 @@ const moduleCards = [
 
 export default async function HomePage() {
   const session = await getOptionalSession();
-  const [subjects, parcels, gisMetrics] = await Promise.all([
+  const [subjects, parcels, gisMetrics, operationalMetrics] = await Promise.all([
     getSubjects(),
     getParcels(),
     session
@@ -69,6 +71,14 @@ export default async function HomePage() {
           publicationStatus,
           subjectParcelLinks,
         }))
+      : Promise.resolve(null),
+    session
+      ? Promise.all([getIngestionRuns(session.accessToken), getAuditEvents(session.accessToken)]).then(
+          ([ingestionRuns, auditEvents]) => ({
+            ingestionRuns,
+            auditEvents,
+          }),
+        )
       : Promise.resolve(null),
   ]);
 
@@ -152,6 +162,54 @@ export default async function HomePage() {
           <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
             Le metriche GIS operative sono visibili con sessione operatore attiva. Il viewer e gli shortcut restano
             disponibili dai moduli GIS e Operations.
+          </div>
+        )}
+      </SectionCard>
+
+      <SectionCard title="Metriche ingestion e audit" eyebrow="Ops">
+        {operationalMetrics ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Run ingestione
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {operationalMetrics.ingestionRuns.total}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Run in coda
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {
+                  operationalMetrics.ingestionRuns.items.filter((run) => run.status === 'queued').length
+                }
+              </p>
+            </div>
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Eventi audit
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {operationalMetrics.auditEvents.total}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Ultimo evento
+              </p>
+              <p className="mt-2 text-sm font-semibold text-[var(--pcb-ink)]">
+                {operationalMetrics.auditEvents.items[0]
+                  ? new Date(operationalMetrics.auditEvents.items[0].createdAt).toLocaleString('it-IT')
+                  : 'n/d'}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
+            Le metriche di ingestione e audit richiedono sessione operatore attiva. Le viste dettagliate restano
+            disponibili nei moduli dedicati.
           </div>
         )}
       </SectionCard>
