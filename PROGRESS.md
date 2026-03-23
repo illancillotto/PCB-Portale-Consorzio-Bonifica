@@ -1029,6 +1029,7 @@ Verifiche eseguite:
 Completato:
 
 - filtri URL-shareable per stage `acquisition` e `post-processing` nella lista run
+- filtri URL-shareable anche per stage `normalization` e `matching`
 - preservazione dei filtri esistenti su `status` e `connector`
 
 Verifiche eseguite:

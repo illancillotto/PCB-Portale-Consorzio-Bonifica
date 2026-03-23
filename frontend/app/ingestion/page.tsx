@@ -772,6 +772,82 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
             </Link>
           ))}
         </div>
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildRunsFilterHref({
+              status: filters.status,
+              connector: filters.connector,
+              acquisitionStage: filters.acquisitionStage,
+              postProcessingStage: filters.postProcessingStage,
+              matchingStage: filters.matchingStage,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.normalizationStage
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Norm tutti
+          </Link>
+          {(['not_started', 'running', 'completed', 'failed'] as const).map((stage) => (
+            <Link
+              key={stage}
+              href={buildRunsFilterHref({
+                status: filters.status,
+                connector: filters.connector,
+                acquisitionStage: filters.acquisitionStage,
+                postProcessingStage: filters.postProcessingStage,
+                normalizationStage: stage,
+                matchingStage: filters.matchingStage,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.normalizationStage === stage
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              norm {stage}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-6 flex flex-wrap gap-3">
+          <Link
+            href={buildRunsFilterHref({
+              status: filters.status,
+              connector: filters.connector,
+              acquisitionStage: filters.acquisitionStage,
+              postProcessingStage: filters.postProcessingStage,
+              normalizationStage: filters.normalizationStage,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.matchingStage
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Match tutti
+          </Link>
+          {(['not_started', 'running', 'completed', 'failed'] as const).map((stage) => (
+            <Link
+              key={stage}
+              href={buildRunsFilterHref({
+                status: filters.status,
+                connector: filters.connector,
+                acquisitionStage: filters.acquisitionStage,
+                postProcessingStage: filters.postProcessingStage,
+                normalizationStage: filters.normalizationStage,
+                matchingStage: stage,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.matchingStage === stage
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              match {stage}
+            </Link>
+          ))}
+        </div>
         {filteredRuns.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">Nessuna run disponibile.</p>
         ) : (

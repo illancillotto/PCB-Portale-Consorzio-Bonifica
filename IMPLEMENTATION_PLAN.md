@@ -489,3 +489,7 @@ Estensioni completate:
 - `IMPLEMENTATION_PLAN.md`
 - `README.md`
 - `backend/README.md`
+
+## Estensioni operative completate
+
+- il monitor `ingestion` copre tutti gli stage applicativi con filtri condivisibili
