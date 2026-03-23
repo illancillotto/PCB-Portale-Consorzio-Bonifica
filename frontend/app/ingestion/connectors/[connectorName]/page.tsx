@@ -17,6 +17,7 @@ interface ConnectorDetailPageProps {
   searchParams?: Promise<{
     status?: string;
     issueSeverity?: 'warning' | 'critical';
+    issueType?: string;
   }>;
 }
 
@@ -25,6 +26,7 @@ function buildConnectorRunsFilterHref(
   filters: {
     status?: string;
     issueSeverity?: 'warning' | 'critical';
+    issueType?: string;
   },
 ) {
   const params = new URLSearchParams();
@@ -35,6 +37,10 @@ function buildConnectorRunsFilterHref(
 
   if (filters.issueSeverity) {
     params.set('issueSeverity', filters.issueSeverity);
+  }
+
+  if (filters.issueType) {
+    params.set('issueType', filters.issueType);
   }
 
   const queryString = params.toString();
@@ -65,6 +71,10 @@ export default async function ConnectorDetailPage({
   });
   const connectorIssues = connector.issues.filter((issue) => {
     if (filters.issueSeverity && issue.severity !== filters.issueSeverity) {
+      return false;
+    }
+
+    if (filters.issueType && issue.issueType !== filters.issueType) {
       return false;
     }
 
@@ -207,7 +217,10 @@ export default async function ConnectorDetailPage({
       <SectionCard title="Issue operative" eyebrow="Attention">
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
-            href={buildConnectorRunsFilterHref(connector.connectorName, { status: filters.status })}
+            href={buildConnectorRunsFilterHref(connector.connectorName, {
+              status: filters.status,
+              issueType: filters.issueType,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.issueSeverity
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -222,6 +235,7 @@ export default async function ConnectorDetailPage({
               href={buildConnectorRunsFilterHref(connector.connectorName, {
                 status: filters.status,
                 issueSeverity: severity,
+                issueType: filters.issueType,
               })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.issueSeverity === severity
@@ -232,6 +246,40 @@ export default async function ConnectorDetailPage({
               {severity}
             </Link>
           ))}
+        </div>
+        <div className="mb-6 flex flex-wrap gap-3">
+          <Link
+            href={buildConnectorRunsFilterHref(connector.connectorName, {
+              status: filters.status,
+              issueSeverity: filters.issueSeverity,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.issueType
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti i tipi
+          </Link>
+          {['not_configured', 'not_runnable', 'dry_run_only', 'latest_run_failed', 'no_completed_runs'].map(
+            (issueType) => (
+              <Link
+                key={issueType}
+                href={buildConnectorRunsFilterHref(connector.connectorName, {
+                  status: filters.status,
+                  issueSeverity: filters.issueSeverity,
+                  issueType,
+                })}
+                className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                  filters.issueType === issueType
+                    ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                    : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+                }`}
+              >
+                {issueType}
+              </Link>
+            ),
+          )}
         </div>
         {connectorIssues.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">Nessuna issue aperta per il connector corrente.</p>
@@ -273,6 +321,7 @@ export default async function ConnectorDetailPage({
           <Link
             href={buildConnectorRunsFilterHref(connector.connectorName, {
               issueSeverity: filters.issueSeverity,
+              issueType: filters.issueType,
             })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.status
@@ -288,6 +337,7 @@ export default async function ConnectorDetailPage({
               href={buildConnectorRunsFilterHref(connector.connectorName, {
                 status,
                 issueSeverity: filters.issueSeverity,
+                issueType: filters.issueType,
               })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.status === status
