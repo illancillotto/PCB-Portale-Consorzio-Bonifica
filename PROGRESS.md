@@ -219,6 +219,7 @@ Nota:
 - riepilogo operativo ingestion in lista e dettaglio run: completato
 - filtri operativi ingestion in lista e dettaglio run: completato
 - riepilogo audit e filtri operativi dedicati: completato
+- `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato
 - endpoint GIS applicativo relazioni soggetto-particella: completato
 - filtri GIS relazioni per soggetto/particella: completato
