@@ -18,6 +18,29 @@ interface IngestionRunDetailPageProps {
   params: Promise<{
     id: string;
   }>;
+  searchParams?: Promise<{
+    normalizedStatus?: string;
+    matchingStatus?: string;
+  }>;
+}
+
+function buildRunDetailFilterHref(
+  runId: string,
+  filters: { normalizedStatus?: string; matchingStatus?: string },
+) {
+  const params = new URLSearchParams();
+
+  if (filters.normalizedStatus) {
+    params.set('normalizedStatus', filters.normalizedStatus);
+  }
+
+  if (filters.matchingStatus) {
+    params.set('matchingStatus', filters.matchingStatus);
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `/ingestion/${runId}?${queryString}` : `/ingestion/${runId}`;
 }
 
 function formatDecisionLabel(value: string) {
@@ -38,9 +61,11 @@ function canAssignSubject(status: string) {
 
 export default async function IngestionRunDetailPage({
   params,
+  searchParams,
 }: IngestionRunDetailPageProps) {
   const session = await requireOperatorSession();
   const { id } = await params;
+  const filters = (await searchParams) ?? {};
 
   let run;
 
@@ -72,6 +97,20 @@ export default async function IngestionRunDetailPage({
     id: subject.id,
     label: `${subject.currentDisplayName} · ${subject.cuua}`,
   }));
+  const filteredNormalizedRecords = normalizedRecords.items.filter((item) => {
+    if (filters.normalizedStatus && item.normalizationStatus !== filters.normalizedStatus) {
+      return false;
+    }
+
+    return true;
+  });
+  const filteredMatchingResults = matchingResults.items.filter((item) => {
+    if (filters.matchingStatus && item.decisionStatus !== filters.matchingStatus) {
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <PageShell
@@ -145,13 +184,41 @@ export default async function IngestionRunDetailPage({
       </SectionCard>
 
       <SectionCard title="Normalized records" eyebrow="Normalized">
-        {normalizedRecords.items.length === 0 ? (
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildRunDetailFilterHref(run.id, { matchingStatus: filters.matchingStatus })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.normalizedStatus
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti
+          </Link>
+          {Array.from(new Set(normalizedRecords.items.map((item) => item.normalizationStatus))).map((status) => (
+            <Link
+              key={status}
+              href={buildRunDetailFilterHref(run.id, {
+                normalizedStatus: status,
+                matchingStatus: filters.matchingStatus,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.normalizedStatus === status
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {status}
+            </Link>
+          ))}
+        </div>
+        {filteredNormalizedRecords.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">
             Nessun record normalizzato disponibile per questa run.
           </p>
         ) : (
           <div className="grid gap-4">
-            {normalizedRecords.items.map((item) => (
+            {filteredNormalizedRecords.map((item) => (
               <article
                 key={item.id}
                 className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
@@ -195,13 +262,41 @@ export default async function IngestionRunDetailPage({
       </SectionCard>
 
       <SectionCard title="Matching results" eyebrow="Matching">
-        {matchingResults.items.length === 0 ? (
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildRunDetailFilterHref(run.id, { normalizedStatus: filters.normalizedStatus })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.matchingStatus
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti
+          </Link>
+          {Array.from(new Set(matchingResults.items.map((item) => item.decisionStatus))).map((status) => (
+            <Link
+              key={status}
+              href={buildRunDetailFilterHref(run.id, {
+                normalizedStatus: filters.normalizedStatus,
+                matchingStatus: status,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.matchingStatus === status
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {status}
+            </Link>
+          ))}
+        </div>
+        {filteredMatchingResults.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">
             Nessun risultato di matching disponibile per questa run.
           </p>
         ) : (
           <div className="grid gap-4">
-            {matchingResults.items.map((item) => (
+            {filteredMatchingResults.map((item) => (
               <article
                 key={item.id}
                 className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
