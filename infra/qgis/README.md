@@ -18,6 +18,9 @@ Layer tematico reale pubblicato:
 - `gis.v_qgis_subjects`
 - nome WMS pubblicato: `pcb_subjects`
 - titolo layer: `Soggetti georiferiti`
+- `gis.v_qgis_subject_parcel_links`
+- nome WMS pubblicato: `pcb_subject_parcel_links`
+- titolo layer: `Relazioni soggetto-particella`
 
 Rigenerazione progetto QGIS dal container:
 

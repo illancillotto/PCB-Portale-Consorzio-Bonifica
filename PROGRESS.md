@@ -206,6 +206,7 @@ Nota:
 - risultati `GetFeatureInfo` navigabili: completato
 - evidenziazione feature da `GetFeatureInfo`: completato
 - sync inverso viewer-pannello GIS: completato
+- layer relazioni soggetto-particella pubblicato: completato
 
 ## Blocchi aperti
 
@@ -850,3 +851,19 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Layer relazioni soggetto-particella
+
+Completato:
+
+- migration GIS aggiuntiva `070-gis-relation-layer.sql`
+- terzo layer QGIS pubblicato:
+  - `pcb_subject_parcel_links`
+  - titolo `Relazioni soggetto-particella`
+- viewer frontend allineato per overlay e query WMS sul layer relazionale
+
+Verifiche eseguite:
+
+- `SELECT ... FROM gis.v_qgis_subject_parcel_links`
+- `GetCapabilities` verificato con `pcb_subject_parcel_links`
+- `GetMap` verificato con `pcb_subject_parcel_links`

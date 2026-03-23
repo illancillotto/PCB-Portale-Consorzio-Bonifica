@@ -9,6 +9,7 @@ from qgis.core import (
     QgsDataSourceUri,
     QgsFillSymbol,
     QgsLayerTreeLayer,
+    QgsLineSymbol,
     QgsMarkerSymbol,
     QgsProject,
     QgsSingleSymbolRenderer,
@@ -87,6 +88,35 @@ def build_subjects_layer() -> QgsVectorLayer:
     return layer
 
 
+def build_subject_parcel_links_layer() -> QgsVectorLayer:
+    uri = QgsDataSourceUri()
+    uri.setConnection(
+        POSTGRES_HOST,
+        POSTGRES_PORT,
+        POSTGRES_DB,
+        POSTGRES_USER,
+        POSTGRES_PASSWORD,
+    )
+    uri.setDataSource("gis", "v_qgis_subject_parcel_links", "geometry", "", "id")
+
+    layer = QgsVectorLayer(uri.uri(False), "Relazioni soggetto-particella", "postgres")
+
+    if not layer.isValid():
+        raise RuntimeError("Impossibile caricare il layer PostGIS gis.v_qgis_subject_parcel_links")
+
+    symbol = QgsLineSymbol.createSimple(
+        {
+            "line_color": "31,41,51,220",
+            "line_width": "1.2",
+        }
+    )
+    layer.setRenderer(QgsSingleSymbolRenderer(symbol))
+    layer.setShortName("pcb_subject_parcel_links")
+    layer.setCrs(QgsCoordinateReferenceSystem("EPSG:4326"))
+
+    return layer
+
+
 def main() -> int:
     QgsApplication.setPrefixPath(QGIS_PREFIX_PATH, True)
     app = QgsApplication([], False)
@@ -101,11 +131,14 @@ def main() -> int:
 
     parcels_layer = build_parcels_layer()
     subjects_layer = build_subjects_layer()
+    relation_layer = build_subject_parcel_links_layer()
     project.addMapLayer(parcels_layer)
     project.addMapLayer(subjects_layer)
+    project.addMapLayer(relation_layer)
 
     root = project.layerTreeRoot()
     root.removeAllChildren()
+    root.addChildNode(QgsLayerTreeLayer(relation_layer))
     root.addChildNode(QgsLayerTreeLayer(parcels_layer))
     root.addChildNode(QgsLayerTreeLayer(subjects_layer))
 
@@ -116,6 +149,7 @@ def main() -> int:
     print(f"Project layers: {len(project.mapLayers())}")
     print(f"Layer published: pcb_parcels -> {parcels_layer.name()}")
     print(f"Layer published: pcb_subjects -> {subjects_layer.name()}")
+    print(f"Layer published: pcb_subject_parcel_links -> {relation_layer.name()}")
     app.exitQgis()
     return 0
 

@@ -17,12 +17,17 @@ function getQgisRequestUrl(request: Request) {
   targetUrl.searchParams.set('SERVICE', 'WMS');
   targetUrl.searchParams.set('VERSION', '1.3.0');
   targetUrl.searchParams.set('REQUEST', 'GetFeatureInfo');
-  targetUrl.searchParams.set('LAYERS', requestUrl.searchParams.get('layers') ?? 'pcb_parcels,pcb_subjects');
+  targetUrl.searchParams.set(
+    'LAYERS',
+    requestUrl.searchParams.get('layers') ?? 'pcb_subject_parcel_links,pcb_parcels,pcb_subjects',
+  );
   targetUrl.searchParams.set(
     'QUERY_LAYERS',
-    requestUrl.searchParams.get('queryLayers') ?? requestUrl.searchParams.get('layers') ?? 'pcb_parcels,pcb_subjects',
+    requestUrl.searchParams.get('queryLayers') ??
+      requestUrl.searchParams.get('layers') ??
+      'pcb_subject_parcel_links,pcb_parcels,pcb_subjects',
   );
-  targetUrl.searchParams.set('STYLES', requestUrl.searchParams.get('styles') ?? 'default,default');
+  targetUrl.searchParams.set('STYLES', requestUrl.searchParams.get('styles') ?? 'default,default,default');
   targetUrl.searchParams.set('CRS', requestUrl.searchParams.get('crs') ?? 'EPSG:4326');
   targetUrl.searchParams.set('BBOX', requestUrl.searchParams.get('bbox') ?? '');
   targetUrl.searchParams.set('WIDTH', requestUrl.searchParams.get('width') ?? '');

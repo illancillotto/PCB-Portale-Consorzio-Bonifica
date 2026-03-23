@@ -235,11 +235,12 @@ Stato attuale:
 - completati link navigabili dai risultati `GetFeatureInfo`
 - completata evidenziazione automatica in mappa della feature selezionata via `GetFeatureInfo`
 - completato sync inverso tra selezione mappa e pannello risultati
+- completata vista/overlay tematico dedicato alle relazioni soggetto-particella
 
 Prossimo passo naturale:
 
-- introdurre una vista QGIS dedicata alle relazioni soggetto-particella
-- oppure introdurre una vista/overlay tematico dedicato alle relazioni soggetto-particella
+- introdurre interrogazione più precisa del layer relazionale via `GetFeatureInfo`
+- oppure portare nel backend un endpoint GIS dedicato alle relazioni per analisi applicativa
 
 Dipendenze:
 

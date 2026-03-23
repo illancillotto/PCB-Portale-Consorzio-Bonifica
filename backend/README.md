@@ -84,7 +84,7 @@ API protette da ruolo `pcb-operator`:
 
 Il dominio `gis` espone anche lo stato del publication target QGIS Server via `GET /api/v1/gis/publication-status`.
 Il controllo usa `PCB_QGIS_SERVER_URL` e `PCB_QGIS_PROJECT_FILE` per verificare `GetCapabilities` sul route pubblico `/ows/`.
-Il publication target locale espone gia` i layer tematici reali `pcb_parcels` e `pcb_subjects`.
+Il publication target locale espone gia` i layer tematici reali `pcb_parcels`, `pcb_subjects` e `pcb_subject_parcel_links`.
 
 ## Keycloak locale
 

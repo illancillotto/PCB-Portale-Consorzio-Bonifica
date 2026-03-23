@@ -104,7 +104,7 @@ export function GisMap({
         leaflet
           .tileLayer
           .wms(wmsUrl.toString(), {
-            layers: 'pcb_parcels,pcb_subjects',
+            layers: 'pcb_subject_parcel_links,pcb_parcels,pcb_subjects',
             format: 'image/png',
             transparent: true,
             version: '1.3.0',
@@ -123,9 +123,9 @@ export function GisMap({
 
         const point = map.latLngToContainerPoint(event.latlng);
         const params = new URLSearchParams({
-          layers: 'pcb_parcels,pcb_subjects',
-          queryLayers: 'pcb_parcels,pcb_subjects',
-          styles: 'default,default',
+          layers: 'pcb_subject_parcel_links,pcb_parcels,pcb_subjects',
+          queryLayers: 'pcb_subject_parcel_links,pcb_parcels,pcb_subjects',
+          styles: 'default,default,default',
           crs: 'EPSG:4326',
           bbox: `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`,
           width: String(size.x),
@@ -294,6 +294,9 @@ export function GisMap({
         <p className="text-sm font-semibold text-[var(--pcb-ink)]">Interrogazione mappa</p>
         <p className="mt-1 text-xs text-[var(--pcb-muted)]">
           Clicca sul viewer per interrogare il publication target QGIS con `GetFeatureInfo`.
+        </p>
+        <p className="mt-1 text-xs text-[var(--pcb-muted)]">
+          Layer interrogati: `pcb_subject_parcel_links`, `pcb_parcels`, `pcb_subjects`.
         </p>
         {featureInfoState.loading ? (
           <p className="mt-3 text-sm text-[var(--pcb-muted)]">Caricamento feature info...</p>
