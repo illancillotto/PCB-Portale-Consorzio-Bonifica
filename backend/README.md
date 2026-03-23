@@ -33,6 +33,7 @@ npm run dev
 
 - `GET /api/v1/health`
 - `GET /api/v1/system/modules`
+- `GET /api/v1/system/integrations`
 - `GET /api/v1/auth/keycloak`
 - `GET /api/v1/auth/keycloak/discovery`
 - `GET /api/v1/auth/session`

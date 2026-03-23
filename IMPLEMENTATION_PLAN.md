@@ -383,6 +383,19 @@ Stato:
 
 - in corso
 
+### Step E
+
+Centralizzare lo stato operativo delle integrazioni core.
+
+Output:
+
+- endpoint protetto di integrazione runtime
+- vista frontend protetta per operatori
+
+Stato:
+
+- completato
+
 ## Criteri di done per ogni milestone
 
 - codice coerente con modular monolith

@@ -15,6 +15,7 @@ const navigationItems = [
   { href: '/gis', label: 'GIS' },
   { href: '/ingestion', label: 'Ingestion' },
   { href: '/audit', label: 'Audit' },
+  { href: '/operations', label: 'Operations' },
 ];
 
 export async function PageShell({ title, description, children, actions }: PageShellProps) {

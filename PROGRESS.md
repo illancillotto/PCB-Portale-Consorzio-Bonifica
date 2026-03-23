@@ -198,6 +198,7 @@ Nota:
 - Keycloak realm import + JWT verification backend: completato
 - Keycloak protezione applicativa estesa: completato
 - QGIS publication target: operativo con `GetCapabilities` verificato
+- operations view centralizzata integrazioni: completata
 
 ## Blocchi aperti
 
@@ -706,3 +707,26 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Stato integrazioni centralizzato
+
+Completato:
+
+- endpoint backend protetto `GET /api/v1/system/integrations`
+- aggregazione runtime di:
+  - PostgreSQL/PostGIS
+  - Redis
+  - Keycloak discovery
+  - QGIS `GetCapabilities`
+- vista frontend protetta `/operations`
+- navigazione dashboard aggiornata con accesso dedicato
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
+- `GET /api/v1/system/integrations` senza token -> `401`
+- `GET /api/v1/system/integrations` con token Keycloak reale -> `200`
+- payload verificato con `postgres`, `redis`, `keycloak`, `qgis` tutti in stato `ok`

@@ -30,6 +30,11 @@ const moduleCards = [
     description: 'Eventi di pipeline e decisioni manuali, tracciati e consultabili in sicurezza.',
     href: '/audit',
   },
+  {
+    title: 'Operations',
+    description: 'Stato centralizzato di Postgres, Redis, Keycloak e QGIS per la verifica runtime.',
+    href: '/operations',
+  },
 ];
 
 export default async function HomePage() {

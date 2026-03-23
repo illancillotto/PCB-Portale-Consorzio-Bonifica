@@ -203,6 +203,20 @@ export interface GisPublicationStatus {
   checkedAt: string;
 }
 
+export interface IntegrationStatusItem {
+  key: 'postgres' | 'redis' | 'keycloak' | 'qgis';
+  label: string;
+  configured: boolean;
+  available: boolean;
+  statusLabel: 'ok' | 'unavailable' | 'not_configured';
+  detail: string | null;
+}
+
+export interface IntegrationStatus {
+  checkedAt: string;
+  items: IntegrationStatusItem[];
+}
+
 interface PaginatedResponse<T> {
   items: T[];
   total: number;
@@ -310,6 +324,12 @@ export async function getGisMapFeatures(accessToken: string) {
 
 export async function getGisPublicationStatus(accessToken: string) {
   return apiFetch<GisPublicationStatus>('/gis/publication-status', {
+    accessToken,
+  });
+}
+
+export async function getSystemIntegrations(accessToken: string) {
+  return apiFetch<IntegrationStatus>('/system/integrations', {
     accessToken,
   });
 }
