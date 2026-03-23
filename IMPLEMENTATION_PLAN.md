@@ -236,6 +236,7 @@ Stato attuale:
 - completata evidenziazione automatica in mappa della feature selezionata via `GetFeatureInfo`
 - completato sync inverso tra selezione mappa e pannello risultati
 - completato cartiglio `GetFeatureInfo` con contesto PCB relazionale
+- completato raffinamento `GetFeatureInfo` con priorita` al layer relazionale
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella
 - completato endpoint GIS applicativo dedicato alle relazioni soggetto-particella
 - completati filtri `subjectId` e `parcelId` sull'endpoint GIS relazionale
@@ -244,8 +245,8 @@ Stato attuale:
 
 Prossimo passo naturale:
 
-- introdurre interrogazione piu` precisa del layer relazionale via `GetFeatureInfo`
-- oppure usare il layer relazionale per popup/cartigli ancora piu` mirati nel viewer
+- usare il layer relazionale per popup/cartigli ancora piu` mirati nel viewer
+- oppure portare nel viewer una legenda/controllo layer operativo
 
 Dipendenze:
 

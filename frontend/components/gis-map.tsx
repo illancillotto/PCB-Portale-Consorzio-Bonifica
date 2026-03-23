@@ -17,6 +17,8 @@ interface QgisFeatureInfoResponse {
   features: QgisFeatureInfoFeature[];
 }
 
+const qgisQueryableLayers = 'pcb_subject_parcel_links,pcb_parcels,pcb_subjects';
+
 function toFeatureInfoFeature(feature: GisMapFeature): QgisFeatureInfoFeature {
   return {
     id: `${feature.properties.layerCode}.${feature.id}`,
@@ -76,6 +78,70 @@ function getRelatedSubjectParcelLinks(
       (subjectId && relation.subjectId === subjectId) ||
       (parcelId && relation.parcelId === parcelId),
   );
+}
+
+function getFeaturePriority(feature: QgisFeatureInfoFeature) {
+  const layerCode = asOptionalString(feature.properties.layer_code);
+
+  if (layerCode === 'pcb_subject_parcel_links') {
+    return 0;
+  }
+
+  if (layerCode === 'pcb_parcels') {
+    return 1;
+  }
+
+  if (layerCode === 'pcb_subjects') {
+    return 2;
+  }
+
+  return 3;
+}
+
+function matchesFocus(
+  feature: QgisFeatureInfoFeature,
+  selectedSubjectId?: string,
+  selectedParcelId?: string,
+) {
+  const subjectId = asOptionalString(feature.properties.subject_id);
+  const parcelId = asOptionalString(feature.properties.parcel_id);
+
+  if (selectedSubjectId && subjectId === selectedSubjectId) {
+    return true;
+  }
+
+  if (selectedParcelId && parcelId === selectedParcelId) {
+    return true;
+  }
+
+  return false;
+}
+
+function normalizeFeatureInfoResults(
+  features: QgisFeatureInfoFeature[],
+  selectedSubjectId?: string,
+  selectedParcelId?: string,
+) {
+  const sortedFeatures = [...features].sort((left, right) => {
+    const leftPriority = getFeaturePriority(left);
+    const rightPriority = getFeaturePriority(right);
+
+    if (leftPriority !== rightPriority) {
+      return leftPriority - rightPriority;
+    }
+
+    return String(left.id).localeCompare(String(right.id));
+  });
+
+  if (!selectedSubjectId && !selectedParcelId) {
+    return sortedFeatures;
+  }
+
+  const focusedFeatures = sortedFeatures.filter((feature) =>
+    matchesFocus(feature, selectedSubjectId, selectedParcelId),
+  );
+
+  return focusedFeatures.length > 0 ? focusedFeatures : sortedFeatures;
 }
 
 interface GisMapProps {
@@ -155,8 +221,8 @@ export function GisMap({
 
         const point = map.latLngToContainerPoint(event.latlng);
         const params = new URLSearchParams({
-          layers: 'pcb_subject_parcel_links,pcb_parcels,pcb_subjects',
-          queryLayers: 'pcb_subject_parcel_links,pcb_parcels,pcb_subjects',
+          layers: qgisQueryableLayers,
+          queryLayers: qgisQueryableLayers,
           styles: 'default,default,default',
           crs: 'EPSG:4326',
           bbox: `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`,
@@ -183,7 +249,11 @@ export function GisMap({
           }
 
           const data = (await response.json()) as QgisFeatureInfoResponse;
-          const nextFeatures = data.features ?? [];
+          const nextFeatures = normalizeFeatureInfoResults(
+            data.features ?? [],
+            selectedSubjectId,
+            selectedParcelId,
+          );
           const firstFeature = nextFeatures[0];
 
           setFeatureInfoState({
@@ -329,6 +399,9 @@ export function GisMap({
         </p>
         <p className="mt-1 text-xs text-[var(--pcb-muted)]">
           Layer interrogati: `pcb_subject_parcel_links`, `pcb_parcels`, `pcb_subjects`.
+        </p>
+        <p className="mt-1 text-xs text-[var(--pcb-muted)]">
+          I risultati sono ordinati con priorita` al layer relazionale e, se c'e` un focus attivo, ristretti alle feature coerenti con soggetto o particella correnti quando disponibili.
         </p>
         {featureInfoState.loading ? (
           <p className="mt-3 text-sm text-[var(--pcb-muted)]">Caricamento feature info...</p>
