@@ -45,9 +45,9 @@ services:
     container_name: pcb-qgis-server
     restart: unless-stopped
     environment:
-      QGIS_PROJECT_FILE: /io/projects/pcb-placeholder.qgz
+      QGIS_PROJECT_FILE: ${PCB_QGIS_PROJECT_FILE:-/io/projects/pcb.qgs}
     ports:
-      - "8090:80"
+      - "${PCB_QGIS_PORT:-8090}:80"
     volumes:
       - ./infra/qgis/projects:/io/projects
 

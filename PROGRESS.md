@@ -379,6 +379,19 @@ Nota:
 
 - il pull dell'immagine `qgis/qgis-server:latest` e` molto pesante; l'availability reale del container non e` stata attesa sul critical path
 
+### 2026-03-23 – Bootstrap progetto QGIS
+
+Completato:
+
+- file progetto minimale `infra/qgis/projects/pcb.qgs`
+- riallineamento `docker-compose` a `PCB_QGIS_PROJECT_FILE`
+- configurazione QGIS esplicita in `.env.example`
+
+Verifiche eseguite:
+
+- validazione strutturale del file nel repository
+- wiring compose e documentazione aggiornati
+
 ### 2026-03-23 – Redis operativo backend
 
 Completato:

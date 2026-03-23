@@ -225,6 +225,7 @@ Stato attuale:
 - completato viewer cartografico iniziale con feature PostGIS reali
 - completati deep-link contestuali da soggetti e particelle verso il viewer
 - completata osservabilita` del publication target QGIS lato backend/frontend
+- completato progetto QGIS minimale di bootstrap nel repository
 
 Dipendenze:
 
