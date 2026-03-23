@@ -2,7 +2,14 @@ import Link from 'next/link';
 import { PageShell } from '../components/page-shell';
 import { SearchForm } from '../components/search-form';
 import { SectionCard } from '../components/section-card';
-import { getParcels, getSubjects } from '../lib/api';
+import {
+  getGisLayers,
+  getGisPublicationStatus,
+  getGisSubjectParcelLinks,
+  getParcels,
+  getSubjects,
+} from '../lib/api';
+import { getOptionalSession } from '../lib/auth';
 
 const moduleCards = [
   {
@@ -48,7 +55,22 @@ const moduleCards = [
 ];
 
 export default async function HomePage() {
-  const [subjects, parcels] = await Promise.all([getSubjects(), getParcels()]);
+  const session = await getOptionalSession();
+  const [subjects, parcels, gisMetrics] = await Promise.all([
+    getSubjects(),
+    getParcels(),
+    session
+      ? Promise.all([
+          getGisLayers(session.accessToken),
+          getGisPublicationStatus(session.accessToken),
+          getGisSubjectParcelLinks(session.accessToken),
+        ]).then(([layers, publicationStatus, subjectParcelLinks]) => ({
+          layers,
+          publicationStatus,
+          subjectParcelLinks,
+        }))
+      : Promise.resolve(null),
+  ]);
 
   return (
     <PageShell
@@ -91,6 +113,48 @@ export default async function HomePage() {
           </ul>
         </SectionCard>
       </section>
+
+      <SectionCard title="Metriche GIS" eyebrow="Map Ops">
+        {gisMetrics ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Layer pubblicati
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {gisMetrics.layers.total}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Relazioni GIS
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {gisMetrics.subjectParcelLinks.total}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Publication target
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {gisMetrics.publicationStatus.statusLabel}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Preset operativi
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">4</p>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
+            Le metriche GIS operative sono visibili con sessione operatore attiva. Il viewer e gli shortcut restano
+            disponibili dai moduli GIS e Operations.
+          </div>
+        )}
+      </SectionCard>
 
       <SectionCard title="Preset GIS rapidi" eyebrow="Map">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

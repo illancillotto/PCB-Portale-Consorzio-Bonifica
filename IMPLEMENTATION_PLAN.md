@@ -243,6 +243,7 @@ Stato attuale:
 - completati preset operativi GIS condivisibili
 - completati quick link ai preset GIS da viste operative
 - completati preset GIS contestuali da dashboard e search
+- completate metriche GIS sintetiche in dashboard
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella
 - completato endpoint GIS applicativo dedicato alle relazioni soggetto-particella
 - completati filtri `subjectId` e `parcelId` sull'endpoint GIS relazionale
@@ -252,7 +253,7 @@ Stato attuale:
 Prossimo passo naturale:
 
 - usare il layer relazionale per popup/cartigli ancora piu` mirati nel viewer
-- oppure portare metriche operative GIS sintetiche nella dashboard principale
+- oppure estendere la dashboard con metriche sintetiche anche per ingestion e audit
 
 Dipendenze:
 

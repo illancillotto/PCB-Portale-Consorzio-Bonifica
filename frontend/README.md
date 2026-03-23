@@ -52,5 +52,6 @@ Stato attuale:
 - preset operativi GIS condivisibili via URL: `completo`, `relazioni`, `catasto`, `soggetti`
 - azioni rapide ai preset GIS da schede soggetto, particella e operations
 - preset GIS contestuali disponibili anche da dashboard e risultati ricerca
+- metriche GIS sintetiche nella dashboard principale per sessioni operatore
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

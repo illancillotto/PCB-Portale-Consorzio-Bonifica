@@ -214,6 +214,7 @@ Nota:
 - preset operativi GIS condivisibili: completato
 - quick link ai preset GIS da viste operative: completato
 - preset GIS contestuali da dashboard e search: completato
+- metriche GIS sintetiche in dashboard: completato
 - layer relazioni soggetto-particella pubblicato: completato
 - endpoint GIS applicativo relazioni soggetto-particella: completato
 - filtri GIS relazioni per soggetto/particella: completato
