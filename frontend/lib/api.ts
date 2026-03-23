@@ -138,6 +138,17 @@ export interface MatchingResult {
   createdAt: string;
 }
 
+export interface AuditEvent {
+  id: string;
+  eventType: string;
+  actorType: string;
+  actorId: string | null;
+  entityType: string;
+  entityId: string;
+  payload: Record<string, unknown>;
+  createdAt: string;
+}
+
 export interface GisLayer {
   id: string;
   name: string;
@@ -256,6 +267,12 @@ export async function getGisLayers(accessToken: string) {
 
 export async function getGisFeatureLinks(accessToken: string) {
   return apiFetch<PaginatedResponse<GisFeatureLink>>('/gis/feature-links', {
+    accessToken,
+  });
+}
+
+export async function getAuditEvents(accessToken: string) {
+  return apiFetch<PaginatedResponse<AuditEvent>>('/audit/events', {
     accessToken,
   });
 }

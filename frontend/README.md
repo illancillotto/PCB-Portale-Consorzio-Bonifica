@@ -31,6 +31,7 @@ Stato attuale:
 - vista GIS foundation basata su catalogo layer
 - ingestion monitor iniziale
 - dettaglio run ingestion con normalized e matching
+- audit trail operativo protetto
 - login frontend reale via Keycloak locale
 - protezione selettiva delle viste operative `ingestion` e `gis`
 - proxy frontend autenticato per le azioni operative `ingestion`

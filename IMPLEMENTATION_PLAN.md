@@ -255,6 +255,7 @@ Stato attuale:
 - completata integrazione login frontend
 - completata protezione selettiva iniziale delle viste operative `ingestion` e `gis`
 - completata protezione delle API operative `ingestion` e `gis`
+- completata protezione e prima vista operativa `audit`
 - da completare protezione selettiva delle altre API non pubbliche del portale
 
 Dipendenze:

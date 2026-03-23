@@ -23,7 +23,12 @@ const moduleCards = [
   {
     title: 'Ingestione',
     description: 'Run di ingestione e trigger manuale già disponibili a livello backend.',
-    href: '/search?q=connector',
+    href: '/ingestion',
+  },
+  {
+    title: 'Audit operativo',
+    description: 'Eventi di pipeline e decisioni manuali, tracciati e consultabili in sicurezza.',
+    href: '/audit',
   },
 ];
 
@@ -36,7 +41,7 @@ export default async function HomePage() {
       description="La dashboard iniziale usa dati reali del backend NestJS e del database PostgreSQL/PostGIS per anagrafiche, catasto e ricerca."
       actions={<SearchForm />}
     >
-      <section className="grid gap-4 md:grid-cols-2">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {moduleCards.map((card) => (
           <Link
             key={card.title}

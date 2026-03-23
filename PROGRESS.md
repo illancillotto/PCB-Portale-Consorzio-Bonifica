@@ -313,6 +313,22 @@ Verifiche eseguite:
 - `GET /ingestion` con cookie di sessione -> `200`
 - `GET /gis` con cookie di sessione -> contenuto operativo visibile
 
+### 2026-03-23 – Audit protetto e vista operativa
+
+Completato:
+
+- protezione backend con ruolo `pcb-operator` su `GET /api/v1/audit/events`
+- prima vista frontend `/audit` collegata all'API reale audit
+- navigazione applicativa aggiornata con accesso a audit trail
+
+Verifiche eseguite:
+
+- lint e build backend
+- lint e build frontend
+- `GET /api/v1/audit/events` senza token -> `401`
+- `GET /audit` senza sessione -> redirect `/login`
+- `GET /audit` con sessione frontend -> contenuto operativo visibile
+
 ### 2026-03-23 – Redis operativo backend
 
 Completato:

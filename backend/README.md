@@ -77,6 +77,7 @@ API protette da ruolo `pcb-operator`:
 
 - tutte le route `GET/POST /api/v1/ingestion/...`
 - tutte le route `GET /api/v1/gis/...`
+- tutte le route `GET /api/v1/audit/...`
 
 ## Keycloak locale
 
