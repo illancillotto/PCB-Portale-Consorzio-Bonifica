@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { IngestionAutoRefresh } from '../../components/ingestion-auto-refresh';
 import { IngestionRunTrigger } from '../../components/ingestion-run-trigger';
 import { PageShell } from '../../components/page-shell';
 import { SectionCard } from '../../components/section-card';
@@ -112,6 +113,7 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
     return true;
   });
   const queuedRuns = runs.items.filter((run) => run.status === 'queued').length;
+  const runningRuns = runs.items.filter((run) => run.status === 'running').length;
   const completedRuns = runs.items.filter((run) => run.status === 'completed').length;
   const failedRuns = runs.items.filter((run) => run.status === 'failed').length;
   const totalRecords = runs.items.reduce((total, run) => total + run.recordsTotal, 0);
@@ -134,6 +136,8 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
         </div>
       }
     >
+      <IngestionAutoRefresh enabled={queuedRuns > 0 || runningRuns > 0} />
+
       <SectionCard title="Riepilogo operativo" eyebrow="Summary">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
@@ -147,6 +151,11 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Run in coda</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{queuedRuns}</p>
+            {runningRuns > 0 ? (
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                {runningRuns} run in esecuzione
+              </p>
+            ) : null}
           </article>
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Record osservati</p>

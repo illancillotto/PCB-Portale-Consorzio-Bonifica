@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { IngestionAutoRefresh } from '../../../components/ingestion-auto-refresh';
 import { IngestionStageTrigger } from '../../../components/ingestion-stage-trigger';
 import { MatchingDecisionTrigger } from '../../../components/matching-decision-trigger';
 import { MatchingSubjectAssignment } from '../../../components/matching-subject-assignment';
@@ -93,6 +94,7 @@ export default async function IngestionRunDetailPage({
   const unmatchedCount = matchingResults.items.filter(
     (item) => item.decisionStatus === 'unmatched',
   ).length;
+  const autoRefreshEnabled = run.status === 'queued' || run.status === 'running';
   const subjectOptions = subjects.items.map((subject) => ({
     id: subject.id,
     label: `${subject.currentDisplayName} · ${subject.cuua}`,
@@ -123,6 +125,8 @@ export default async function IngestionRunDetailPage({
         </div>
       }
     >
+      <IngestionAutoRefresh enabled={autoRefreshEnabled} />
+
       <SectionCard title="Sintesi run" eyebrow="Ingestion">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>

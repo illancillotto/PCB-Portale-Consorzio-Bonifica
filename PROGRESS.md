@@ -969,3 +969,16 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run lint --workspace connectors`
 - `npm run build --workspace connectors`
+
+### 2026-03-23 – Auto-refresh delle viste ingestion
+
+Completato:
+
+- auto-refresh del monitor `ingestion` quando esistono run `queued` o `running`
+- auto-refresh del dettaglio run `ingestion/[id]` nello stesso scenario
+- visibilita` delle run in esecuzione nel riepilogo del monitor
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
