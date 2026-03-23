@@ -238,6 +238,7 @@ Stato attuale:
 - completato cartiglio `GetFeatureInfo` con contesto PCB relazionale
 - completato raffinamento `GetFeatureInfo` con priorita` al layer relazionale
 - completato controllo layer operativo nel viewer GIS
+- completata legenda cartografica esplicita nel viewer GIS
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella
 - completato endpoint GIS applicativo dedicato alle relazioni soggetto-particella
 - completati filtri `subjectId` e `parcelId` sull'endpoint GIS relazionale
@@ -247,7 +248,7 @@ Stato attuale:
 Prossimo passo naturale:
 
 - usare il layer relazionale per popup/cartigli ancora piu` mirati nel viewer
-- oppure introdurre una legenda cartografica piu` esplicita per layer e simboli
+- oppure sincronizzare i layer attivi del viewer con la URL per condividere il contesto GIS
 
 Dipendenze:
 

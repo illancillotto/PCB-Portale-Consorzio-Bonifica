@@ -25,6 +25,24 @@ const qgisLayerLabels: Record<(typeof defaultQgisLayers)[number], string> = {
   pcb_subjects: 'Soggetti',
 };
 
+const qgisLayerLegendStyles: Record<
+  (typeof defaultQgisLayers)[number],
+  { swatchClassName: string; description: string }
+> = {
+  pcb_subject_parcel_links: {
+    swatchClassName: 'border-[#8f2d17] bg-[#c85d3a]',
+    description: 'legame geografico tra soggetto e particella',
+  },
+  pcb_parcels: {
+    swatchClassName: 'border-[#3d6d64] bg-[#78a59a]',
+    description: 'geometrie particellari catastali',
+  },
+  pcb_subjects: {
+    swatchClassName: 'border-[#8f3a21] bg-[#d88a58]',
+    description: 'punti o marker soggetto georiferiti',
+  },
+};
+
 function toFeatureInfoFeature(feature: GisMapFeature): QgisFeatureInfoFeature {
   return {
     id: `${feature.properties.layerCode}.${feature.id}`,
@@ -456,6 +474,51 @@ export function GisMap({
           <p className="text-xs text-[var(--pcb-muted)]">
             I layer attivi controllano sia l&apos;overlay WMS sia l&apos;interrogazione `GetFeatureInfo`.
           </p>
+        </div>
+        <div className="mb-4 grid gap-3 rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+            Legenda cartografica
+          </p>
+          <div className="grid gap-3 md:grid-cols-3">
+            {defaultQgisLayers.map((layerCode) => {
+              const isActive = activeQgisLayers.includes(layerCode);
+              const legendStyle = qgisLayerLegendStyles[layerCode];
+
+              return (
+                <article
+                  key={layerCode}
+                  className={`rounded-2xl border p-4 ${
+                    isActive
+                      ? 'border-[var(--pcb-line)] bg-[var(--pcb-bg)]/45'
+                      : 'border-dashed border-[var(--pcb-line)] bg-[var(--pcb-bg)]/20 opacity-70'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`inline-flex h-4 w-4 rounded-full border-2 ${legendStyle.swatchClassName}`}
+                    />
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--pcb-ink)]">
+                        {qgisLayerLabels[layerCode]}
+                      </p>
+                      <p className="text-xs text-[var(--pcb-muted)]">
+                        {isActive ? 'attivo' : 'disattivato'}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs text-[var(--pcb-muted)]">{legendStyle.description}</p>
+                </article>
+              );
+            })}
+          </div>
+          <div className="grid gap-2 text-xs text-[var(--pcb-muted)] md:grid-cols-2">
+            <p>
+              <strong className="text-[var(--pcb-ink)]">GeoJSON applicativo</strong>: evidenziato dal backend PCB per focus e selezione.
+            </p>
+            <p>
+              <strong className="text-[var(--pcb-ink)]">Overlay WMS</strong>: pubblicazione QGIS Server usata per consultazione e `GetFeatureInfo`.
+            </p>
+          </div>
         </div>
         <p className="text-sm font-semibold text-[var(--pcb-ink)]">Interrogazione mappa</p>
         <p className="mt-1 text-xs text-[var(--pcb-muted)]">
