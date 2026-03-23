@@ -83,6 +83,7 @@ Note matching:
 - `GET /api/v1/ingestion/connectors/{connectorName}` espone anche l’elenco issue del singolo connector
 - il dettaglio connector espone anche contatori per tipo di issue
 - catalogo e dettaglio connector espongono anche `operationalStatus` derivato da issue critiche/warning
+- il catalogo connector e` ordinato backend-side per priorita` operativa (`critical -> warning -> healthy`)
 - `GET /api/v1/parcels`
 - `GET /api/v1/parcels/{id}`
 - `GET /api/v1/parcels/{id}/subjects`

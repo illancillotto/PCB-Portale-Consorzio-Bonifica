@@ -268,6 +268,7 @@ Stato attuale:
 - completato filtro `issueType` nel dettaglio connector
 - completati contatori per tipo di issue nel dettaglio connector
 - completato `operationalStatus` sintetico per catalogo e dettaglio connector
+- completato ordinamento backend-side del catalogo connector per priorita` operativa
 - completato riepilogo audit con filtri operativi dedicati
 - completata osservabilita` cross-domain nella vista `operations`
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella

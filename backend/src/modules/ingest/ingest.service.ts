@@ -214,8 +214,7 @@ export class IngestService {
       issueCountsByConnector.set(issue.connectorName, current);
     }
 
-    return {
-      items: connectorCatalog.map((connector) => {
+    const items: IngestionConnectorCatalogResponseDto[] = connectorCatalog.map((connector) => {
         const latestRun = latestRunByConnector.get(connector.connectorName);
         const executionReadiness = this.getConnectorExecutionReadiness(connector.connectorName);
         const issueCounters = issueCountsByConnector.get(connector.connectorName) ?? {
@@ -241,11 +240,34 @@ export class IngestService {
                 status: latestRun.status,
                 startedAt: new Date(latestRun.started_at).toISOString(),
                 endedAt: latestRun.ended_at ? new Date(latestRun.ended_at).toISOString() : null,
-              }
+          }
             : null,
           issueCounters,
         };
-      }),
+      });
+
+    items.sort((left, right) => {
+      const statusWeight = (status: 'healthy' | 'warning' | 'critical') =>
+        status === 'critical' ? 0 : status === 'warning' ? 1 : 2;
+
+      const statusDiff =
+        statusWeight(left.operationalStatus) - statusWeight(right.operationalStatus);
+
+      if (statusDiff !== 0) {
+        return statusDiff;
+      }
+
+      const issueDiff = right.issueCounters.total - left.issueCounters.total;
+
+      if (issueDiff !== 0) {
+        return issueDiff;
+      }
+
+      return left.displayName.localeCompare(right.displayName, 'it');
+    });
+
+    return {
+      items,
       total: connectorCatalog.length,
     };
   }
