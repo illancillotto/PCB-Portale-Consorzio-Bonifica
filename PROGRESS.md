@@ -240,6 +240,7 @@ Nota:
 - dettaglio connector arricchito con contatori per tipo di issue: completato
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
+- feed issue connector ordinato backend-side per severita` e connector: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

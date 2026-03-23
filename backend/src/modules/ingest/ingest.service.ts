@@ -371,6 +371,26 @@ export class IngestService {
       }
     }
 
+    items.sort((left, right) => {
+      const severityWeight = (severity: 'warning' | 'critical') =>
+        severity === 'critical' ? 0 : 1;
+
+      const severityDiff =
+        severityWeight(left.severity) - severityWeight(right.severity);
+
+      if (severityDiff !== 0) {
+        return severityDiff;
+      }
+
+      const connectorDiff = left.displayName.localeCompare(right.displayName, 'it');
+
+      if (connectorDiff !== 0) {
+        return connectorDiff;
+      }
+
+      return left.issueType.localeCompare(right.issueType, 'it');
+    });
+
     return {
       items,
       total: items.length,

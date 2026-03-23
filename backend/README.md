@@ -84,6 +84,7 @@ Note matching:
 - il dettaglio connector espone anche contatori per tipo di issue
 - catalogo e dettaglio connector espongono anche `operationalStatus` derivato da issue critiche/warning
 - il catalogo connector e` ordinato backend-side per priorita` operativa (`critical -> warning -> healthy`)
+- il feed issue connector e` ordinato backend-side per severita` e poi per connector
 - `GET /api/v1/parcels`
 - `GET /api/v1/parcels/{id}`
 - `GET /api/v1/parcels/{id}/subjects`

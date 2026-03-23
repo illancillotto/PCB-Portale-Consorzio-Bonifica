@@ -78,6 +78,7 @@ Stato attuale:
 - il dettaglio connector mostra anche un riepilogo per tipo di issue
 - catalogo e dettaglio connector mostrano anche uno stato operativo sintetico `healthy/warning/critical`
 - il catalogo connector nel monitor ingestion arriva gia` ordinato per priorita` operativa
+- il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
