@@ -268,6 +268,30 @@ Verifiche eseguite:
 - `GET /api/v1/auth/session` verificato con bearer token valido
 - `GET /api/v1/auth/operator-access` verificato con ruolo `pcb-operator`
 
+### 2026-03-23 – Keycloak frontend login operativo
+
+Completato:
+
+- sessione frontend httpOnly basata su token Keycloak validato dal backend
+- pagina `login` reale con credenziali Keycloak locali
+- route handler:
+  - `POST /api/auth/login`
+  - `POST /api/auth/logout`
+- protezione server-side delle viste operative:
+  - `/ingestion`
+  - `/ingestion/[id]`
+  - `/gis`
+- stato sessione visibile nell'header applicativo
+
+Verifiche eseguite:
+
+- lint e build frontend
+- `GET /ingestion` senza cookie -> redirect `/login`
+- login reale via `pcb.operator`
+- `GET /ingestion` con cookie di sessione -> `200`
+- `GET /gis` con cookie di sessione -> contenuto operativo visibile
+- logout con invalidazione cookie verificato
+
 ### 2026-03-23 – Redis operativo backend
 
 Completato:

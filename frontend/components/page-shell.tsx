@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getOptionalSession } from '../lib/auth';
 
 interface PageShellProps {
   title: string;
@@ -15,13 +16,15 @@ const navigationItems = [
   { href: '/ingestion', label: 'Ingestion' },
 ];
 
-export function PageShell({ title, description, children, actions }: PageShellProps) {
+export async function PageShell({ title, description, children, actions }: PageShellProps) {
+  const session = await getOptionalSession();
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-8">
       <header className="rounded-[32px] border border-[var(--pcb-line)] bg-[var(--pcb-surface)]/95 p-8 shadow-[0_24px_80px_rgba(31,41,51,0.08)]">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
-            <div className="mb-4 flex flex-wrap gap-2">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
               {navigationItems.map((item) => (
                 <Link
                   key={item.href}
@@ -31,11 +34,37 @@ export function PageShell({ title, description, children, actions }: PageShellPr
                   {item.label}
                 </Link>
               ))}
+              {session ? (
+                <span className="rounded-full bg-[var(--pcb-accent)]/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-accent)]">
+                  {session.principal.preferredUsername}
+                </span>
+              ) : null}
             </div>
             <h1 className="text-4xl font-semibold tracking-tight text-[var(--pcb-ink)]">{title}</h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--pcb-muted)]">{description}</p>
           </div>
-          {actions ? <div className="w-full max-w-xl">{actions}</div> : null}
+          <div className="flex w-full max-w-xl flex-col gap-3">
+            {actions}
+            <div className="flex items-center justify-end">
+              {session ? (
+                <form action="/api/auth/logout" method="post">
+                  <button
+                    type="submit"
+                    className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]"
+                  >
+                    Logout
+                  </button>
+                </form>
+              ) : (
+                <Link
+                  href="/login"
+                  className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]"
+                >
+                  Login
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
       </header>
 

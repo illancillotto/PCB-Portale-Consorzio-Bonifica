@@ -1,9 +1,11 @@
 import { PageShell } from '../../components/page-shell';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
+import { requireOperatorSession } from '../../lib/auth';
 import { getGisFeatureLinks, getGisLayers } from '../../lib/api';
 
 export default async function GisPage() {
+  await requireOperatorSession();
   const [layers, featureLinks] = await Promise.all([getGisLayers(), getGisFeatureLinks()]);
 
   return (

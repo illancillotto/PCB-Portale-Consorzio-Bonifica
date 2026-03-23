@@ -20,6 +20,7 @@ npm run dev
 Configurazione utile:
 
 - `PCB_API_BASE_URL` per puntare il frontend alle API backend
+- `PCB_FRONTEND_BASE_URL` per redirect coerenti delle route auth
 
 Stato attuale:
 
@@ -30,4 +31,6 @@ Stato attuale:
 - vista GIS foundation basata su catalogo layer
 - ingestion monitor iniziale
 - dettaglio run ingestion con normalized e matching
-- autenticazione reale e mappa GIS ancora non integrate
+- login frontend reale via Keycloak locale
+- protezione selettiva delle viste operative `ingestion` e `gis`
+- mappa GIS completa ancora non integrata

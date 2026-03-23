@@ -6,6 +6,7 @@ import { MatchingSubjectAssignment } from '../../../components/matching-subject-
 import { PageShell } from '../../../components/page-shell';
 import { SectionCard } from '../../../components/section-card';
 import { StatusChip } from '../../../components/status-chip';
+import { requireOperatorSession } from '../../../lib/auth';
 import {
   getSubjects,
   getIngestionRun,
@@ -38,6 +39,7 @@ function canAssignSubject(status: string) {
 export default async function IngestionRunDetailPage({
   params,
 }: IngestionRunDetailPageProps) {
+  await requireOperatorSession();
   const { id } = await params;
 
   let run;

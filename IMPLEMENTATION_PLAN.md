@@ -252,8 +252,9 @@ Stato attuale:
 - completata discovery reale lato backend
 - completata validazione JWT via JWKS
 - completata prima guard backend verificata su endpoint auth
-- da completare integrazione login frontend
-- da completare protezione selettiva delle API non pubbliche del portale
+- completata integrazione login frontend
+- completata protezione selettiva iniziale delle viste operative `ingestion` e `gis`
+- da completare protezione selettiva delle API non pubbliche del portale in modo piu` esteso
 
 Dipendenze:
 
