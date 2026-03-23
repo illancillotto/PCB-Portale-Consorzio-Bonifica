@@ -139,6 +139,37 @@ export class IngestService {
     };
   }
 
+  async listRunsByConnectorName(connectorName: string) {
+    if (!this.isSupportedConnector(connectorName)) {
+      return null;
+    }
+
+    const result = await this.databaseService.query<IngestionRunRow>(
+      `
+        SELECT
+          id,
+          connector_name,
+          source_system,
+          status,
+          started_at,
+          ended_at,
+          records_total,
+          records_success,
+          records_error,
+          log_excerpt
+        FROM ingest.ingestion_run
+        WHERE connector_name = $1
+        ORDER BY started_at DESC
+      `,
+      [connectorName],
+    );
+
+    return {
+      items: result.rows.map((row) => this.mapRun(row)),
+      total: result.rows.length,
+    };
+  }
+
   async listConnectorCatalog(): Promise<{
     items: IngestionConnectorCatalogResponseDto[];
     total: number;

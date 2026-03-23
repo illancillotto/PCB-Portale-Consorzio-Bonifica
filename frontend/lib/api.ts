@@ -401,6 +401,15 @@ export async function getIngestionConnectorDetail(connectorName: string, accessT
   );
 }
 
+export async function getIngestionConnectorRuns(connectorName: string, accessToken: string) {
+  return apiFetch<{ items: IngestionRun[]; total: number }>(
+    `/ingestion/connectors/${encodeURIComponent(connectorName)}/runs`,
+    {
+      accessToken,
+    },
+  );
+}
+
 export async function getIngestionOrchestrationSummary(accessToken: string) {
   return apiFetch<IngestionOrchestrationSummary>('/ingestion/orchestration-summary', {
     accessToken,

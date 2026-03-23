@@ -7,7 +7,7 @@ import { StatusChip } from '../../../../components/status-chip';
 import { requireOperatorSession } from '../../../../lib/auth';
 import {
   getIngestionConnectorDetail,
-  getIngestionRuns,
+  getIngestionConnectorRuns,
 } from '../../../../lib/api';
 
 interface ConnectorDetailPageProps {
@@ -28,8 +28,8 @@ export default async function ConnectorDetailPage({ params }: ConnectorDetailPag
     notFound();
   }
 
-  const runs = await getIngestionRuns(session.accessToken);
-  const connectorRuns = runs.items.filter((run) => run.connectorName === connector.connectorName);
+  const runs = await getIngestionConnectorRuns(connector.connectorName, session.accessToken);
+  const connectorRuns = runs.items;
 
   return (
     <PageShell

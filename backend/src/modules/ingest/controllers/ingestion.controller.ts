@@ -48,6 +48,19 @@ export class IngestionController {
     return connector;
   }
 
+  @Get('connectors/:connectorName/runs')
+  async listRunsByConnector(
+    @Param('connectorName') connectorName: string,
+  ): Promise<{ items: IngestionRunResponseDto[]; total: number }> {
+    const runs = await this.ingestService.listRunsByConnectorName(connectorName);
+
+    if (!runs) {
+      throw new NotFoundException(`Connector not found for name ${connectorName}`);
+    }
+
+    return runs;
+  }
+
   @Get('orchestration-summary')
   async getOrchestrationSummary(): Promise<IngestionOrchestrationSummaryResponseDto> {
     return this.ingestService.getOrchestrationSummary();

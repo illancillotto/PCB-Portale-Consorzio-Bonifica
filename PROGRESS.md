@@ -225,6 +225,7 @@ Nota:
 - readiness runtime dei connector nel dominio ingestion: completato
 - summary orchestration ingestion con readiness runtime e trigger UI bloccato per connector non eseguibili: completato
 - dettaglio connector con storico operativo sintetico su esecuzioni e volumi: completato
+- endpoint backend dedicato alle run del singolo connector e dettaglio frontend disaccoppiato dal fetch globale delle run: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

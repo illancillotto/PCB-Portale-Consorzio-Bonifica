@@ -47,6 +47,7 @@ npm run dev
 - `GET /api/v1/ingestion/runs`
 - `GET /api/v1/ingestion/connectors`
 - `GET /api/v1/ingestion/connectors/{connectorName}`
+- `GET /api/v1/ingestion/connectors/{connectorName}/runs`
 - `GET /api/v1/ingestion/orchestration-summary`
 - `GET /api/v1/ingestion/runs/{id}`
 - `POST /api/v1/ingestion/runs/{id}/normalize`
