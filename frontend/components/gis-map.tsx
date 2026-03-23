@@ -1,6 +1,7 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import type { Map as LeafletMap } from 'leaflet';
 import type { GisMapFeature } from '../lib/api';
@@ -14,6 +15,14 @@ interface QgisFeatureInfoFeature {
 interface QgisFeatureInfoResponse {
   type: 'FeatureCollection';
   features: QgisFeatureInfoFeature[];
+}
+
+function asOptionalString(value: string | number | boolean | null | undefined) {
+  if (typeof value === 'string' && value !== 'NULL' && value.trim().length > 0) {
+    return value;
+  }
+
+  return null;
 }
 
 interface GisMapProps {
@@ -225,11 +234,34 @@ export function GisMap({
         {featureInfoState.features.length > 0 ? (
           <div className="mt-4 grid gap-3">
             {featureInfoState.features.map((feature) => (
-              <article
-                key={feature.id}
-                className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4"
-              >
+              <article key={feature.id} className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4">
                 <p className="text-sm font-semibold text-[var(--pcb-ink)]">{feature.id}</p>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {asOptionalString(feature.properties.subject_id) ? (
+                    <Link
+                      href={`/subjects/${asOptionalString(feature.properties.subject_id)}`}
+                      className="rounded-full border border-[var(--pcb-line)] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                    >
+                      Apri soggetto
+                    </Link>
+                  ) : null}
+                  {asOptionalString(feature.properties.parcel_id) ? (
+                    <Link
+                      href={`/parcels/${asOptionalString(feature.properties.parcel_id)}`}
+                      className="rounded-full border border-[var(--pcb-line)] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                    >
+                      Apri particella
+                    </Link>
+                  ) : null}
+                  {asOptionalString(feature.properties.subject_id) || asOptionalString(feature.properties.parcel_id) ? (
+                    <Link
+                      href={`/gis${asOptionalString(feature.properties.subject_id) ? `?subjectId=${asOptionalString(feature.properties.subject_id)}` : asOptionalString(feature.properties.parcel_id) ? `?parcelId=${asOptionalString(feature.properties.parcel_id)}` : ''}`}
+                      className="rounded-full bg-[var(--pcb-accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white"
+                    >
+                      Apri focus GIS
+                    </Link>
+                  ) : null}
+                </div>
                 <div className="mt-2 grid gap-1 text-xs text-[var(--pcb-muted)]">
                   {Object.entries(feature.properties).map(([key, value]) => (
                     <p key={key}>

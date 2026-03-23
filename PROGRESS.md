@@ -203,6 +203,7 @@ Nota:
 - secondo layer tematico QGIS reale: completato
 - overlay WMS QGIS nel viewer frontend: completato
 - `GetFeatureInfo` QGIS dal viewer frontend: completato
+- risultati `GetFeatureInfo` navigabili: completato
 
 ## Blocchi aperti
 
@@ -804,5 +805,20 @@ Completato:
 Verifiche eseguite:
 
 - verifica manuale `GetFeatureInfo` QGIS in `application/json`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
+
+### 2026-03-23 – Risultati GetFeatureInfo navigabili
+
+Completato:
+
+- link diretti a:
+  - scheda soggetto PCB
+  - scheda particella PCB
+  - focus GIS contestuale
+- mapping dei campi `subject_id` e `parcel_id` dal payload QGIS ai route interni PCB
+
+Verifiche eseguite:
+
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`

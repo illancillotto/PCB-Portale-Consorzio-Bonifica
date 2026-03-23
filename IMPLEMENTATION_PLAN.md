@@ -232,11 +232,12 @@ Stato attuale:
 - completato secondo layer tematico reale `pcb_subjects` pubblicato da QGIS Server
 - completato overlay WMS pubblicato nel viewer frontend GIS
 - completato `GetFeatureInfo` operativo dal viewer frontend GIS
+- completati link navigabili dai risultati `GetFeatureInfo`
 
 Prossimo passo naturale:
 
 - introdurre una vista QGIS dedicata alle relazioni soggetto-particella
-- oppure introdurre evidenziazione e link navigabili dai risultati `GetFeatureInfo`
+- oppure introdurre evidenziazione automatica in mappa della feature selezionata via `GetFeatureInfo`
 
 Dipendenze:
 
