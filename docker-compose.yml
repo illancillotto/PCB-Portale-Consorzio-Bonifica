@@ -45,12 +45,14 @@ services:
     container_name: pcb-qgis-server
     restart: unless-stopped
     environment:
+      PYTHONPATH: /usr/share/qgis/python:/usr/lib/python3/dist-packages
       QGIS_PROJECT_FILE: ${PCB_QGIS_PROJECT_FILE:-/io/projects/pcb.qgs}
     ports:
       - "${PCB_QGIS_PORT:-8090}:80"
     volumes:
       - ./infra/qgis/projects:/io/projects
       - ./infra/qgis/plugins:/io/plugins
+      - ./infra/qgis/scripts:/io/scripts:ro
 
 volumes:
   pcb-postgres-data:

@@ -199,6 +199,7 @@ Nota:
 - Keycloak protezione applicativa estesa: completato
 - QGIS publication target: operativo con `GetCapabilities` verificato
 - operations view centralizzata integrazioni: completata
+- primo layer tematico QGIS reale: completato
 
 ## Blocchi aperti
 
@@ -730,3 +731,25 @@ Verifiche eseguite:
 - `GET /api/v1/system/integrations` senza token -> `401`
 - `GET /api/v1/system/integrations` con token Keycloak reale -> `200`
 - payload verificato con `postgres`, `redis`, `keycloak`, `qgis` tutti in stato `ok`
+
+### 2026-03-23 – Primo layer tematico QGIS reale
+
+Completato:
+
+- vista PostGIS dedicata `gis.v_qgis_parcels`
+- script versionato di generazione progetto QGIS `infra/qgis/scripts/generate_project.py`
+- progetto `infra/qgis/projects/pcb.qgs` rigenerato con layer pubblicato:
+  - `pcb_parcels`
+  - titolo `Particelle consortili`
+- wiring compose aggiornato per eseguire gli script QGIS nel container
+
+Verifiche eseguite:
+
+- `docker exec -i pcb-postgres psql -U pcb -d pcb < infra/postgres/init/060-gis-qgis-views.sql`
+- `docker exec pcb-qgis-server python3 /io/scripts/generate_project.py`
+- `SELECT ... FROM gis.v_qgis_parcels`
+- `GET http://127.0.0.1:8090/ows/?SERVICE=WMS&REQUEST=GetCapabilities&MAP=/io/projects/pcb.qgs`
+- `GET http://127.0.0.1:8090/ows/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&MAP=/io/projects/pcb.qgs&LAYERS=pcb_parcels...`
+- `GetCapabilities` verificato con layer:
+  - `pcb_parcels`
+  - `Particelle consortili`

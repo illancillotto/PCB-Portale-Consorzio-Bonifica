@@ -228,6 +228,12 @@ Stato attuale:
 - completati deep-link contestuali soggetto/particella
 - completato monitoraggio publication target QGIS con `GetCapabilities` reale sul progetto bootstrap
 - completato accesso operativo dal frontend al publication target QGIS
+- completato primo layer tematico reale `pcb_parcels` pubblicato da QGIS Server
+
+Prossimo passo naturale:
+
+- pubblicare il secondo layer tematico reale `pcb_subjects`
+- oppure introdurre una vista QGIS dedicata alle relazioni soggetto-particella
 
 Dipendenze:
 

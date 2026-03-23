@@ -10,4 +10,23 @@ Stato corrente:
 - il progetto minimo pubblicabile e` `infra/qgis/projects/pcb.qgs`
 - il publication target pubblico previsto e` `http://localhost:8090/ows/` con parametro `MAP=/io/projects/pcb.qgs`
 
+Layer tematico reale pubblicato:
+
+- `gis.v_qgis_parcels`
+- nome WMS pubblicato: `pcb_parcels`
+- titolo layer: `Particelle consortili`
+
+Rigenerazione progetto QGIS dal container:
+
+```bash
+docker exec \
+  -e PCB_POSTGRES_HOST=pcb-postgres \
+  -e PCB_POSTGRES_PORT=5432 \
+  -e PCB_POSTGRES_DB=pcb \
+  -e PCB_POSTGRES_USER=pcb \
+  -e PCB_POSTGRES_PASSWORD=pcb \
+  pcb-qgis-server \
+  python3 /io/scripts/generate_project.py
+```
+
 Il progetto QGIS ufficiale resta ancora da consolidare; per ora il publication target usa un progetto minimale di bootstrap, sufficiente per chiudere il wiring compose/backend/frontend.
