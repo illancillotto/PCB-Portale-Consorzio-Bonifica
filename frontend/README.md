@@ -69,6 +69,7 @@ Stato attuale:
 - `operations` mostra anche issue connector cross-domain con severita` e link rapidi
 - issue connector nel monitor ingestion filtrabili via query string su `issueSeverity` e `issueType`
 - riepiloghi `ingestion` e `operations` usano anche contatori backend sintetici su issue connector
+- anche `operations` espone filtri URL-shareable su `issueSeverity` e `issueType`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB

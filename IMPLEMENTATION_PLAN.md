@@ -260,6 +260,7 @@ Stato attuale:
 - completata esposizione cross-domain delle issue connector in `operations`
 - completati filtri operativi sulle issue connector nel monitor ingestion
 - completati contatori sintetici backend sulle issue connector per riepiloghi cross-domain
+- completati filtri URL-shareable sulle issue connector anche nella vista `operations`
 - completato riepilogo audit con filtri operativi dedicati
 - completata osservabilita` cross-domain nella vista `operations`
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella

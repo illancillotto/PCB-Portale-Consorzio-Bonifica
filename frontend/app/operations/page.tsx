@@ -13,13 +13,43 @@ import {
 } from '../../lib/api';
 import Link from 'next/link';
 
-export default async function OperationsPage() {
+interface OperationsPageProps {
+  searchParams?: Promise<{
+    issueSeverity?: 'warning' | 'critical';
+    issueType?: string;
+  }>;
+}
+
+function buildIssueFilterHref(filters: {
+  issueSeverity?: 'warning' | 'critical';
+  issueType?: string;
+}) {
+  const params = new URLSearchParams();
+
+  if (filters.issueSeverity) {
+    params.set('issueSeverity', filters.issueSeverity);
+  }
+
+  if (filters.issueType) {
+    params.set('issueType', filters.issueType);
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `/operations?${queryString}` : '/operations';
+}
+
+export default async function OperationsPage({ searchParams }: OperationsPageProps) {
   const session = await requireOperatorSession();
+  const filters = (await searchParams) ?? {};
   const [integrations, ingestionRuns, connectorIssues, orchestrationSummary, auditEvents, publicationStatus, subjectParcelLinks] =
     await Promise.all([
       getSystemIntegrations(session.accessToken),
       getIngestionRuns(session.accessToken),
-      getIngestionConnectorIssues(session.accessToken),
+      getIngestionConnectorIssues(session.accessToken, {
+        severity: filters.issueSeverity,
+        issueType: filters.issueType,
+      }),
       getIngestionOrchestrationSummary(session.accessToken),
       getAuditEvents(session.accessToken),
       getGisPublicationStatus(session.accessToken),
@@ -158,11 +188,66 @@ export default async function OperationsPage() {
             </p>
           </article>
         </div>
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildIssueFilterHref({ issueType: filters.issueType })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.issueSeverity
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutte le severity
+          </Link>
+          {(['critical', 'warning'] as const).map((severity) => (
+            <Link
+              key={severity}
+              href={buildIssueFilterHref({ issueSeverity: severity, issueType: filters.issueType })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.issueSeverity === severity
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {severity}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-6 flex flex-wrap gap-3">
+          <Link
+            href={buildIssueFilterHref({ issueSeverity: filters.issueSeverity })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.issueType
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti i tipi
+          </Link>
+          {['not_configured', 'not_runnable', 'dry_run_only', 'latest_run_failed', 'no_completed_runs'].map(
+            (issueType) => (
+              <Link
+                key={issueType}
+                href={buildIssueFilterHref({
+                  issueSeverity: filters.issueSeverity,
+                  issueType,
+                })}
+                className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                  filters.issueType === issueType
+                    ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                    : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+                }`}
+              >
+                {issueType}
+              </Link>
+            ),
+          )}
+        </div>
         {connectorIssues.total === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">Nessuna issue aperta sui connector registrati.</p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {connectorIssues.items.slice(0, 6).map((issue, index) => (
+            {connectorIssues.items.map((issue, index) => (
               <article
                 key={`${issue.connectorName}-${issue.issueType}-${index}`}
                 className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
