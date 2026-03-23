@@ -66,6 +66,7 @@ Stato attuale:
 - dettaglio connector alimentato da endpoint backend dedicato per le run del singolo connector
 - storico run del connector filtrabile via query string `status`
 - monitor ingestion con sezione issue operative dei connector derivata dal backend
+- `operations` mostra anche issue connector cross-domain con severita` e link rapidi
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB

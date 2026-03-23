@@ -6,7 +6,9 @@ export function StatusChip({ label }: StatusChipProps) {
   const normalized = label.toLowerCase();
 
   const style =
-    normalized === 'review'
+    normalized === 'critical'
+      ? 'bg-[#f6dfda] text-[#9b3d2e]'
+      : normalized === 'warning' || normalized === 'review'
       ? 'bg-[#f7eed9] text-[#8b6a19]'
       : normalized === 'unmatched' || normalized === 'rejected'
         ? 'bg-[#f6dfda] text-[#9b3d2e]'

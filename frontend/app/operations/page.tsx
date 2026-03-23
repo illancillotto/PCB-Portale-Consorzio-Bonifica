@@ -6,6 +6,7 @@ import {
   getAuditEvents,
   getGisPublicationStatus,
   getGisSubjectParcelLinks,
+  getIngestionConnectorIssues,
   getIngestionRuns,
   getSystemIntegrations,
 } from '../../lib/api';
@@ -13,16 +14,20 @@ import Link from 'next/link';
 
 export default async function OperationsPage() {
   const session = await requireOperatorSession();
-  const [integrations, ingestionRuns, auditEvents, publicationStatus, subjectParcelLinks] =
+  const [integrations, ingestionRuns, connectorIssues, auditEvents, publicationStatus, subjectParcelLinks] =
     await Promise.all([
       getSystemIntegrations(session.accessToken),
       getIngestionRuns(session.accessToken),
+      getIngestionConnectorIssues(session.accessToken),
       getAuditEvents(session.accessToken),
       getGisPublicationStatus(session.accessToken),
       getGisSubjectParcelLinks(session.accessToken),
     ]);
   const queuedRuns = ingestionRuns.items.filter((run) => run.status === 'queued').length;
   const failedRuns = ingestionRuns.items.filter((run) => run.status === 'failed').length;
+  const criticalConnectorIssues = connectorIssues.items.filter(
+    (issue) => issue.severity === 'critical',
+  ).length;
   const systemOperatorAuditEvents = auditEvents.items.filter(
     (event) => event.actorType === 'system_operator',
   ).length;
@@ -33,7 +38,7 @@ export default async function OperationsPage() {
       description="Stato operativo centralizzato delle integrazioni core del Portale Consorzio Bonifica."
     >
       <SectionCard title="Riepilogo operativo" eyebrow="Overview">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Integrazioni OK</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
@@ -55,6 +60,15 @@ export default async function OperationsPage() {
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
               {systemOperatorAuditEvents}
             </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Issue connector</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{connectorIssues.total}</p>
+            {criticalConnectorIssues > 0 ? (
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
+                {criticalConnectorIssues} critiche
+              </p>
+            ) : null}
           </article>
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Relazioni GIS</p>
@@ -122,6 +136,48 @@ export default async function OperationsPage() {
         <p className="mt-4 text-xs text-[var(--pcb-muted)]">
           Ultimo controllo {new Date(integrations.checkedAt).toLocaleString('it-IT')}
         </p>
+      </SectionCard>
+
+      <SectionCard title="Connector attention" eyebrow="Ingestion">
+        {connectorIssues.total === 0 ? (
+          <p className="text-sm text-[var(--pcb-muted)]">Nessuna issue aperta sui connector registrati.</p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {connectorIssues.items.slice(0, 6).map((issue, index) => (
+              <article
+                key={`${issue.connectorName}-${issue.issueType}-${index}`}
+                className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-semibold text-[var(--pcb-ink)]">{issue.displayName}</h2>
+                    <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                      {issue.issueType}
+                    </p>
+                  </div>
+                  <StatusChip label={issue.severity} />
+                </div>
+                <p className="mt-4 text-sm text-[var(--pcb-muted)]">{issue.detail}</p>
+                <div className="mt-4 flex flex-wrap gap-4 text-sm">
+                  <Link
+                    href={`/ingestion/connectors/${issue.connectorName}`}
+                    className="font-semibold text-[var(--pcb-accent)]"
+                  >
+                    Apri connector
+                  </Link>
+                  {issue.latestRunId ? (
+                    <Link
+                      href={`/ingestion/${issue.latestRunId}`}
+                      className="font-semibold text-[var(--pcb-accent)]"
+                    >
+                      Ultima run
+                    </Link>
+                  ) : null}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </SectionCard>
     </PageShell>
   );
