@@ -7,9 +7,11 @@ import type { GisMapFeature } from '../lib/api';
 
 interface GisMapProps {
   features: GisMapFeature[];
+  selectedSubjectId?: string;
+  selectedParcelId?: string;
 }
 
-export function GisMap({ features }: GisMapProps) {
+export function GisMap({ features, selectedSubjectId, selectedParcelId }: GisMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -35,27 +37,34 @@ export function GisMap({ features }: GisMapProps) {
       const geoJsonLayer = leaflet.geoJSON(features as unknown as GeoJSON.GeoJsonObject, {
         style(feature) {
           const layerCode = feature?.properties?.layerCode;
+          const isSelected =
+            feature?.properties?.subjectId === selectedSubjectId ||
+            feature?.properties?.parcelId === selectedParcelId;
 
           if (layerCode === 'pcb_parcels') {
             return {
-              color: '#3d6d64',
-              weight: 2,
-              fillColor: '#78a59a',
-              fillOpacity: 0.35,
+              color: isSelected ? '#235347' : '#3d6d64',
+              weight: isSelected ? 4 : 2,
+              fillColor: isSelected ? '#4d9988' : '#78a59a',
+              fillOpacity: isSelected ? 0.5 : 0.35,
             };
           }
 
           return {
-            color: '#c85d3a',
-            weight: 2,
+            color: isSelected ? '#8f2d17' : '#c85d3a',
+            weight: isSelected ? 4 : 2,
           };
         },
         pointToLayer(feature, latlng) {
+          const isSelected =
+            feature.properties?.subjectId === selectedSubjectId ||
+            feature.properties?.parcelId === selectedParcelId;
+
           return leaflet.circleMarker(latlng, {
-            radius: 8,
-            color: '#8f3a21',
-            weight: 2,
-            fillColor: '#d88a58',
+            radius: isSelected ? 11 : 8,
+            color: isSelected ? '#712714' : '#8f3a21',
+            weight: isSelected ? 3 : 2,
+            fillColor: isSelected ? '#e67d4a' : '#d88a58',
             fillOpacity: 0.9,
           });
         },

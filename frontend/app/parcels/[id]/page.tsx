@@ -31,6 +31,12 @@ export default async function ParcelDetailPage({ params }: ParcelDetailPageProps
             Sorgente
           </p>
           <p className="mt-2 text-lg font-semibold text-[var(--pcb-ink)]">{parcel.sourceSystem}</p>
+          <Link
+            href={`/gis?parcelId=${parcel.id}`}
+            className="mt-4 inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+          >
+            Apri focus GIS
+          </Link>
         </div>
       }
     >
@@ -78,6 +84,9 @@ export default async function ParcelDetailPage({ params }: ParcelDetailPageProps
                 <p className="mt-1 text-sm text-[var(--pcb-muted)]">
                   {subject.title ?? 'Titolo non specificato'}
                   {subject.quota !== null ? ` · quota ${subject.quota}` : ''}
+                </p>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
+                  Apri scheda soggetto
                 </p>
               </Link>
             ))}

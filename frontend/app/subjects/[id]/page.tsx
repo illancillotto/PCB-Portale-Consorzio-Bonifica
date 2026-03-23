@@ -36,6 +36,12 @@ export default async function SubjectDetailPage({ params }: SubjectDetailPagePro
           <div className="mt-4">
             <StatusChip label={subject.status} />
           </div>
+          <Link
+            href={`/gis?subjectId=${subject.id}`}
+            className="mt-4 inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+          >
+            Apri focus GIS
+          </Link>
         </div>
       }
     >
@@ -148,6 +154,9 @@ export default async function SubjectDetailPage({ params }: SubjectDetailPagePro
                 <p className="mt-2 text-sm text-[var(--pcb-muted)]">
                   {parcel.title ?? 'Titolo non specificato'}
                   {parcel.quota !== null ? ` · quota ${parcel.quota}` : ''}
+                </p>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
+                  Apri scheda particella
                 </p>
               </Link>
             ))}

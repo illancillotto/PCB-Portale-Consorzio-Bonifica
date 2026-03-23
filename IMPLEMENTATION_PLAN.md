@@ -223,6 +223,7 @@ Stato attuale:
 
 - completati catalogo layer, endpoint GIS base e vista frontend GIS foundation
 - completato viewer cartografico iniziale con feature PostGIS reali
+- completati deep-link contestuali da soggetti e particelle verso il viewer
 
 Dipendenze:
 

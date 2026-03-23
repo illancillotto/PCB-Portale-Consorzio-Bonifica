@@ -346,6 +346,20 @@ Verifiche eseguite:
 - `GET /api/v1/gis/map-features` con token valido
 - `/gis` verificata con viewer mappa e feature renderizzate
 
+### 2026-03-23 – Deep-link GIS contestuale
+
+Completato:
+
+- link da scheda soggetto verso `/gis?subjectId=...`
+- link da scheda particella verso `/gis?parcelId=...`
+- filtro contestuale viewer GIS con evidenziazione delle feature corrispondenti
+
+Verifiche eseguite:
+
+- lint e build frontend
+- `/gis?subjectId=...` verificata
+- `/gis?parcelId=...` verificata
+
 ### 2026-03-23 – Redis operativo backend
 
 Completato:

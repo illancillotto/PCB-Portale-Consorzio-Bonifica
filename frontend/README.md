@@ -36,4 +36,5 @@ Stato attuale:
 - protezione selettiva delle viste operative `ingestion` e `gis`
 - proxy frontend autenticato per le azioni operative `ingestion`
 - viewer GIS reale con Leaflet e feature PostGIS esposte dal backend
+- deep-link GIS da scheda soggetto e scheda particella
 - mappa GIS completa ancora non integrata

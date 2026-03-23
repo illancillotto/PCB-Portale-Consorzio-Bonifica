@@ -5,13 +5,29 @@ import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
 import { getGisFeatureLinks, getGisLayers, getGisMapFeatures } from '../../lib/api';
 
-export default async function GisPage() {
+interface GisPageProps {
+  searchParams?: Promise<{
+    subjectId?: string;
+    parcelId?: string;
+  }>;
+}
+
+export default async function GisPage({ searchParams }: GisPageProps) {
   const session = await requireOperatorSession();
+  const filters = searchParams ? await searchParams : {};
+  const selectedSubjectId = filters.subjectId;
+  const selectedParcelId = filters.parcelId;
   const [layers, featureLinks, mapFeatures] = await Promise.all([
     getGisLayers(session.accessToken),
     getGisFeatureLinks(session.accessToken),
     getGisMapFeatures(session.accessToken),
   ]);
+  const focusedFeatures = mapFeatures.items.filter(
+    (feature) =>
+      (!selectedSubjectId || feature.properties.subjectId === selectedSubjectId) &&
+      (!selectedParcelId || feature.properties.parcelId === selectedParcelId),
+  );
+  const displayedFeatures = focusedFeatures.length > 0 ? focusedFeatures : mapFeatures.items;
 
   return (
     <PageShell
@@ -19,7 +35,21 @@ export default async function GisPage() {
       description="Viewer cartografico iniziale basato su PostGIS reale, catalogo layer PCB e feature georiferite esposte dal backend protetto."
     >
       <SectionCard title="Viewer mappa" eyebrow="Map">
-        <GisMap features={mapFeatures.items} />
+        <div className="grid gap-4">
+          {selectedSubjectId || selectedParcelId ? (
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4 text-sm text-[var(--pcb-muted)]">
+              Focus attivo:
+              {selectedSubjectId ? ` soggetto ${selectedSubjectId}` : ''}
+              {selectedParcelId ? ` particella ${selectedParcelId}` : ''}
+              {focusedFeatures.length === 0 ? ' · nessuna feature dedicata trovata, vista completa mostrata' : ''}
+            </div>
+          ) : null}
+          <GisMap
+            features={displayedFeatures}
+            selectedSubjectId={selectedSubjectId}
+            selectedParcelId={selectedParcelId}
+          />
+        </div>
       </SectionCard>
 
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -61,7 +91,7 @@ export default async function GisPage() {
         <SectionCard title="Feature links" eyebrow="Relations">
           <div className="grid gap-3">
             <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4 text-sm text-[var(--pcb-muted)]">
-              Feature mappate: <strong className="text-[var(--pcb-ink)]">{mapFeatures.total}</strong>
+              Feature mappate: <strong className="text-[var(--pcb-ink)]">{displayedFeatures.length}</strong>
             </div>
             {featureLinks.items.map((link) => (
               <article key={link.id} className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
