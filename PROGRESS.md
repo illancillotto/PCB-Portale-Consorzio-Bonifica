@@ -1072,3 +1072,14 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Deep link operativi nella vista audit
+
+Completato:
+
+- la vista `audit` apre direttamente run, soggetti e moduli collegati quando l'evento contiene riferimenti applicativi utili
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

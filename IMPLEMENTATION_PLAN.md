@@ -494,3 +494,4 @@ Estensioni completate:
 ## Estensioni operative completate
 
 - il monitor `ingestion` copre tutti gli stage applicativi con filtri condivisibili
+- la vista `audit` supporta deep link operativi verso run e soggetti collegati

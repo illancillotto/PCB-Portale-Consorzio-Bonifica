@@ -4,6 +4,12 @@ import { requireOperatorSession } from '../../lib/auth';
 import { getAuditEvents } from '../../lib/api';
 import Link from 'next/link';
 
+function readPayloadString(payload: Record<string, unknown>, key: string) {
+  const value = payload[key];
+
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
 function formatPayload(payload: Record<string, unknown>) {
   const entries = Object.entries(payload);
 
@@ -15,6 +21,54 @@ function formatPayload(payload: Record<string, unknown>) {
     .slice(0, 4)
     .map(([key, value]) => `${key}: ${String(value)}`)
     .join(' · ');
+}
+
+function resolveAuditLinks(event: {
+  sourceModule: string;
+  entityType: string;
+  entityId: string;
+  payload: Record<string, unknown>;
+}) {
+  const links: Array<{ href: string; label: string }> = [];
+  const ingestionRunId =
+    readPayloadString(event.payload, 'ingestionRunId') ||
+    (event.entityType === 'ingestion_run' ? event.entityId : null);
+  const matchedSubjectId = readPayloadString(event.payload, 'matchedSubjectId');
+  const assignedSubjectId = readPayloadString(event.payload, 'assignedSubjectId');
+  const subjectId =
+    assignedSubjectId ||
+    matchedSubjectId ||
+    (event.entityType === 'subject' || event.entityType === 'master_subject' ? event.entityId : null);
+
+  if (ingestionRunId) {
+    links.push({
+      href: `/ingestion/${ingestionRunId}`,
+      label: 'Apri run',
+    });
+  }
+
+  if (subjectId) {
+    links.push({
+      href: `/subjects/${subjectId}`,
+      label: 'Apri soggetto',
+    });
+  }
+
+  if (event.sourceModule === 'ingest') {
+    links.push({
+      href: '/ingestion',
+      label: 'Modulo ingestion',
+    });
+  }
+
+  if (event.sourceModule === 'audit') {
+    links.push({
+      href: '/operations',
+      label: 'Operations',
+    });
+  }
+
+  return links;
 }
 
 interface AuditPageProps {
@@ -143,7 +197,10 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
           <p className="text-sm text-[var(--pcb-muted)]">Nessun evento disponibile.</p>
         ) : (
           <div className="grid gap-4">
-            {filteredEvents.map((event) => (
+            {filteredEvents.map((event) => {
+              const resolvedLinks = resolveAuditLinks(event);
+
+              return (
               <article
                 key={event.id}
                 className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
@@ -178,8 +235,22 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
                     <dd>{formatPayload(event.payload)}</dd>
                   </div>
                 </dl>
+                {resolvedLinks.length > 0 ? (
+                  <div className="mt-4 flex flex-wrap gap-4 text-sm">
+                    {resolvedLinks.map((link) => (
+                      <Link
+                        key={`${event.id}-${link.href}-${link.label}`}
+                        href={link.href}
+                        className="font-semibold text-[var(--pcb-accent)]"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
               </article>
-            ))}
+              );
+            })}
           </div>
         )}
       </SectionCard>
