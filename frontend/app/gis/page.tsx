@@ -55,7 +55,12 @@ export default async function GisPage({ searchParams }: GisPageProps) {
             features={displayedFeatures}
             selectedSubjectId={selectedSubjectId}
             selectedParcelId={selectedParcelId}
+            wmsServiceUrl={publicationStatus.available ? publicationStatus.serviceUrl : null}
+            wmsProjectFile={publicationStatus.available ? publicationStatus.projectFile : null}
           />
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]">
+            Il viewer combina overlay WMS pubblicato da QGIS Server e feature applicative GeoJSON del backend PCB.
+          </div>
         </div>
       </SectionCard>
 

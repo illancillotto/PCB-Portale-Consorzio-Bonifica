@@ -201,6 +201,7 @@ Nota:
 - operations view centralizzata integrazioni: completata
 - primo layer tematico QGIS reale: completato
 - secondo layer tematico QGIS reale: completato
+- overlay WMS QGIS nel viewer frontend: completato
 
 ## Blocchi aperti
 
@@ -775,3 +776,18 @@ Verifiche eseguite:
 - `GetCapabilities` verificato con layer:
   - `pcb_subjects`
   - `Soggetti georiferiti`
+
+### 2026-03-23 – Overlay WMS QGIS nel viewer frontend
+
+Completato:
+
+- integrazione del publication target QGIS nel viewer Leaflet frontend
+- overlay WMS pubblicato per:
+  - `pcb_parcels`
+  - `pcb_subjects`
+- mantenuto overlay applicativo GeoJSON sopra il WMS per popup e focus contestuale
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

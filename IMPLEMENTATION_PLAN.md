@@ -230,11 +230,12 @@ Stato attuale:
 - completato accesso operativo dal frontend al publication target QGIS
 - completato primo layer tematico reale `pcb_parcels` pubblicato da QGIS Server
 - completato secondo layer tematico reale `pcb_subjects` pubblicato da QGIS Server
+- completato overlay WMS pubblicato nel viewer frontend GIS
 
 Prossimo passo naturale:
 
 - introdurre una vista QGIS dedicata alle relazioni soggetto-particella
-- oppure integrare overlay WMS/WFS pubblicati nel viewer frontend
+- oppure introdurre interrogazione WMS/GetFeatureInfo dal viewer frontend
 
 Dipendenze:
 

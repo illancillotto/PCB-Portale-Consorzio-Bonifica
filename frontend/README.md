@@ -40,4 +40,5 @@ Stato attuale:
 - deep-link GIS da scheda soggetto e scheda particella
 - stato publication target QGIS esposto nella vista GIS
 - accesso operativo dal frontend GIS a endpoint OWS e `GetCapabilities`
+- overlay WMS QGIS reale nel viewer GIS sopra il publication target locale
 - mappa GIS completa ancora non integrata

@@ -9,9 +9,17 @@ interface GisMapProps {
   features: GisMapFeature[];
   selectedSubjectId?: string;
   selectedParcelId?: string;
+  wmsServiceUrl?: string | null;
+  wmsProjectFile?: string | null;
 }
 
-export function GisMap({ features, selectedSubjectId, selectedParcelId }: GisMapProps) {
+export function GisMap({
+  features,
+  selectedSubjectId,
+  selectedParcelId,
+  wmsServiceUrl,
+  wmsProjectFile,
+}: GisMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -33,6 +41,22 @@ export function GisMap({ features, selectedSubjectId, selectedParcelId }: GisMap
           attribution: '&copy; OpenStreetMap contributors',
         })
         .addTo(map);
+
+      if (wmsServiceUrl && wmsProjectFile) {
+        const wmsUrl = new URL(wmsServiceUrl);
+        wmsUrl.searchParams.set('MAP', wmsProjectFile);
+
+        leaflet
+          .tileLayer
+          .wms(wmsUrl.toString(), {
+            layers: 'pcb_parcels,pcb_subjects',
+            format: 'image/png',
+            transparent: true,
+            version: '1.3.0',
+            opacity: 0.72,
+          })
+          .addTo(map);
+      }
 
       const geoJsonLayer = leaflet.geoJSON(features as unknown as GeoJSON.GeoJsonObject, {
         style(feature) {
@@ -101,7 +125,7 @@ export function GisMap({ features, selectedSubjectId, selectedParcelId }: GisMap
         map.remove();
       }
     };
-  }, [features]);
+  }, [features, selectedSubjectId, selectedParcelId, wmsServiceUrl, wmsProjectFile]);
 
   return (
     <div
