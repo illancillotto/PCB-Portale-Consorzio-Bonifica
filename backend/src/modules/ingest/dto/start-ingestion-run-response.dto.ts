@@ -5,4 +5,8 @@ export interface StartIngestionRunResponseDto {
   status: string;
   startedAt: string;
   executionMode: 'manual';
+  postProcessing: {
+    autoNormalize: boolean;
+    autoMatch: boolean;
+  };
 }

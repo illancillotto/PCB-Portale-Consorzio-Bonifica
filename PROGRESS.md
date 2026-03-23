@@ -982,3 +982,17 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Chaining automatico run -> normalize -> match
+
+Completato:
+
+- orchestrazione post-run configurabile via ambiente per `autoNormalize` e `autoMatch`
+- chaining eseguito solo dopo `connector_run_completed`
+- reuse della stessa `ingestion_run` per acquisition, normalization e matching
+- audit aggiuntivo per `connector_post_processing_completed` e `connector_post_processing_failed`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`

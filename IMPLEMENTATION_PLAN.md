@@ -460,6 +460,7 @@ Estensioni completate:
 - filtri URL-shareable del catalogo su stato operativo e trigger mode
 - trigger manuale backend collegato al CLI reale del connector NAS con riuso della stessa `ingestion_run`
 - auto-refresh delle viste operative `ingestion` per run asincrone `queued/running`
+- chaining opzionale `run -> normalize -> match` orchestrato dal backend sulla stessa run
 
 ## Criteri di done per ogni milestone
 

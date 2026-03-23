@@ -73,6 +73,9 @@ Note matching:
 - eventi audit automatici per `connector_run_requested`, `connector_run_completed`, `connector_run_failed`, `ingestion_normalized`, `ingestion_matched`
 - il trigger manuale `POST /api/v1/ingestion/connectors/{connectorName}/run` esegue il CLI reale del connector quando `connectors/dist` è disponibile
 - per `connector-nas-catasto` il backend riusa la `ingestion_run` già creata e forza la persistenza nel layer `raw ingest`
+- il chaining post-run è configurabile via `PCB_INGEST_AUTO_NORMALIZE` e `PCB_INGEST_AUTO_MATCH`
+- `PCB_INGEST_AUTO_MATCH` è effettivo solo se `PCB_INGEST_AUTO_NORMALIZE=true`
+- a completamento del connector il backend può orchestrare automaticamente `normalize -> match` sulla stessa run
 - Redis operativo per:
   - `PING` da health/runtime metadata
   - marker di run manuale ingest

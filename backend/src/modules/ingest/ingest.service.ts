@@ -108,6 +108,11 @@ interface ConnectorExecutionResult {
   };
 }
 
+interface PostProcessingConfig {
+  autoNormalize: boolean;
+  autoMatch: boolean;
+}
+
 const connectorCatalog: ConnectorCatalogEntry[] = [
   {
     connectorName: 'connector-nas-catasto',
@@ -762,6 +767,7 @@ export class IngestService {
       status: 'running',
       startedAt: startedAt.toISOString(),
       executionMode: 'manual',
+      postProcessing: this.getPostProcessingConfig(),
     };
   }
 
@@ -1219,6 +1225,21 @@ export class IngestService {
     return connectorCatalog.some((connector) => connector.connectorName === connectorName);
   }
 
+  private getPostProcessingConfig(): PostProcessingConfig {
+    const autoNormalize =
+      process.env.PCB_INGEST_AUTO_NORMALIZE === '1' ||
+      process.env.PCB_INGEST_AUTO_NORMALIZE?.toLowerCase() === 'true';
+    const autoMatch =
+      (process.env.PCB_INGEST_AUTO_MATCH === '1' ||
+        process.env.PCB_INGEST_AUTO_MATCH?.toLowerCase() === 'true') &&
+      autoNormalize;
+
+    return {
+      autoNormalize,
+      autoMatch,
+    };
+  }
+
   private getConnectorExecutionReadiness(connectorName: string): ConnectorExecutionReadiness {
     if (connectorName === 'connector-nas-catasto') {
       const rootPath = process.env.PCB_NAS_CATASTO_ROOT ?? null;
@@ -1415,6 +1436,8 @@ export class IngestService {
         stderr: stderr.trim() || null,
       },
     });
+
+    await this.runConfiguredPostProcessing(runId, connectorName, sourceSystem);
   }
 
   private async failRun(
@@ -1478,6 +1501,114 @@ export class IngestService {
       return JSON.parse(normalized) as ConnectorExecutionResult;
     } catch {
       return null;
+    }
+  }
+
+  private async runConfiguredPostProcessing(
+    runId: string,
+    connectorName: string,
+    sourceSystem: string,
+  ) {
+    const config = this.getPostProcessingConfig();
+
+    if (!config.autoNormalize) {
+      return;
+    }
+
+    await this.redisService.setJson(
+      `pcb:ingest:runs:${runId}:post-processing`,
+      {
+        connectorName,
+        sourceSystem,
+        autoNormalize: config.autoNormalize,
+        autoMatch: config.autoMatch,
+        status: 'running',
+        startedAt: new Date().toISOString(),
+      },
+      86400,
+    );
+
+    try {
+      const normalization = await this.normalizeRun(runId);
+
+      if (!normalization) {
+        throw new Error(`Normalization could not start for run ${runId}`);
+      }
+
+      let matchingStatus: 'skipped' | 'completed' = 'skipped';
+
+      if (config.autoMatch) {
+        const matching = await this.runMatching(runId);
+
+        if (!matching) {
+          throw new Error(`Matching could not start for run ${runId}`);
+        }
+
+        matchingStatus = 'completed';
+      }
+
+      await this.auditService.recordEvent({
+        eventType: 'connector_post_processing_completed',
+        actorType: 'system',
+        actorId: connectorName,
+        sourceModule: 'ingest',
+        entityType: 'ingestion_run',
+        entityId: runId,
+        payload: {
+          connectorName,
+          sourceSystem,
+          autoNormalize: config.autoNormalize,
+          autoMatch: config.autoMatch,
+          matchingStatus,
+        },
+      });
+
+      await this.redisService.setJson(
+        `pcb:ingest:runs:${runId}:post-processing`,
+        {
+          connectorName,
+          sourceSystem,
+          autoNormalize: config.autoNormalize,
+          autoMatch: config.autoMatch,
+          status: 'completed',
+          matchingStatus,
+          completedAt: new Date().toISOString(),
+        },
+        86400,
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown post-processing orchestration error';
+
+      await this.auditService.recordEvent({
+        eventType: 'connector_post_processing_failed',
+        actorType: 'system',
+        actorId: connectorName,
+        sourceModule: 'ingest',
+        entityType: 'ingestion_run',
+        entityId: runId,
+        payload: {
+          connectorName,
+          sourceSystem,
+          autoNormalize: config.autoNormalize,
+          autoMatch: config.autoMatch,
+          error: message,
+        },
+      });
+
+      await this.redisService.setJson(
+        `pcb:ingest:runs:${runId}:post-processing`,
+        {
+          connectorName,
+          sourceSystem,
+          autoNormalize: config.autoNormalize,
+          autoMatch: config.autoMatch,
+          status: 'failed',
+          error: message,
+          failedAt: new Date().toISOString(),
+        },
+        86400,
+      );
     }
   }
 

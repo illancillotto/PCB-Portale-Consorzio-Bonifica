@@ -82,6 +82,7 @@ Stato attuale:
 - il catalogo connector supporta filtri URL-shareable su `connectorOperationalStatus` e `connectorTriggerMode`
 - `operations` espone anche il catalogo connector con gli stessi filtri URL-shareable su `connectorOperationalStatus` e `connectorTriggerMode`
 - le viste `ingestion` e `ingestion/[id]` si auto-aggiornano quando esistono run `queued` o `running`
+- il trigger manuale ingestion può innescare anche `normalize -> match` lato backend sulla stessa run, se abilitato da configurazione
 - il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
