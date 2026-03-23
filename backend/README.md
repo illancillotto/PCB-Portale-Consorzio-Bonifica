@@ -73,12 +73,15 @@ Note matching:
 - `GET /api/v1/gis/layers`
 - `GET /api/v1/gis/feature-links`
 - `GET /api/v1/gis/map-features`
+- `GET /api/v1/gis/publication-status`
 
 API protette da ruolo `pcb-operator`:
 
 - tutte le route `GET/POST /api/v1/ingestion/...`
 - tutte le route `GET /api/v1/gis/...`
 - tutte le route `GET /api/v1/audit/...`
+
+Il dominio `gis` espone anche lo stato del publication target QGIS Server via `GET /api/v1/gis/publication-status`.
 
 ## Keycloak locale
 

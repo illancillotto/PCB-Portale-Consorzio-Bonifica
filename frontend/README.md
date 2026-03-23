@@ -37,4 +37,5 @@ Stato attuale:
 - proxy frontend autenticato per le azioni operative `ingestion`
 - viewer GIS reale con Leaflet e feature PostGIS esposte dal backend
 - deep-link GIS da scheda soggetto e scheda particella
+- stato publication target QGIS esposto nella vista GIS
 - mappa GIS completa ancora non integrata

@@ -360,6 +360,25 @@ Verifiche eseguite:
 - `/gis?subjectId=...` verificata
 - `/gis?parcelId=...` verificata
 
+### 2026-03-23 – Publication status QGIS
+
+Completato:
+
+- endpoint backend `GET /api/v1/gis/publication-status`
+- esposizione dello stato publication target nella vista frontend `/gis`
+- tracciamento esplicito degli stati `not_configured`, `unavailable`, `ok`
+
+Verifiche eseguite:
+
+- lint e build backend
+- lint e build frontend
+- `GET /api/v1/gis/publication-status` senza token -> `401`
+- endpoint verificato su backend isolato in esecuzione su porta `3002`
+
+Nota:
+
+- il pull dell'immagine `qgis/qgis-server:latest` e` molto pesante; l'availability reale del container non e` stata attesa sul critical path
+
 ### 2026-03-23 – Redis operativo backend
 
 Completato:

@@ -3,6 +3,7 @@ import { DatabaseService } from '../core/database/database.service';
 import { GisFeatureLinkResponseDto } from './dto/feature-link-response.dto';
 import { GisLayerResponseDto } from './dto/layer-response.dto';
 import { GisMapFeatureResponseDto } from './dto/map-feature-response.dto';
+import { GisPublicationStatusResponseDto } from './dto/publication-status-response.dto';
 
 interface GisLayerRow {
   id: string;
@@ -48,6 +49,54 @@ export class GisService {
       databaseExtension: 'postgis',
       publicationTarget: 'qgis-server',
     };
+  }
+
+  async getPublicationStatus(): Promise<GisPublicationStatusResponseDto> {
+    const serviceUrl = process.env.PCB_QGIS_SERVER_URL ?? '';
+
+    if (!serviceUrl) {
+      return {
+        publicationTarget: 'qgis-server',
+        serviceUrl,
+        configured: false,
+        available: false,
+        statusCode: null,
+        statusLabel: 'not_configured',
+        checkedAt: new Date().toISOString(),
+      };
+    }
+
+    const requestUrl = new URL(serviceUrl);
+    requestUrl.searchParams.set('SERVICE', 'WMS');
+    requestUrl.searchParams.set('REQUEST', 'GetCapabilities');
+
+    try {
+      const response = await fetch(requestUrl, {
+        headers: {
+          Accept: 'application/xml,text/xml;q=0.9,*/*;q=0.8',
+        },
+      });
+
+      return {
+        publicationTarget: 'qgis-server',
+        serviceUrl,
+        configured: true,
+        available: response.ok,
+        statusCode: response.status,
+        statusLabel: response.ok ? 'ok' : 'unavailable',
+        checkedAt: new Date().toISOString(),
+      };
+    } catch {
+      return {
+        publicationTarget: 'qgis-server',
+        serviceUrl,
+        configured: true,
+        available: false,
+        statusCode: null,
+        statusLabel: 'unavailable',
+        checkedAt: new Date().toISOString(),
+      };
+    }
   }
 
   async listLayers(): Promise<{ items: GisLayerResponseDto[]; total: number }> {

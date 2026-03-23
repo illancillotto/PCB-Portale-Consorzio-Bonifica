@@ -190,6 +190,16 @@ export interface GisMapFeature {
   };
 }
 
+export interface GisPublicationStatus {
+  publicationTarget: 'qgis-server';
+  serviceUrl: string;
+  configured: boolean;
+  available: boolean;
+  statusCode: number | null;
+  statusLabel: 'ok' | 'unavailable' | 'not_configured';
+  checkedAt: string;
+}
+
 interface PaginatedResponse<T> {
   items: T[];
   total: number;
@@ -291,6 +301,12 @@ export async function getGisFeatureLinks(accessToken: string) {
 
 export async function getGisMapFeatures(accessToken: string) {
   return apiFetch<PaginatedResponse<GisMapFeature>>('/gis/map-features', {
+    accessToken,
+  });
+}
+
+export async function getGisPublicationStatus(accessToken: string) {
+  return apiFetch<GisPublicationStatus>('/gis/publication-status', {
     accessToken,
   });
 }

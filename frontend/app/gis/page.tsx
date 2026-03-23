@@ -3,7 +3,12 @@ import { GisMap } from '../../components/gis-map';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
-import { getGisFeatureLinks, getGisLayers, getGisMapFeatures } from '../../lib/api';
+import {
+  getGisFeatureLinks,
+  getGisLayers,
+  getGisMapFeatures,
+  getGisPublicationStatus,
+} from '../../lib/api';
 
 interface GisPageProps {
   searchParams?: Promise<{
@@ -17,10 +22,11 @@ export default async function GisPage({ searchParams }: GisPageProps) {
   const filters = searchParams ? await searchParams : {};
   const selectedSubjectId = filters.subjectId;
   const selectedParcelId = filters.parcelId;
-  const [layers, featureLinks, mapFeatures] = await Promise.all([
+  const [layers, featureLinks, mapFeatures, publicationStatus] = await Promise.all([
     getGisLayers(session.accessToken),
     getGisFeatureLinks(session.accessToken),
     getGisMapFeatures(session.accessToken),
+    getGisPublicationStatus(session.accessToken),
   ]);
   const focusedFeatures = mapFeatures.items.filter(
     (feature) =>
@@ -90,6 +96,24 @@ export default async function GisPage({ searchParams }: GisPageProps) {
 
         <SectionCard title="Feature links" eyebrow="Relations">
           <div className="grid gap-3">
+            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--pcb-ink)]">QGIS publication target</p>
+                  <p className="mt-1 break-all text-xs text-[var(--pcb-muted)]">
+                    {publicationStatus.serviceUrl || 'non configurato'}
+                  </p>
+                </div>
+                <StatusChip label={publicationStatus.statusLabel} />
+              </div>
+              <p className="mt-3 text-xs text-[var(--pcb-muted)]">
+                {publicationStatus.available
+                  ? `QGIS Server raggiungibile · HTTP ${publicationStatus.statusCode ?? 'n/d'}`
+                  : publicationStatus.configured
+                    ? 'QGIS Server non ancora raggiungibile o non pronto'
+                    : 'QGIS Server non configurato'}
+              </p>
+            </div>
             <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4 text-sm text-[var(--pcb-muted)]">
               Feature mappate: <strong className="text-[var(--pcb-ink)]">{displayedFeatures.length}</strong>
             </div>
