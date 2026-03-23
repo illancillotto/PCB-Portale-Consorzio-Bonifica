@@ -1,5 +1,9 @@
 const apiBaseUrl = process.env.PCB_API_BASE_URL ?? 'http://127.0.0.1:3001/api/v1';
 
+interface ApiFetchOptions {
+  accessToken?: string;
+}
+
 export interface SubjectIdentifier {
   type: string;
   value: string;
@@ -171,9 +175,14 @@ class ApiError extends Error {
   }
 }
 
-async function apiFetch<T>(path: string): Promise<T> {
+async function apiFetch<T>(path: string, options?: ApiFetchOptions): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`, {
     cache: 'no-store',
+    headers: options?.accessToken
+      ? {
+          Authorization: `Bearer ${options.accessToken}`,
+        }
+      : undefined,
   });
 
   if (!response.ok) {
@@ -209,30 +218,44 @@ export async function searchAll(query: string) {
   return apiFetch<PaginatedResponse<SearchResult>>(`/search?q=${encodeURIComponent(query)}`);
 }
 
-export async function getIngestionRuns() {
-  return apiFetch<PaginatedResponse<IngestionRun>>('/ingestion/runs');
+export async function getIngestionRuns(accessToken: string) {
+  return apiFetch<PaginatedResponse<IngestionRun>>('/ingestion/runs', {
+    accessToken,
+  });
 }
 
-export async function getIngestionRun(id: string) {
-  return apiFetch<IngestionRun>(`/ingestion/runs/${id}`);
+export async function getIngestionRun(id: string, accessToken: string) {
+  return apiFetch<IngestionRun>(`/ingestion/runs/${id}`, {
+    accessToken,
+  });
 }
 
-export async function getNormalizedRecords(id: string) {
+export async function getNormalizedRecords(id: string, accessToken: string) {
   return apiFetch<PaginatedResponse<NormalizedRecord>>(
     `/ingestion/runs/${id}/normalized-records`,
+    {
+      accessToken,
+    },
   );
 }
 
-export async function getMatchingResults(id: string) {
+export async function getMatchingResults(id: string, accessToken: string) {
   return apiFetch<PaginatedResponse<MatchingResult>>(
     `/ingestion/runs/${id}/matching-results`,
+    {
+      accessToken,
+    },
   );
 }
 
-export async function getGisLayers() {
-  return apiFetch<PaginatedResponse<GisLayer>>('/gis/layers');
+export async function getGisLayers(accessToken: string) {
+  return apiFetch<PaginatedResponse<GisLayer>>('/gis/layers', {
+    accessToken,
+  });
 }
 
-export async function getGisFeatureLinks() {
-  return apiFetch<PaginatedResponse<GisFeatureLink>>('/gis/feature-links');
+export async function getGisFeatureLinks(accessToken: string) {
+  return apiFetch<PaginatedResponse<GisFeatureLink>>('/gis/feature-links', {
+    accessToken,
+  });
 }

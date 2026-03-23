@@ -5,8 +5,11 @@ import { requireOperatorSession } from '../../lib/auth';
 import { getGisFeatureLinks, getGisLayers } from '../../lib/api';
 
 export default async function GisPage() {
-  await requireOperatorSession();
-  const [layers, featureLinks] = await Promise.all([getGisLayers(), getGisFeatureLinks()]);
+  const session = await requireOperatorSession();
+  const [layers, featureLinks] = await Promise.all([
+    getGisLayers(session.accessToken),
+    getGisFeatureLinks(session.accessToken),
+  ]);
 
   return (
     <PageShell

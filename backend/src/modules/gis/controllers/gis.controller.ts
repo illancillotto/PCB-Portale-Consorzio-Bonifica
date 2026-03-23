@@ -1,4 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
+import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
 import { GisService } from '../gis.service';
 import { GisFeatureLinkResponseDto } from '../dto/feature-link-response.dto';
 import { GisLayerResponseDto } from '../dto/layer-response.dto';
@@ -7,6 +10,8 @@ import { GisLayerResponseDto } from '../dto/layer-response.dto';
   path: 'gis',
   version: '1',
 })
+@UseGuards(KeycloakAuthGuard, KeycloakRolesGuard)
+@Roles('pcb-operator')
 export class GisController {
   constructor(private readonly gisService: GisService) {}
 

@@ -7,8 +7,8 @@ import { requireOperatorSession } from '../../lib/auth';
 import { getIngestionRuns } from '../../lib/api';
 
 export default async function IngestionPage() {
-  await requireOperatorSession();
-  const runs = await getIngestionRuns();
+  const session = await requireOperatorSession();
+  const runs = await getIngestionRuns(session.accessToken);
 
   return (
     <PageShell

@@ -33,4 +33,5 @@ Stato attuale:
 - dettaglio run ingestion con normalized e matching
 - login frontend reale via Keycloak locale
 - protezione selettiva delle viste operative `ingestion` e `gis`
+- proxy frontend autenticato per le azioni operative `ingestion`
 - mappa GIS completa ancora non integrata

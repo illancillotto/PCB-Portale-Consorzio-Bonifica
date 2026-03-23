@@ -3,9 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_PCB_API_BASE_URL ?? 'http://127.0.0.1:3001/api/v1';
-
 interface IngestionStageTriggerProps {
   runId: string;
   stage: 'normalize' | 'match';
@@ -25,7 +22,7 @@ export function IngestionStageTrigger({ runId, stage }: IngestionStageTriggerPro
 
     try {
       const response = await fetch(
-        `${apiBaseUrl}/ingestion/runs/${encodeURIComponent(runId)}/${stage}`,
+        `/api/pcb/ingestion/runs/${encodeURIComponent(runId)}/${stage}`,
         {
           method: 'POST',
         },

@@ -292,6 +292,27 @@ Verifiche eseguite:
 - `GET /gis` con cookie di sessione -> contenuto operativo visibile
 - logout con invalidazione cookie verificato
 
+### 2026-03-23 – Protezione API operative e token propagation
+
+Completato:
+
+- protezione backend con ruolo `pcb-operator` su:
+  - `GET/POST /api/v1/ingestion/...`
+  - `GET /api/v1/gis/...`
+- propagazione bearer token server-side dal frontend alle API protette
+- proxy frontend autenticato in `frontend/app/api/pcb/[...path]/route.ts`
+- trigger client-side `ingestion` riallineati al proxy frontend invece che al backend diretto
+
+Verifiche eseguite:
+
+- lint e build backend
+- lint e build frontend
+- `GET /api/v1/ingestion/runs` senza token -> `401`
+- `GET /api/v1/gis/layers` senza token -> `401`
+- `GET /api/pcb/ingestion/runs` con sessione frontend -> `200`
+- `GET /ingestion` con cookie di sessione -> `200`
+- `GET /gis` con cookie di sessione -> contenuto operativo visibile
+
 ### 2026-03-23 – Redis operativo backend
 
 Completato:

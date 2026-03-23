@@ -3,9 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_PCB_API_BASE_URL ?? 'http://127.0.0.1:3001/api/v1';
-
 interface MatchingDecisionTriggerProps {
   runId: string;
   resultId: string;
@@ -29,7 +26,7 @@ export function MatchingDecisionTrigger({
 
     try {
       const response = await fetch(
-        `${apiBaseUrl}/ingestion/runs/${encodeURIComponent(runId)}/matching-results/${encodeURIComponent(resultId)}/${action}`,
+        `/api/pcb/ingestion/runs/${encodeURIComponent(runId)}/matching-results/${encodeURIComponent(resultId)}/${action}`,
         {
           method: 'POST',
         },

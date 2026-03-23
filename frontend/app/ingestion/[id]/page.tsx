@@ -39,25 +39,25 @@ function canAssignSubject(status: string) {
 export default async function IngestionRunDetailPage({
   params,
 }: IngestionRunDetailPageProps) {
-  await requireOperatorSession();
+  const session = await requireOperatorSession();
   const { id } = await params;
 
   let run;
 
   try {
-    run = await getIngestionRun(id);
+    run = await getIngestionRun(id, session.accessToken);
   } catch {
     notFound();
   }
 
   const [normalizedRecords, matchingResults, subjects] = await Promise.all([
-    getNormalizedRecords(id),
-    getMatchingResults(id),
+    getNormalizedRecords(id, session.accessToken),
+    getMatchingResults(id, session.accessToken),
     getSubjects(),
   ]);
 
   const matchedCount = matchingResults.items.filter(
-    (item) => item.decisionStatus === 'matched',
+    (item) => item.decisionStatus === 'matched' || item.decisionStatus === 'accepted',
   ).length;
   const reviewCount = matchingResults.items.filter(
     (item) => item.decisionStatus === 'review',

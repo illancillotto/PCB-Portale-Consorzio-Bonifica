@@ -73,6 +73,11 @@ Note matching:
 - `GET /api/v1/gis/layers`
 - `GET /api/v1/gis/feature-links`
 
+API protette da ruolo `pcb-operator`:
+
+- tutte le route `GET/POST /api/v1/ingestion/...`
+- tutte le route `GET /api/v1/gis/...`
+
 ## Keycloak locale
 
 `docker compose` importa automaticamente il realm `pcb` da `infra/keycloak/import/realm-pcb.json`.

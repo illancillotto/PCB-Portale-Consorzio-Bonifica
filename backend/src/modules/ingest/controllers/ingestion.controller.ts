@@ -5,7 +5,11 @@ import {
   NotFoundException,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
+import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
 import { IngestService } from '../ingest.service';
 import { IngestionRunResponseDto } from '../dto/ingestion-run-response.dto';
 import { MatchingResultResponseDto } from '../dto/matching-result-response.dto';
@@ -18,6 +22,8 @@ import { StartIngestionRunResponseDto } from '../dto/start-ingestion-run-respons
   path: 'ingestion',
   version: '1',
 })
+@UseGuards(KeycloakAuthGuard, KeycloakRolesGuard)
+@Roles('pcb-operator')
 export class IngestionController {
   constructor(private readonly ingestService: IngestService) {}
 
