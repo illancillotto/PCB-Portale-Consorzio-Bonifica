@@ -73,6 +73,7 @@ Note matching:
 - `GET /api/v1/search?q=...`
 - `GET /api/v1/gis/layers`
 - `GET /api/v1/gis/feature-links`
+  supporta filtri query `subjectId` e `parcelId`
 - `GET /api/v1/gis/map-features`
   supporta filtri query `subjectId` e `parcelId`
 - `GET /api/v1/gis/subject-parcel-links`

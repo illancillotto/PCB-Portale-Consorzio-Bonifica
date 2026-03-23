@@ -26,7 +26,10 @@ export default async function GisPage({ searchParams }: GisPageProps) {
   const selectedParcelId = filters.parcelId;
   const [layers, featureLinks, mapFeatures, publicationStatus, subjectParcelLinks] = await Promise.all([
     getGisLayers(session.accessToken),
-    getGisFeatureLinks(session.accessToken),
+    getGisFeatureLinks(session.accessToken, {
+      subjectId: selectedSubjectId,
+      parcelId: selectedParcelId,
+    }),
     getGisMapFeatures(session.accessToken, {
       subjectId: selectedSubjectId,
       parcelId: selectedParcelId,

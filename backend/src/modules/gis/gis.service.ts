@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../core/database/database.service';
 import { GisFeatureLinkResponseDto } from './dto/feature-link-response.dto';
 import { GisLayerResponseDto } from './dto/layer-response.dto';
+import { ListGisFeatureLinksQueryDto } from './dto/list-feature-links-query.dto';
 import { ListGisMapFeaturesQueryDto } from './dto/list-map-features-query.dto';
 import { GisMapFeatureResponseDto } from './dto/map-feature-response.dto';
 import { ListGisSubjectParcelLinksQueryDto } from './dto/list-subject-parcel-links-query.dto';
@@ -171,7 +172,23 @@ export class GisService {
     };
   }
 
-  async listFeatureLinks(): Promise<{ items: GisFeatureLinkResponseDto[]; total: number }> {
+  async listFeatureLinks(
+    query: ListGisFeatureLinksQueryDto = {},
+  ): Promise<{ items: GisFeatureLinkResponseDto[]; total: number }> {
+    const filters: string[] = [];
+    const values: string[] = [];
+
+    if (query.subjectId) {
+      values.push(query.subjectId);
+      filters.push(`fl.subject_id = $${values.length}`);
+    }
+
+    if (query.parcelId) {
+      values.push(query.parcelId);
+      filters.push(`fl.parcel_id = $${values.length}`);
+    }
+
+    const whereClause = filters.length > 0 ? `WHERE ${filters.join(' AND ')}` : '';
     const result = await this.databaseService.query<GisFeatureLinkRow>(
       `
         SELECT
@@ -185,8 +202,10 @@ export class GisService {
         FROM gis.feature_link fl
         INNER JOIN gis.layer_catalog lc
           ON lc.id = fl.layer_id
+        ${whereClause}
         ORDER BY lc.code, fl.feature_external_id
       `,
+      values,
     );
 
     return {

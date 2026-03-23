@@ -327,8 +327,23 @@ export async function getGisLayers(accessToken: string) {
   });
 }
 
-export async function getGisFeatureLinks(accessToken: string) {
-  return apiFetch<PaginatedResponse<GisFeatureLink>>('/gis/feature-links', {
+export async function getGisFeatureLinks(
+  accessToken: string,
+  filters?: { subjectId?: string; parcelId?: string },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.subjectId) {
+    params.set('subjectId', filters.subjectId);
+  }
+
+  if (filters?.parcelId) {
+    params.set('parcelId', filters.parcelId);
+  }
+
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+
+  return apiFetch<PaginatedResponse<GisFeatureLink>>(`/gis/feature-links${suffix}`, {
     accessToken,
   });
 }

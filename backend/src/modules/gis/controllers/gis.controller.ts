@@ -5,6 +5,7 @@ import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
 import { GisService } from '../gis.service';
 import { GisFeatureLinkResponseDto } from '../dto/feature-link-response.dto';
 import { GisLayerResponseDto } from '../dto/layer-response.dto';
+import { ListGisFeatureLinksQueryDto } from '../dto/list-feature-links-query.dto';
 import { ListGisMapFeaturesQueryDto } from '../dto/list-map-features-query.dto';
 import { GisMapFeatureResponseDto } from '../dto/map-feature-response.dto';
 import { ListGisSubjectParcelLinksQueryDto } from '../dto/list-subject-parcel-links-query.dto';
@@ -26,8 +27,10 @@ export class GisController {
   }
 
   @Get('feature-links')
-  async listFeatureLinks(): Promise<{ items: GisFeatureLinkResponseDto[]; total: number }> {
-    return this.gisService.listFeatureLinks();
+  async listFeatureLinks(
+    @Query() query: ListGisFeatureLinksQueryDto,
+  ): Promise<{ items: GisFeatureLinkResponseDto[]; total: number }> {
+    return this.gisService.listFeatureLinks(query);
   }
 
   @Get('map-features')
