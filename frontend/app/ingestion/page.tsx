@@ -15,6 +15,7 @@ interface IngestionPageProps {
   searchParams?: Promise<{
     status?: string;
     connector?: string;
+    issueConnector?: string;
     issueSeverity?: 'warning' | 'critical';
     issueType?: string;
   }>;
@@ -39,6 +40,7 @@ function buildRunsFilterHref(filters: { status?: string; connector?: string }) {
 function buildIssueFilterHref(filters: {
   status?: string;
   connector?: string;
+  issueConnector?: string;
   issueSeverity?: 'warning' | 'critical';
   issueType?: string;
 }) {
@@ -50,6 +52,10 @@ function buildIssueFilterHref(filters: {
 
   if (filters.connector) {
     params.set('connector', filters.connector);
+  }
+
+  if (filters.issueConnector) {
+    params.set('issueConnector', filters.issueConnector);
   }
 
   if (filters.issueSeverity) {
@@ -72,6 +78,7 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
     getIngestionRuns(session.accessToken),
     getIngestionConnectors(session.accessToken),
     getIngestionConnectorIssues(session.accessToken, {
+      connectorName: filters.issueConnector,
       severity: filters.issueSeverity,
       issueType: filters.issueType,
     }),
@@ -278,7 +285,48 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
       <SectionCard title="Issue operative connector" eyebrow="Attention">
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
-            href={buildIssueFilterHref({ status: filters.status, connector: filters.connector })}
+            href={buildIssueFilterHref({
+              status: filters.status,
+              connector: filters.connector,
+              issueSeverity: filters.issueSeverity,
+              issueType: filters.issueType,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.issueConnector
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti i connector
+          </Link>
+          {connectors.items.map((connector) => (
+            <Link
+              key={connector.connectorName}
+              href={buildIssueFilterHref({
+                status: filters.status,
+                connector: filters.connector,
+                issueConnector: connector.connectorName,
+                issueSeverity: filters.issueSeverity,
+                issueType: filters.issueType,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.issueConnector === connector.connectorName
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {connector.connectorName}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildIssueFilterHref({
+              status: filters.status,
+              connector: filters.connector,
+              issueConnector: filters.issueConnector,
+              issueType: filters.issueType,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.issueSeverity
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -293,6 +341,7 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
               href={buildIssueFilterHref({
                 status: filters.status,
                 connector: filters.connector,
+                issueConnector: filters.issueConnector,
                 issueSeverity: severity,
                 issueType: filters.issueType,
               })}
@@ -311,6 +360,7 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
             href={buildIssueFilterHref({
               status: filters.status,
               connector: filters.connector,
+              issueConnector: filters.issueConnector,
               issueSeverity: filters.issueSeverity,
             })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
@@ -328,6 +378,7 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                 href={buildIssueFilterHref({
                   status: filters.status,
                   connector: filters.connector,
+                  issueConnector: filters.issueConnector,
                   issueSeverity: filters.issueSeverity,
                   issueType,
                 })}

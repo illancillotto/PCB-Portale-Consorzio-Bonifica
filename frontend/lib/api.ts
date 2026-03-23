@@ -415,11 +415,16 @@ export async function getIngestionConnectors(accessToken: string) {
 export async function getIngestionConnectorIssues(
   accessToken: string,
   filters?: {
+    connectorName?: string;
     severity?: 'warning' | 'critical';
     issueType?: string;
   },
 ) {
   const params = new URLSearchParams();
+
+  if (filters?.connectorName) {
+    params.set('connectorName', filters.connectorName);
+  }
 
   if (filters?.severity) {
     params.set('severity', filters.severity);

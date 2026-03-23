@@ -334,6 +334,7 @@ export class IngestService {
   }
 
   async listConnectorOperationalIssuesFiltered(filters?: {
+    connectorName?: string;
     severity?: 'warning' | 'critical';
     issueType?: string;
   }): Promise<{
@@ -341,10 +342,15 @@ export class IngestService {
     total: number;
   }> {
     const issues = await this.listConnectorOperationalIssues();
+    const connectorName = filters?.connectorName?.trim();
     const severity = filters?.severity?.trim();
     const issueType = filters?.issueType?.trim();
 
     const items = issues.items.filter((item) => {
+      if (connectorName && item.connectorName !== connectorName) {
+        return false;
+      }
+
       if (severity && item.severity !== severity) {
         return false;
       }

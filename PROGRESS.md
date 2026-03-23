@@ -232,6 +232,7 @@ Nota:
 - filtri backend/frontend sulle issue operative dei connector nel monitor ingestion: completato
 - orchestration summary arricchito con contatori sintetici sulle issue connector, usati da ingestion e operations: completato
 - vista `operations` estesa con filtri URL-shareable sulle issue connector: completato
+- filtro `connectorName` sulle issue connector, esposto in backend e nelle viste `ingestion` e `operations`: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

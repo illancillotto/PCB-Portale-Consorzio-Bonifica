@@ -15,16 +15,22 @@ import Link from 'next/link';
 
 interface OperationsPageProps {
   searchParams?: Promise<{
+    issueConnector?: string;
     issueSeverity?: 'warning' | 'critical';
     issueType?: string;
   }>;
 }
 
 function buildIssueFilterHref(filters: {
+  issueConnector?: string;
   issueSeverity?: 'warning' | 'critical';
   issueType?: string;
 }) {
   const params = new URLSearchParams();
+
+  if (filters.issueConnector) {
+    params.set('issueConnector', filters.issueConnector);
+  }
 
   if (filters.issueSeverity) {
     params.set('issueSeverity', filters.issueSeverity);
@@ -47,6 +53,7 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
       getSystemIntegrations(session.accessToken),
       getIngestionRuns(session.accessToken),
       getIngestionConnectorIssues(session.accessToken, {
+        connectorName: filters.issueConnector,
         severity: filters.issueSeverity,
         issueType: filters.issueType,
       }),
@@ -190,7 +197,42 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         </div>
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
-            href={buildIssueFilterHref({ issueType: filters.issueType })}
+            href={buildIssueFilterHref({
+              issueSeverity: filters.issueSeverity,
+              issueType: filters.issueType,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.issueConnector
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti i connector
+          </Link>
+          {Array.from(new Set(connectorIssues.items.map((issue) => issue.connectorName))).map((connectorName) => (
+            <Link
+              key={connectorName}
+              href={buildIssueFilterHref({
+                issueConnector: connectorName,
+                issueSeverity: filters.issueSeverity,
+                issueType: filters.issueType,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.issueConnector === connectorName
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {connectorName}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildIssueFilterHref({
+              issueConnector: filters.issueConnector,
+              issueType: filters.issueType,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.issueSeverity
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -202,7 +244,11 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
           {(['critical', 'warning'] as const).map((severity) => (
             <Link
               key={severity}
-              href={buildIssueFilterHref({ issueSeverity: severity, issueType: filters.issueType })}
+              href={buildIssueFilterHref({
+                issueConnector: filters.issueConnector,
+                issueSeverity: severity,
+                issueType: filters.issueType,
+              })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.issueSeverity === severity
                   ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -215,7 +261,10 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         </div>
         <div className="mb-6 flex flex-wrap gap-3">
           <Link
-            href={buildIssueFilterHref({ issueSeverity: filters.issueSeverity })}
+            href={buildIssueFilterHref({
+              issueConnector: filters.issueConnector,
+              issueSeverity: filters.issueSeverity,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.issueType
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -229,6 +278,7 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
               <Link
                 key={issueType}
                 href={buildIssueFilterHref({
+                  issueConnector: filters.issueConnector,
                   issueSeverity: filters.issueSeverity,
                   issueType,
                 })}
