@@ -8,8 +8,13 @@ interface PersistedRunResult {
   recordsPersisted: number;
 }
 
+interface PersistNasCatastoRunOptions {
+  ingestionRunId?: string;
+}
+
 export async function persistNasCatastoRun(
   report: NasCatastoRunReport,
+  options: PersistNasCatastoRunOptions = {},
 ): Promise<PersistedRunResult> {
   const pool = createConnectorPool();
   const client = await pool.connect();
@@ -17,37 +22,73 @@ export async function persistNasCatastoRun(
   try {
     await client.query('BEGIN');
 
-    const ingestionRunId = randomUUID();
+    const ingestionRunId =
+      options.ingestionRunId ?? process.env.PCB_INGESTION_RUN_ID ?? randomUUID();
 
-    await client.query(
-      `
-        INSERT INTO ingest.ingestion_run (
-          id,
-          connector_name,
-          source_system,
-          started_at,
-          ended_at,
-          status,
-          records_total,
-          records_success,
-          records_error,
-          log_excerpt
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      `,
-      [
-        ingestionRunId,
-        report.connectorName,
-        report.sourceSystem,
-        report.startedAt,
-        report.endedAt,
-        report.status,
-        report.items.length,
-        report.items.length,
-        0,
-        `NAS scan ${report.filesScanned} files / ${report.directoriesScanned} directories`,
-      ],
-    );
+    if (options.ingestionRunId ?? process.env.PCB_INGESTION_RUN_ID) {
+      const updateResult = await client.query(
+        `
+          UPDATE ingest.ingestion_run
+          SET
+            connector_name = $2,
+            source_system = $3,
+            started_at = $4,
+            ended_at = $5,
+            status = $6,
+            records_total = $7,
+            records_success = $8,
+            records_error = $9,
+            log_excerpt = $10
+          WHERE id = $1
+        `,
+        [
+          ingestionRunId,
+          report.connectorName,
+          report.sourceSystem,
+          report.startedAt,
+          report.endedAt,
+          report.status,
+          report.items.length,
+          report.items.length,
+          0,
+          `NAS scan ${report.filesScanned} files / ${report.directoriesScanned} directories`,
+        ],
+      );
+
+      if (updateResult.rowCount === 0) {
+        throw new Error(`Ingestion run ${ingestionRunId} not found for connector persistence`);
+      }
+    } else {
+      await client.query(
+        `
+          INSERT INTO ingest.ingestion_run (
+            id,
+            connector_name,
+            source_system,
+            started_at,
+            ended_at,
+            status,
+            records_total,
+            records_success,
+            records_error,
+            log_excerpt
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `,
+        [
+          ingestionRunId,
+          report.connectorName,
+          report.sourceSystem,
+          report.startedAt,
+          report.endedAt,
+          report.status,
+          report.items.length,
+          report.items.length,
+          0,
+          `NAS scan ${report.filesScanned} files / ${report.directoriesScanned} directories`,
+        ],
+      );
+    }
 
     for (const item of report.items) {
       await insertRawRecord(client, ingestionRunId, item);

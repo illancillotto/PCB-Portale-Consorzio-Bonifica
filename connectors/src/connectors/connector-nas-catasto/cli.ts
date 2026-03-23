@@ -7,7 +7,9 @@ async function main() {
   const report = await runNasCatastoScan(config);
 
   if (config.persistIngest) {
-    const persisted = await persistNasCatastoRun(report);
+    const persisted = await persistNasCatastoRun(report, {
+      ingestionRunId: process.env.PCB_INGESTION_RUN_ID,
+    });
     report.persistence = {
       mode: 'persisted',
       ingestionRunId: persisted.ingestionRunId,

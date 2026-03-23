@@ -36,6 +36,7 @@ Variabili principali:
 - `PCB_NAS_CATASTO_INCLUDE_HIDDEN`
 - `PCB_NAS_CATASTO_SAMPLE_BYTES`
 - `PCB_NAS_CATASTO_PERSIST_INGEST`
+- `PCB_INGESTION_RUN_ID`
 
 Esecuzione:
 
@@ -50,6 +51,7 @@ Nota:
   - `ingest.ingestion_run`
   - `ingest.ingestion_record_raw`
 - la persistenza si attiva con `PCB_NAS_CATASTO_PERSIST_INGEST=true`
+- se `PCB_INGESTION_RUN_ID` è valorizzato, il connector aggiorna la run esistente invece di crearne una nuova
 
 Esempio con persistenza:
 

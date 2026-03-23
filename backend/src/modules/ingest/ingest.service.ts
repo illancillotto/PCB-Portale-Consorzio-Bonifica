@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { spawn } from 'child_process';
 import { randomUUID } from 'crypto';
 import { existsSync } from 'fs';
+import { resolve } from 'path';
 import { AuditService } from '../audit/audit.service';
 import { DatabaseService } from '../core/database/database.service';
 import { RedisService } from '../core/redis/redis.service';
@@ -90,6 +92,20 @@ interface NumericCountRow {
 
 interface TimestampRow {
   latest_run_at: Date | string | null;
+}
+
+interface ConnectorExecutionResult {
+  status: string;
+  startedAt?: string;
+  endedAt?: string;
+  filesScanned?: number;
+  directoriesScanned?: number;
+  items?: unknown[];
+  persistence?: {
+    mode: string;
+    ingestionRunId: string | null;
+    recordsPersisted: number;
+  };
 }
 
 const connectorCatalog: ConnectorCatalogEntry[] = [
@@ -737,11 +753,13 @@ export class IngestService {
     );
     await this.redisService.setString('pcb:ingest:last-manual-run-id', runId, 86400);
 
+    await this.launchConnectorProcess(runId, connectorName, sourceSystem);
+
     return {
       id: runId,
       connectorName,
       sourceSystem,
-      status: 'queued',
+      status: 'running',
       startedAt: startedAt.toISOString(),
       executionMode: 'manual',
     };
@@ -1207,6 +1225,7 @@ export class IngestService {
       const persistenceEnabled =
         process.env.PCB_NAS_CATASTO_PERSIST_INGEST === '1' ||
         process.env.PCB_NAS_CATASTO_PERSIST_INGEST?.toLowerCase() === 'true';
+      const cliPath = this.resolveConnectorCliPath(connectorName);
 
       if (!rootPath) {
         return {
@@ -1219,6 +1238,7 @@ export class IngestService {
       }
 
       const pathExists = existsSync(rootPath);
+      const cliExists = existsSync(cliPath);
 
       if (!pathExists) {
         return {
@@ -1227,6 +1247,16 @@ export class IngestService {
           persistenceEnabled,
           rootPath,
           detail: 'root path configurato ma non accessibile nel runtime corrente',
+        };
+      }
+
+      if (!cliExists) {
+        return {
+          configured: true,
+          runnable: false,
+          persistenceEnabled,
+          rootPath,
+          detail: 'connector configurato ma CLI buildato non disponibile in connectors/dist',
         };
       }
 
@@ -1248,6 +1278,207 @@ export class IngestService {
       rootPath: null,
       detail: 'connector registrato senza profilo runtime locale',
     };
+  }
+
+  private resolveConnectorCliPath(connectorName: string) {
+    const connectorsDistRoot =
+      process.env.PCB_CONNECTORS_DIST_ROOT ?? resolve(process.cwd(), 'connectors', 'dist');
+
+    if (connectorName === 'connector-nas-catasto') {
+      return resolve(connectorsDistRoot, 'connectors', 'connector-nas-catasto', 'cli.js');
+    }
+
+    return resolve(connectorsDistRoot, connectorName, 'cli.js');
+  }
+
+  private async launchConnectorProcess(runId: string, connectorName: string, sourceSystem: string) {
+    const cliPath = this.resolveConnectorCliPath(connectorName);
+
+    if (!existsSync(cliPath)) {
+      await this.failRun(
+        runId,
+        connectorName,
+        sourceSystem,
+        `Connector CLI non trovato: ${cliPath}`,
+      );
+      throw new Error(`Connector CLI not found for ${connectorName}`);
+    }
+
+    const child = spawn(process.execPath, [cliPath], {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        PCB_NAS_CATASTO_PERSIST_INGEST: 'true',
+        PCB_INGESTION_RUN_ID: runId,
+      },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    let stdout = '';
+    let stderr = '';
+    let settled = false;
+
+    child.stdout.on('data', (chunk: Buffer | string) => {
+      stdout += chunk.toString();
+    });
+
+    child.stderr.on('data', (chunk: Buffer | string) => {
+      stderr += chunk.toString();
+    });
+
+    child.once('spawn', async () => {
+      await this.databaseService.query(
+        `
+          UPDATE ingest.ingestion_run
+          SET status = 'running', log_excerpt = $2
+          WHERE id = $1
+        `,
+        [runId, 'Connector process started'],
+      );
+
+      await this.redisService.setJson(
+        `pcb:ingest:runs:${runId}`,
+        {
+          connectorName,
+          sourceSystem,
+          status: 'running',
+          executionMode: 'manual',
+          startedAt: new Date().toISOString(),
+        },
+        86400,
+      );
+    });
+
+    child.once('error', async (error) => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+      await this.failRun(runId, connectorName, sourceSystem, error.message);
+    });
+
+    child.once('close', async (code) => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+
+      if (code === 0) {
+        await this.completeRun(runId, connectorName, sourceSystem, stdout, stderr);
+        return;
+      }
+
+      const excerpt = stderr.trim() || `Connector process exited with code ${code ?? 'unknown'}`;
+      await this.failRun(runId, connectorName, sourceSystem, excerpt);
+    });
+  }
+
+  private async completeRun(
+    runId: string,
+    connectorName: string,
+    sourceSystem: string,
+    stdout: string,
+    stderr: string,
+  ) {
+    const report = this.parseConnectorExecutionResult(stdout);
+    const endedAt = report?.endedAt ?? new Date().toISOString();
+
+    await this.redisService.setJson(
+      `pcb:ingest:runs:${runId}`,
+      {
+        connectorName,
+        sourceSystem,
+        status: 'completed',
+        executionMode: 'manual',
+        endedAt,
+        persistence: report?.persistence ?? null,
+      },
+      86400,
+    );
+
+    await this.auditService.recordEvent({
+      eventType: 'connector_run_completed',
+      actorType: 'system',
+      actorId: connectorName,
+      sourceModule: 'ingest',
+      entityType: 'ingestion_run',
+      entityId: runId,
+      payload: {
+        connectorName,
+        sourceSystem,
+        status: report?.status ?? 'completed',
+        filesScanned: report?.filesScanned ?? null,
+        directoriesScanned: report?.directoriesScanned ?? null,
+        recordsPersisted: report?.persistence?.recordsPersisted ?? null,
+        stderr: stderr.trim() || null,
+      },
+    });
+  }
+
+  private async failRun(
+    runId: string,
+    connectorName: string,
+    sourceSystem: string,
+    reason: string,
+  ) {
+    const endedAt = new Date().toISOString();
+    const excerpt = reason.trim().slice(0, 1000) || 'Connector execution failed';
+
+    await this.databaseService.query(
+      `
+        UPDATE ingest.ingestion_run
+        SET
+          status = 'failed',
+          ended_at = $2,
+          log_excerpt = $3
+        WHERE id = $1
+      `,
+      [runId, endedAt, excerpt],
+    );
+
+    await this.redisService.setJson(
+      `pcb:ingest:runs:${runId}`,
+      {
+        connectorName,
+        sourceSystem,
+        status: 'failed',
+        executionMode: 'manual',
+        endedAt,
+        error: excerpt,
+      },
+      86400,
+    );
+
+    await this.auditService.recordEvent({
+      eventType: 'connector_run_failed',
+      actorType: 'system',
+      actorId: connectorName,
+      sourceModule: 'ingest',
+      entityType: 'ingestion_run',
+      entityId: runId,
+      payload: {
+        connectorName,
+        sourceSystem,
+        status: 'failed',
+        error: excerpt,
+      },
+    });
+  }
+
+  private parseConnectorExecutionResult(stdout: string): ConnectorExecutionResult | null {
+    const normalized = stdout.trim();
+
+    if (!normalized) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(normalized) as ConnectorExecutionResult;
+    } catch {
+      return null;
+    }
   }
 
   private mapRun(row: IngestionRunRow): IngestionRunResponseDto {

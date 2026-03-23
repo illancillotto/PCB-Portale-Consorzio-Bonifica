@@ -953,3 +953,19 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Esecuzione reale del trigger manuale NAS
+
+Completato:
+
+- trigger manuale backend collegato al CLI reale di `connector-nas-catasto`
+- riuso della `ingestion_run` già creata dall'API, senza duplicare run tra backend e connector
+- aggiornamento automatico di stato `running/completed/failed` con audit e cache runtime
+- readiness runtime estesa alla presenza del CLI buildato in `connectors/dist`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace connectors`
+- `npm run build --workspace connectors`

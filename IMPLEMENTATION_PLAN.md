@@ -458,6 +458,7 @@ Estensioni completate:
 - filtri URL-shareable issue connector in `operations`
 - catalogo connector operativo in `operations`
 - filtri URL-shareable del catalogo su stato operativo e trigger mode
+- trigger manuale backend collegato al CLI reale del connector NAS con riuso della stessa `ingestion_run`
 
 ## Criteri di done per ogni milestone
 

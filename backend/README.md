@@ -70,7 +70,9 @@ Note matching:
 - supporto a match `source-link aware`
 - supporto a match su nome soggetto canonico per ridurre review evitabili
 - decisioni manuali di matching tracciate anche in `audit.audit_event`
-- eventi audit automatici per `connector_run_requested`, `ingestion_normalized`, `ingestion_matched`
+- eventi audit automatici per `connector_run_requested`, `connector_run_completed`, `connector_run_failed`, `ingestion_normalized`, `ingestion_matched`
+- il trigger manuale `POST /api/v1/ingestion/connectors/{connectorName}/run` esegue il CLI reale del connector quando `connectors/dist` è disponibile
+- per `connector-nas-catasto` il backend riusa la `ingestion_run` già creata e forza la persistenza nel layer `raw ingest`
 - Redis operativo per:
   - `PING` da health/runtime metadata
   - marker di run manuale ingest
