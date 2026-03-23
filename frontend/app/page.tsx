@@ -35,6 +35,16 @@ const moduleCards = [
     description: 'Stato centralizzato di Postgres, Redis, Keycloak e QGIS per la verifica runtime.',
     href: '/operations',
   },
+  {
+    title: 'GIS completo',
+    description: 'Viewer operativo con tutti i layer QGIS e preset completo condivisibile.',
+    href: '/gis?preset=completo',
+  },
+  {
+    title: 'GIS relazioni',
+    description: 'Accesso rapido alla vista relazionale soggetto-particella per controllo operativo.',
+    href: '/gis?preset=relazioni&layers=pcb_subject_parcel_links',
+  },
 ];
 
 export default async function HomePage() {
@@ -81,6 +91,47 @@ export default async function HomePage() {
           </ul>
         </SectionCard>
       </section>
+
+      <SectionCard title="Preset GIS rapidi" eyebrow="Map">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Link
+            href="/gis?preset=completo"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
+            <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">Vista completa</h3>
+            <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+              Tutti i layer QGIS attivi per consultazione generale.
+            </p>
+          </Link>
+          <Link
+            href="/gis?preset=relazioni&layers=pcb_subject_parcel_links"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
+            <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">Solo relazioni</h3>
+            <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+              Evidenzia il layer relazionale soggetto-particella.
+            </p>
+          </Link>
+          <Link
+            href="/gis?preset=catasto&layers=pcb_subject_parcel_links,pcb_parcels"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
+            <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">Preset catasto</h3>
+            <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+              Relazioni e particelle per lettura operativa del dominio catastale.
+            </p>
+          </Link>
+          <Link
+            href="/gis?preset=soggetti&layers=pcb_subjects"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
+            <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">Focus soggetti</h3>
+            <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+              Marker soggetto georiferiti senza sovraccarico cartografico.
+            </p>
+          </Link>
+        </div>
+      </SectionCard>
     </PageShell>
   );
 }

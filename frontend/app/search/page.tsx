@@ -31,19 +31,42 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         ) : (
           <div className="grid gap-4">
             {results.items.map((item) => (
-              <Link
+              <article
                 key={`${item.type}-${item.id}`}
-                href={item.route}
-                className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+                className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
               >
-                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                  <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">{item.title}</h3>
-                  <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
-                    {item.type}
-                  </span>
+                <Link href={item.route} className="block transition hover:-translate-y-0.5">
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                    <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">{item.title}</h3>
+                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
+                      {item.type}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-[var(--pcb-muted)]">{item.subtitle}</p>
+                </Link>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link
+                    href={
+                      item.type === 'subject'
+                        ? `/gis?subjectId=${item.id}&preset=relazioni&layers=pcb_subject_parcel_links`
+                        : `/gis?parcelId=${item.id}&preset=catasto&layers=pcb_subject_parcel_links,pcb_parcels`
+                    }
+                    className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+                  >
+                    Apri GIS contestuale
+                  </Link>
+                  <Link
+                    href={
+                      item.type === 'subject'
+                        ? `/gis?subjectId=${item.id}&preset=soggetti&layers=pcb_subjects`
+                        : `/gis?parcelId=${item.id}&preset=relazioni&layers=pcb_subject_parcel_links`
+                    }
+                    className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+                  >
+                    Preset operativo
+                  </Link>
                 </div>
-                <p className="mt-2 text-sm text-[var(--pcb-muted)]">{item.subtitle}</p>
-              </Link>
+              </article>
             ))}
           </div>
         )}

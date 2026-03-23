@@ -242,6 +242,7 @@ Stato attuale:
 - completata sincronizzazione URL dei layer attivi del viewer GIS
 - completati preset operativi GIS condivisibili
 - completati quick link ai preset GIS da viste operative
+- completati preset GIS contestuali da dashboard e search
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella
 - completato endpoint GIS applicativo dedicato alle relazioni soggetto-particella
 - completati filtri `subjectId` e `parcelId` sull'endpoint GIS relazionale
@@ -251,7 +252,7 @@ Stato attuale:
 Prossimo passo naturale:
 
 - usare il layer relazionale per popup/cartigli ancora piu` mirati nel viewer
-- oppure rendere i preset GIS sensibili al dominio corrente in dashboard e search
+- oppure portare metriche operative GIS sintetiche nella dashboard principale
 
 Dipendenze:
 

@@ -213,6 +213,7 @@ Nota:
 - layer attivi del viewer GIS sincronizzati con URL: completato
 - preset operativi GIS condivisibili: completato
 - quick link ai preset GIS da viste operative: completato
+- preset GIS contestuali da dashboard e search: completato
 - layer relazioni soggetto-particella pubblicato: completato
 - endpoint GIS applicativo relazioni soggetto-particella: completato
 - filtri GIS relazioni per soggetto/particella: completato
