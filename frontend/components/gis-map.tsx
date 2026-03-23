@@ -17,6 +17,23 @@ interface QgisFeatureInfoResponse {
   features: QgisFeatureInfoFeature[];
 }
 
+function toFeatureInfoFeature(feature: GisMapFeature): QgisFeatureInfoFeature {
+  return {
+    id: `${feature.properties.layerCode}.${feature.id}`,
+    type: 'Feature',
+    properties: {
+      id: feature.id,
+      feature_external_id: feature.properties.featureExternalId,
+      subject_id: feature.properties.subjectId,
+      parcel_id: feature.properties.parcelId,
+      layer_code: feature.properties.layerCode,
+      layer_name: feature.properties.layerName,
+      valid_from: feature.properties.validFrom,
+      valid_to: feature.properties.validTo,
+    },
+  };
+}
+
 function getFeatureSelectionKey(layerCode: string | null, id: string | null) {
   if (!layerCode || !id) {
     return null;
@@ -206,6 +223,34 @@ export function GisMap({
         },
         onEachFeature(feature, layer) {
           const properties = feature.properties as GisMapFeature['properties'];
+          const sourceFeature = feature as unknown as GisMapFeature;
+
+          layer.on('click', () => {
+            const selectedKey = getFeatureSelectionKey(properties.layerCode, sourceFeature.id);
+
+            setSelectedFeatureKey(selectedKey);
+            setFeatureInfoState((currentState) => {
+              const nextFeature = toFeatureInfoFeature(sourceFeature);
+              const alreadyPresent = currentState.features.some(
+                (currentFeature) =>
+                  getFeatureSelectionKey(
+                    asOptionalString(currentFeature.properties.layer_code),
+                    asOptionalString(currentFeature.properties.id),
+                  ) === selectedKey,
+              );
+
+              if (alreadyPresent) {
+                return currentState;
+              }
+
+              return {
+                loading: false,
+                error: null,
+                features: [nextFeature, ...currentState.features],
+              };
+            });
+          });
+
           layer.bindPopup(
             `
               <div style="min-width: 220px">

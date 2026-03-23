@@ -44,4 +44,5 @@ Stato attuale:
 - `GetFeatureInfo` operativo dal viewer GIS via route frontend dedicata
 - risultati `GetFeatureInfo` con link navigabili a soggetti e particelle PCB
 - evidenziazione automatica nel viewer della feature selezionata da `GetFeatureInfo`
+- sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

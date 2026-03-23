@@ -234,11 +234,12 @@ Stato attuale:
 - completato `GetFeatureInfo` operativo dal viewer frontend GIS
 - completati link navigabili dai risultati `GetFeatureInfo`
 - completata evidenziazione automatica in mappa della feature selezionata via `GetFeatureInfo`
+- completato sync inverso tra selezione mappa e pannello risultati
 
 Prossimo passo naturale:
 
 - introdurre una vista QGIS dedicata alle relazioni soggetto-particella
-- oppure introdurre sync inverso tra selezione mappa e pannello risultati
+- oppure introdurre una vista/overlay tematico dedicato alle relazioni soggetto-particella
 
 Dipendenze:
 

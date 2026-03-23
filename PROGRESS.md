@@ -205,6 +205,7 @@ Nota:
 - `GetFeatureInfo` QGIS dal viewer frontend: completato
 - risultati `GetFeatureInfo` navigabili: completato
 - evidenziazione feature da `GetFeatureInfo`: completato
+- sync inverso viewer-pannello GIS: completato
 
 ## Blocchi aperti
 
@@ -831,6 +832,19 @@ Completato:
 - selezione automatica della prima feature restituita da `GetFeatureInfo`
 - pulsante esplicito `Evidenzia in mappa` sui risultati
 - highlight coerente nel viewer Leaflet sulle feature GeoJSON PCB
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
+
+### 2026-03-23 – Sync inverso viewer-pannello GIS
+
+Completato:
+
+- click su feature GeoJSON PCB -> selezione attiva nel viewer
+- click su feature GeoJSON PCB -> allineamento del pannello risultati
+- inserimento nel pannello della feature cliccata quando non presente nei risultati correnti
 
 Verifiche eseguite:
 
