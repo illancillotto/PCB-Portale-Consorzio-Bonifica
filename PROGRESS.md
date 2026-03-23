@@ -221,6 +221,7 @@ Nota:
 - catalogo connector orchestrato nel backend e visibile in ingestion UI: completato
 - summary backend di orchestration ingestion: completato
 - trigger manuali ingestion derivati dal catalogo connector: completato
+- dettaglio per singolo connector in ingestion: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

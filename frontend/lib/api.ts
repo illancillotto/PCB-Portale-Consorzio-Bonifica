@@ -115,6 +115,28 @@ export interface IngestionConnectorCatalogItem {
   } | null;
 }
 
+export interface IngestionConnectorDetail {
+  connectorName: string;
+  sourceSystem: string;
+  displayName: string;
+  domain: string;
+  triggerMode: 'manual' | 'scheduled';
+  capabilities: Array<'acquisition' | 'raw_ingest' | 'normalization' | 'matching'>;
+  writesToMasterData: false;
+  latestRun: {
+    id: string;
+    status: string;
+    startedAt: string;
+    endedAt: string | null;
+  } | null;
+  runCounters: {
+    total: number;
+    queued: number;
+    completed: number;
+    failed: number;
+  };
+}
+
 export interface IngestionOrchestrationSummary {
   registeredConnectors: number;
   manualConnectors: number;
@@ -327,6 +349,15 @@ export async function getIngestionConnectors(accessToken: string) {
   return apiFetch<PaginatedResponse<IngestionConnectorCatalogItem>>('/ingestion/connectors', {
     accessToken,
   });
+}
+
+export async function getIngestionConnectorDetail(connectorName: string, accessToken: string) {
+  return apiFetch<IngestionConnectorDetail>(
+    `/ingestion/connectors/${encodeURIComponent(connectorName)}`,
+    {
+      accessToken,
+    },
+  );
 }
 
 export async function getIngestionOrchestrationSummary(accessToken: string) {

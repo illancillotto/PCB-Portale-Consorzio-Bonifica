@@ -168,6 +168,14 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                   </Link>
                 </p>
               ) : null}
+              <div className="mt-4">
+                <Link
+                  href={`/ingestion/connectors/${connector.connectorName}`}
+                  className="text-sm font-semibold text-[var(--pcb-accent)]"
+                >
+                  Apri dettaglio connector
+                </Link>
+              </div>
             </article>
           ))}
         </div>

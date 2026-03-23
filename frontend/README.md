@@ -59,6 +59,7 @@ Stato attuale:
 - catalogo connector esposto nel monitor ingestion con capacità e ultimo stato noto
 - summary backend di orchestration ingestion esposto nel monitor
 - trigger manuali ingestion derivati dal catalogo connector, non più hardcoded
+- dettaglio per singolo connector nel dominio ingestion
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB

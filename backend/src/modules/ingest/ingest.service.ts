@@ -5,6 +5,7 @@ import { DatabaseService } from '../core/database/database.service';
 import { RedisService } from '../core/redis/redis.service';
 import { IngestionRunResponseDto } from './dto/ingestion-run-response.dto';
 import { IngestionConnectorCatalogResponseDto } from './dto/connector-catalog-response.dto';
+import { IngestionConnectorDetailResponseDto } from './dto/connector-detail-response.dto';
 import { MatchingResultResponseDto } from './dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from './dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from './dto/normalized-record-response.dto';
@@ -178,6 +179,62 @@ export class IngestService {
         };
       }),
       total: connectorCatalog.length,
+    };
+  }
+
+  async getConnectorDetail(
+    connectorName: string,
+  ): Promise<IngestionConnectorDetailResponseDto | null> {
+    const connector = connectorCatalog.find((item) => item.connectorName === connectorName);
+
+    if (!connector) {
+      return null;
+    }
+
+    const runsResult = await this.databaseService.query<IngestionRunRow>(
+      `
+        SELECT
+          id,
+          connector_name,
+          source_system,
+          status,
+          started_at,
+          ended_at,
+          records_total,
+          records_success,
+          records_error,
+          log_excerpt
+        FROM ingest.ingestion_run
+        WHERE connector_name = $1
+        ORDER BY started_at DESC
+      `,
+      [connectorName],
+    );
+
+    const latestRun = runsResult.rows[0] ?? null;
+
+    return {
+      connectorName: connector.connectorName,
+      sourceSystem: connector.sourceSystem,
+      displayName: connector.displayName,
+      domain: connector.domain,
+      triggerMode: connector.triggerMode,
+      capabilities: connector.capabilities,
+      writesToMasterData: false,
+      latestRun: latestRun
+        ? {
+            id: latestRun.id,
+            status: latestRun.status,
+            startedAt: new Date(latestRun.started_at).toISOString(),
+            endedAt: latestRun.ended_at ? new Date(latestRun.ended_at).toISOString() : null,
+          }
+        : null,
+      runCounters: {
+        total: runsResult.rows.length,
+        queued: runsResult.rows.filter((row) => row.status === 'queued').length,
+        completed: runsResult.rows.filter((row) => row.status === 'completed').length,
+        failed: runsResult.rows.filter((row) => row.status === 'failed').length,
+      },
     };
   }
 

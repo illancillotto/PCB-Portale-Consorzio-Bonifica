@@ -12,6 +12,7 @@ import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
 import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
 import { IngestService } from '../ingest.service';
 import { IngestionConnectorCatalogResponseDto } from '../dto/connector-catalog-response.dto';
+import { IngestionConnectorDetailResponseDto } from '../dto/connector-detail-response.dto';
 import { IngestionRunResponseDto } from '../dto/ingestion-run-response.dto';
 import { MatchingResultResponseDto } from '../dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from '../dto/normalize-run-response.dto';
@@ -32,6 +33,19 @@ export class IngestionController {
   @Get('connectors')
   async listConnectors(): Promise<{ items: IngestionConnectorCatalogResponseDto[]; total: number }> {
     return this.ingestService.listConnectorCatalog();
+  }
+
+  @Get('connectors/:connectorName')
+  async getConnectorDetail(
+    @Param('connectorName') connectorName: string,
+  ): Promise<IngestionConnectorDetailResponseDto> {
+    const connector = await this.ingestService.getConnectorDetail(connectorName);
+
+    if (!connector) {
+      throw new NotFoundException(`Connector not found for name ${connectorName}`);
+    }
+
+    return connector;
   }
 
   @Get('orchestration-summary')
@@ -173,6 +187,11 @@ export class IngestionController {
   async startRun(
     @Param('connectorName') connectorName: string,
   ): Promise<StartIngestionRunResponseDto> {
-    return this.ingestService.startManualRun(connectorName);
+    try {
+      return await this.ingestService.startManualRun(connectorName);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Run request could not be started';
+      throw new BadRequestException(message);
+    }
   }
 }
