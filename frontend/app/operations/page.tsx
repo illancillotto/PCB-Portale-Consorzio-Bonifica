@@ -377,6 +377,47 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         )}
       </SectionCard>
 
+      <SectionCard title="Pipeline stages" eyebrow="Ingestion">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Acquisition running</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.runningRuns}
+            </p>
+            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+              queued {orchestrationSummary.queuedRuns}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Post-processing running</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.postProcessingRunningRuns}
+            </p>
+            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+              queued {orchestrationSummary.postProcessingQueuedRuns}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Normalization completed</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.normalizationCompletedRuns}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Matching completed</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.matchingCompletedRuns}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Run fallite</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.failedRuns}
+            </p>
+          </article>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Catalogo connector" eyebrow="Orchestration">
         <div className="mb-4 flex flex-wrap gap-3">
           <Link

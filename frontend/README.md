@@ -86,6 +86,7 @@ Stato attuale:
 - il trigger manuale frontend reindirizza direttamente al dettaglio della run appena creata
 - monitor e dettaglio run mostrano ora gli stage `acquisition`, `post-processing`, `normalization`, `matching`
 - il monitor run supporta anche filtri URL-shareable per stage `acquisition` e `post-processing`
+- `operations` mostra anche i contatori cross-domain degli stage ingestion
 - il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS

@@ -1035,3 +1035,17 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Stage ingestion anche in operations
+
+Completato:
+
+- summary backend orchestration arricchito con contatori stage ingestion
+- vista `operations` aggiornata con lettura cross-domain di acquisition, post-processing, normalization e matching
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

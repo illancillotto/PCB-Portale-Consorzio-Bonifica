@@ -464,6 +464,7 @@ Estensioni completate:
 - il trigger frontend apre direttamente il dettaglio della run per seguire il chaining asincrono
 - monitor e dettaglio run mostrano esplicitamente gli stage di pipeline della singola run
 - il monitor run supporta filtri stage URL-shareable per lettura operativa piu` rapida
+- `operations` espone anche i contatori cross-domain degli stage ingestion
 
 ## Criteri di done per ogni milestone
 

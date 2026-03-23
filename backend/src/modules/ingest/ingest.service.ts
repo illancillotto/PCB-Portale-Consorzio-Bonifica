@@ -641,13 +641,17 @@ export class IngestService {
       this.getConnectorExecutionReadiness(connector.connectorName),
     );
     const connectorIssues = await this.listConnectorOperationalIssues();
+    const runs = await this.listRuns();
     const healthyConnectors =
       connectorCatalog.length -
       new Set(connectorIssues.items.map((item) => item.connectorName)).size;
-    const [queuedRunsResult, failedRunsResult, normalizedRecordsResult, reviewQueueResult, latestRunResult] =
+    const [queuedRunsResult, runningRunsResult, failedRunsResult, normalizedRecordsResult, reviewQueueResult, latestRunResult] =
       await Promise.all([
         this.databaseService.query<NumericCountRow>(
           `SELECT COUNT(*)::text AS total FROM ingest.ingestion_run WHERE status = 'queued'`,
+        ),
+        this.databaseService.query<NumericCountRow>(
+          `SELECT COUNT(*)::text AS total FROM ingest.ingestion_run WHERE status = 'running'`,
         ),
         this.databaseService.query<NumericCountRow>(
           `SELECT COUNT(*)::text AS total FROM ingest.ingestion_run WHERE status = 'failed'`,
@@ -679,7 +683,20 @@ export class IngestService {
         (item) => item.runnable && !item.persistenceEnabled,
       ).length,
       queuedRuns: Number(queuedRunsResult.rows[0]?.total ?? 0),
+      runningRuns: Number(runningRunsResult.rows[0]?.total ?? 0),
       failedRuns: Number(failedRunsResult.rows[0]?.total ?? 0),
+      postProcessingQueuedRuns: runs.items.filter(
+        (run) => run.stages.postProcessing.status === 'queued',
+      ).length,
+      postProcessingRunningRuns: runs.items.filter(
+        (run) => run.stages.postProcessing.status === 'running',
+      ).length,
+      normalizationCompletedRuns: runs.items.filter(
+        (run) => run.stages.normalization.status === 'completed',
+      ).length,
+      matchingCompletedRuns: runs.items.filter(
+        (run) => run.stages.matching.status === 'completed',
+      ).length,
       normalizedRecords: Number(normalizedRecordsResult.rows[0]?.total ?? 0),
       reviewQueue: Number(reviewQueueResult.rows[0]?.total ?? 0),
       latestRunAt: latestRunResult.rows[0]?.latest_run_at

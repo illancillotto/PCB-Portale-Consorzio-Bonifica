@@ -241,7 +241,12 @@ export interface IngestionOrchestrationSummary {
   blockedConnectors: number;
   dryRunConnectors: number;
   queuedRuns: number;
+  runningRuns: number;
   failedRuns: number;
+  postProcessingQueuedRuns: number;
+  postProcessingRunningRuns: number;
+  normalizationCompletedRuns: number;
+  matchingCompletedRuns: number;
   normalizedRecords: number;
   reviewQueue: number;
   latestRunAt: string | null;
