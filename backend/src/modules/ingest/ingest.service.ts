@@ -430,6 +430,38 @@ export class IngestService {
       },
       { total: 0, critical: 0, warning: 0 },
     );
+    const issueTypeCounters = connectorIssues.items.reduce(
+      (accumulator, item) => {
+        if (item.issueType === 'not_configured') {
+          accumulator.notConfigured += 1;
+        }
+
+        if (item.issueType === 'not_runnable') {
+          accumulator.notRunnable += 1;
+        }
+
+        if (item.issueType === 'dry_run_only') {
+          accumulator.dryRunOnly += 1;
+        }
+
+        if (item.issueType === 'latest_run_failed') {
+          accumulator.latestRunFailed += 1;
+        }
+
+        if (item.issueType === 'no_completed_runs') {
+          accumulator.noCompletedRuns += 1;
+        }
+
+        return accumulator;
+      },
+      {
+        notConfigured: 0,
+        notRunnable: 0,
+        dryRunOnly: 0,
+        latestRunFailed: 0,
+        noCompletedRuns: 0,
+      },
+    );
 
     return {
       connectorName: connector.connectorName,
@@ -485,6 +517,7 @@ export class IngestService {
         recordsErroredTotal: runsResult.rows.reduce((total, row) => total + row.records_error, 0),
       },
       issueCounters,
+      issueTypeCounters,
       issues: connectorIssues.items,
     };
   }

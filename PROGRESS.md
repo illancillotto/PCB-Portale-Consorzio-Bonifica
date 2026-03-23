@@ -237,6 +237,7 @@ Nota:
 - dettaglio connector arricchito con elenco issue aperte e filtro per severity: completato
 - endpoint dettaglio connector esteso con elenco issue aperte, eliminando il fetch frontend separato: completato
 - dettaglio connector esteso con filtro `issueType` sulle issue aperte: completato
+- dettaglio connector arricchito con contatori per tipo di issue: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

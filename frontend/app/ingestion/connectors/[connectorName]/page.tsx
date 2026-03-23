@@ -215,6 +215,38 @@ export default async function ConnectorDetailPage({
       </SectionCard>
 
       <SectionCard title="Issue operative" eyebrow="Attention">
+        <div className="mb-4 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Not configured</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {connector.issueTypeCounters.notConfigured}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Not runnable</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {connector.issueTypeCounters.notRunnable}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Dry-run only</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {connector.issueTypeCounters.dryRunOnly}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Latest run failed</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {connector.issueTypeCounters.latestRunFailed}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">No completed runs</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {connector.issueTypeCounters.noCompletedRuns}
+            </p>
+          </article>
+        </div>
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
             href={buildConnectorRunsFilterHref(connector.connectorName, {

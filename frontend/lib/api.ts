@@ -183,6 +183,13 @@ export interface IngestionConnectorDetail {
     critical: number;
     warning: number;
   };
+  issueTypeCounters: {
+    notConfigured: number;
+    notRunnable: number;
+    dryRunOnly: number;
+    latestRunFailed: number;
+    noCompletedRuns: number;
+  };
   issues: IngestionConnectorIssue[];
 }
 
