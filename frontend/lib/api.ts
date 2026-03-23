@@ -427,10 +427,31 @@ export async function getIngestionRuns(accessToken: string) {
   });
 }
 
-export async function getIngestionConnectors(accessToken: string) {
-  return apiFetch<PaginatedResponse<IngestionConnectorCatalogItem>>('/ingestion/connectors', {
-    accessToken,
-  });
+export async function getIngestionConnectors(
+  accessToken: string,
+  filters?: {
+    operationalStatus?: 'healthy' | 'warning' | 'critical';
+    triggerMode?: 'manual' | 'scheduled';
+  },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.operationalStatus) {
+    params.set('operationalStatus', filters.operationalStatus);
+  }
+
+  if (filters?.triggerMode) {
+    params.set('triggerMode', filters.triggerMode);
+  }
+
+  const queryString = params.toString();
+
+  return apiFetch<PaginatedResponse<IngestionConnectorCatalogItem>>(
+    `/ingestion/connectors${queryString ? `?${queryString}` : ''}`,
+    {
+      accessToken,
+    },
+  );
 }
 
 export async function getIngestionConnectorIssues(

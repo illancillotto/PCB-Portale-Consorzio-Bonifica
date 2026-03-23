@@ -174,7 +174,10 @@ export class IngestService {
     };
   }
 
-  async listConnectorCatalog(): Promise<{
+  async listConnectorCatalog(filters?: {
+    operationalStatus?: 'healthy' | 'warning' | 'critical';
+    triggerMode?: 'manual' | 'scheduled';
+  }): Promise<{
     items: IngestionConnectorCatalogResponseDto[];
     total: number;
   }> {
@@ -266,9 +269,21 @@ export class IngestService {
       return left.displayName.localeCompare(right.displayName, 'it');
     });
 
+    const filteredItems = items.filter((item) => {
+      if (filters?.operationalStatus && item.operationalStatus !== filters.operationalStatus) {
+        return false;
+      }
+
+      if (filters?.triggerMode && item.triggerMode !== filters.triggerMode) {
+        return false;
+      }
+
+      return true;
+    });
+
     return {
-      items,
-      total: connectorCatalog.length,
+      items: filteredItems,
+      total: filteredItems.length,
     };
   }
 

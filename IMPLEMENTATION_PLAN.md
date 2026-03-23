@@ -271,6 +271,7 @@ Stato attuale:
 - completato ordinamento backend-side del catalogo connector per priorita` operativa
 - completato ordinamento backend-side del feed issue connector
 - completato conteggio backend dei connector `healthy` nei riepiloghi orchestration
+- completati filtri backend/frontend sul catalogo connector per stato operativo e trigger mode
 - completato riepilogo audit con filtri operativi dedicati
 - completata osservabilita` cross-domain nella vista `operations`
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella

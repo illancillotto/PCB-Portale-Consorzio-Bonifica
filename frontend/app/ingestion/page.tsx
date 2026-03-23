@@ -15,6 +15,8 @@ interface IngestionPageProps {
   searchParams?: Promise<{
     status?: string;
     connector?: string;
+    connectorOperationalStatus?: 'healthy' | 'warning' | 'critical';
+    connectorTriggerMode?: 'manual' | 'scheduled';
     issueConnector?: string;
     issueSeverity?: 'warning' | 'critical';
     issueType?: string;
@@ -40,6 +42,8 @@ function buildRunsFilterHref(filters: { status?: string; connector?: string }) {
 function buildIssueFilterHref(filters: {
   status?: string;
   connector?: string;
+  connectorOperationalStatus?: 'healthy' | 'warning' | 'critical';
+  connectorTriggerMode?: 'manual' | 'scheduled';
   issueConnector?: string;
   issueSeverity?: 'warning' | 'critical';
   issueType?: string;
@@ -52,6 +56,14 @@ function buildIssueFilterHref(filters: {
 
   if (filters.connector) {
     params.set('connector', filters.connector);
+  }
+
+  if (filters.connectorOperationalStatus) {
+    params.set('connectorOperationalStatus', filters.connectorOperationalStatus);
+  }
+
+  if (filters.connectorTriggerMode) {
+    params.set('connectorTriggerMode', filters.connectorTriggerMode);
   }
 
   if (filters.issueConnector) {
@@ -76,7 +88,10 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
   const filters = (await searchParams) ?? {};
   const [runs, connectors, connectorIssues, orchestrationSummary] = await Promise.all([
     getIngestionRuns(session.accessToken),
-    getIngestionConnectors(session.accessToken),
+    getIngestionConnectors(session.accessToken, {
+      operationalStatus: filters.connectorOperationalStatus,
+      triggerMode: filters.connectorTriggerMode,
+    }),
     getIngestionConnectorIssues(session.accessToken, {
       connectorName: filters.issueConnector,
       severity: filters.issueSeverity,
@@ -225,6 +240,86 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
       </SectionCard>
 
       <SectionCard title="Catalogo connector" eyebrow="Orchestration">
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildIssueFilterHref({
+              status: filters.status,
+              connector: filters.connector,
+              connectorTriggerMode: filters.connectorTriggerMode,
+              issueConnector: filters.issueConnector,
+              issueSeverity: filters.issueSeverity,
+              issueType: filters.issueType,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.connectorOperationalStatus
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti gli stati
+          </Link>
+          {(['critical', 'warning', 'healthy'] as const).map((operationalStatus) => (
+            <Link
+              key={operationalStatus}
+              href={buildIssueFilterHref({
+                status: filters.status,
+                connector: filters.connector,
+                connectorOperationalStatus: operationalStatus,
+                connectorTriggerMode: filters.connectorTriggerMode,
+                issueConnector: filters.issueConnector,
+                issueSeverity: filters.issueSeverity,
+                issueType: filters.issueType,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.connectorOperationalStatus === operationalStatus
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {operationalStatus}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-6 flex flex-wrap gap-3">
+          <Link
+            href={buildIssueFilterHref({
+              status: filters.status,
+              connector: filters.connector,
+              connectorOperationalStatus: filters.connectorOperationalStatus,
+              issueConnector: filters.issueConnector,
+              issueSeverity: filters.issueSeverity,
+              issueType: filters.issueType,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.connectorTriggerMode
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti i trigger
+          </Link>
+          {(['manual', 'scheduled'] as const).map((triggerMode) => (
+            <Link
+              key={triggerMode}
+              href={buildIssueFilterHref({
+                status: filters.status,
+                connector: filters.connector,
+                connectorOperationalStatus: filters.connectorOperationalStatus,
+                connectorTriggerMode: triggerMode,
+                issueConnector: filters.issueConnector,
+                issueSeverity: filters.issueSeverity,
+                issueType: filters.issueType,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.connectorTriggerMode === triggerMode
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {triggerMode}
+            </Link>
+          ))}
+        </div>
         <div className="grid gap-4 xl:grid-cols-2">
           {connectors.items.map((connector) => (
             <article

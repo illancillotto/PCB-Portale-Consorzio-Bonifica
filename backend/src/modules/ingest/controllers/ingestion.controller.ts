@@ -20,6 +20,7 @@ import { MatchingResultResponseDto } from '../dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from '../dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from '../dto/normalized-record-response.dto';
 import { IngestionOrchestrationSummaryResponseDto } from '../dto/orchestration-summary-response.dto';
+import { ListConnectorsQueryDto } from '../dto/list-connectors-query.dto';
 import { ListConnectorIssuesQueryDto } from '../dto/list-connector-issues-query.dto';
 import { ListConnectorRunsQueryDto } from '../dto/list-connector-runs-query.dto';
 import { RunMatchingResponseDto } from '../dto/run-matching-response.dto';
@@ -35,8 +36,10 @@ export class IngestionController {
   constructor(private readonly ingestService: IngestService) {}
 
   @Get('connectors')
-  async listConnectors(): Promise<{ items: IngestionConnectorCatalogResponseDto[]; total: number }> {
-    return this.ingestService.listConnectorCatalog();
+  async listConnectors(
+    @Query() query: ListConnectorsQueryDto,
+  ): Promise<{ items: IngestionConnectorCatalogResponseDto[]; total: number }> {
+    return this.ingestService.listConnectorCatalog(query);
   }
 
   @Get('connectors/issues')

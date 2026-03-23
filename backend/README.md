@@ -46,6 +46,7 @@ npm run dev
 - `GET /api/v1/subjects/{id}` include source links e documenti collegati
 - `GET /api/v1/ingestion/runs`
 - `GET /api/v1/ingestion/connectors`
+  supporta filtri query `operationalStatus` e `triggerMode`
 - `GET /api/v1/ingestion/connectors/{connectorName}`
 - `GET /api/v1/ingestion/connectors/{connectorName}/runs`
   supporta filtro query `status`
