@@ -19,4 +19,9 @@ export interface IngestionConnectorCatalogResponseDto {
     startedAt: string;
     endedAt: string | null;
   } | null;
+  issueCounters: {
+    total: number;
+    critical: number;
+    warning: number;
+  };
 }

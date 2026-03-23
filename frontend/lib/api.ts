@@ -120,6 +120,11 @@ export interface IngestionConnectorCatalogItem {
     startedAt: string;
     endedAt: string | null;
   } | null;
+  issueCounters: {
+    total: number;
+    critical: number;
+    warning: number;
+  };
 }
 
 export interface IngestionConnectorDetail {
@@ -172,6 +177,11 @@ export interface IngestionConnectorDetail {
     recordsObservedTotal: number;
     recordsSucceededTotal: number;
     recordsErroredTotal: number;
+  };
+  issueCounters: {
+    total: number;
+    critical: number;
+    warning: number;
   };
 }
 

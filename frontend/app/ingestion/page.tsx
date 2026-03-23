@@ -243,6 +243,9 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                     connector.executionReadiness.persistenceEnabled ? 'persist-enabled' : 'dry-run'
                   }
                 />
+                {connector.issueCounters.total > 0 ? (
+                  <StatusChip label={`${connector.issueCounters.total}-issues`} />
+                ) : null}
               </div>
               <p className="mt-3 text-sm text-[var(--pcb-muted)]">
                 Dominio {connector.domain} · trigger {connector.triggerMode}
@@ -256,6 +259,12 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
               <p className="mt-2 text-sm text-[var(--pcb-muted)]">
                 Runtime: {connector.executionReadiness.detail}
               </p>
+              {connector.issueCounters.total > 0 ? (
+                <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+                  Issue aperte: {connector.issueCounters.total} · critiche {connector.issueCounters.critical} · warning{' '}
+                  {connector.issueCounters.warning}
+                </p>
+              ) : null}
               {connector.executionReadiness.rootPath ? (
                 <p className="mt-1 break-all text-xs text-[var(--pcb-muted)]">
                   Root path {connector.executionReadiness.rootPath}

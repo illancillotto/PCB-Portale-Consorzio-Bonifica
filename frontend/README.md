@@ -71,6 +71,7 @@ Stato attuale:
 - riepiloghi `ingestion` e `operations` usano anche contatori backend sintetici su issue connector
 - anche `operations` espone filtri URL-shareable su `issueSeverity` e `issueType`
 - `ingestion` e `operations` supportano anche filtro issue per `issueConnector`
+- catalogo e dettaglio connector mostrano anche i contatori di issue aperte
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB

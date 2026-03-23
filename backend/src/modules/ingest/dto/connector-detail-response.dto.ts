@@ -49,4 +49,9 @@ export interface IngestionConnectorDetailResponseDto {
     recordsSucceededTotal: number;
     recordsErroredTotal: number;
   };
+  issueCounters: {
+    total: number;
+    critical: number;
+    warning: number;
+  };
 }

@@ -178,6 +178,7 @@ export class IngestService {
     items: IngestionConnectorCatalogResponseDto[];
     total: number;
   }> {
+    const connectorIssues = await this.listConnectorOperationalIssues();
     const latestRunsResult = await this.databaseService.query<IngestionRunRow>(
       `
         SELECT DISTINCT ON (connector_name)
@@ -199,11 +200,29 @@ export class IngestService {
     const latestRunByConnector = new Map(
       latestRunsResult.rows.map((row) => [row.connector_name, row] as const),
     );
+    const issueCountsByConnector = new Map<string, { total: number; critical: number; warning: number }>();
+
+    for (const issue of connectorIssues.items) {
+      const current = issueCountsByConnector.get(issue.connectorName) ?? {
+        total: 0,
+        critical: 0,
+        warning: 0,
+      };
+
+      current.total += 1;
+      current[issue.severity] += 1;
+      issueCountsByConnector.set(issue.connectorName, current);
+    }
 
     return {
       items: connectorCatalog.map((connector) => {
         const latestRun = latestRunByConnector.get(connector.connectorName);
         const executionReadiness = this.getConnectorExecutionReadiness(connector.connectorName);
+        const issueCounters = issueCountsByConnector.get(connector.connectorName) ?? {
+          total: 0,
+          critical: 0,
+          warning: 0,
+        };
 
         return {
           connectorName: connector.connectorName,
@@ -222,6 +241,7 @@ export class IngestService {
                 endedAt: latestRun.ended_at ? new Date(latestRun.ended_at).toISOString() : null,
               }
             : null,
+          issueCounters,
         };
       }),
       total: connectorCatalog.length,
@@ -377,6 +397,7 @@ export class IngestService {
       return null;
     }
 
+    const connectorIssues = await this.listConnectorOperationalIssuesFiltered({ connectorName });
     const runsResult = await this.databaseService.query<IngestionRunRow>(
       `
         SELECT
@@ -401,6 +422,14 @@ export class IngestService {
     const lastCompletedRun = runsResult.rows.find((row) => row.status === 'completed') ?? null;
     const lastFailedRun = runsResult.rows.find((row) => row.status === 'failed') ?? null;
     const executionReadiness = this.getConnectorExecutionReadiness(connectorName);
+    const issueCounters = connectorIssues.items.reduce(
+      (accumulator, item) => {
+        accumulator.total += 1;
+        accumulator[item.severity] += 1;
+        return accumulator;
+      },
+      { total: 0, critical: 0, warning: 0 },
+    );
 
     return {
       connectorName: connector.connectorName,
@@ -455,6 +484,7 @@ export class IngestService {
         recordsSucceededTotal: runsResult.rows.reduce((total, row) => total + row.records_success, 0),
         recordsErroredTotal: runsResult.rows.reduce((total, row) => total + row.records_error, 0),
       },
+      issueCounters,
     };
   }
 

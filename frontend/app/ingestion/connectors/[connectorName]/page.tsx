@@ -118,6 +118,10 @@ export default async function ConnectorDetailPage({
               <strong className="text-[var(--pcb-ink)]">Root path:</strong> {connector.executionReadiness.rootPath}
             </p>
           ) : null}
+          <p className="mt-2">
+            <strong className="text-[var(--pcb-ink)]">Issue aperte:</strong> {connector.issueCounters.total}
+            {' · '}critiche {connector.issueCounters.critical} · warning {connector.issueCounters.warning}
+          </p>
         </div>
       </SectionCard>
 
