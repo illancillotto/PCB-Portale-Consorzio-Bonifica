@@ -1049,3 +1049,14 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Deep link stage da operations a ingestion
+
+Completato:
+
+- i contatori stage della vista `operations` aprono direttamente il monitor `ingestion` con filtri coerenti
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

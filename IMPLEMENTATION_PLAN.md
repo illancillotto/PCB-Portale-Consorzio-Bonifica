@@ -465,6 +465,7 @@ Estensioni completate:
 - monitor e dettaglio run mostrano esplicitamente gli stage di pipeline della singola run
 - il monitor run supporta filtri stage URL-shareable per lettura operativa piu` rapida
 - `operations` espone anche i contatori cross-domain degli stage ingestion
+- i contatori stage in `operations` fungono da deep link operativo verso `ingestion`
 
 ## Criteri di done per ogni milestone
 
