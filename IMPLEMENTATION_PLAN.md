@@ -227,6 +227,7 @@ Stato attuale:
 - completata vista mappa frontend reale
 - completati deep-link contestuali soggetto/particella
 - completato monitoraggio publication target QGIS con `GetCapabilities` reale sul progetto bootstrap
+- completato accesso operativo dal frontend al publication target QGIS
 
 Dipendenze:
 

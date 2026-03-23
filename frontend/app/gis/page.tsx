@@ -1,5 +1,6 @@
 import { PageShell } from '../../components/page-shell';
 import { GisMap } from '../../components/gis-map';
+import { GisPublicationLinks } from '../../components/gis-publication-links';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
@@ -96,37 +97,7 @@ export default async function GisPage({ searchParams }: GisPageProps) {
 
         <SectionCard title="Feature links" eyebrow="Relations">
           <div className="grid gap-3">
-            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-[var(--pcb-ink)]">QGIS publication target</p>
-                  <p className="mt-1 break-all text-xs text-[var(--pcb-muted)]">
-                    {publicationStatus.serviceUrl || 'non configurato'}
-                  </p>
-                  {publicationStatus.projectFile ? (
-                    <p className="mt-1 break-all text-[11px] text-[var(--pcb-muted)]">
-                      Progetto {publicationStatus.projectFile}
-                    </p>
-                  ) : null}
-                </div>
-                <StatusChip label={publicationStatus.statusLabel} />
-              </div>
-              <p className="mt-3 text-xs text-[var(--pcb-muted)]">
-                {publicationStatus.available
-                  ? `QGIS Server raggiungibile · HTTP ${publicationStatus.statusCode ?? 'n/d'}`
-                  : publicationStatus.configured
-                    ? 'QGIS Server non ancora raggiungibile o non pronto'
-                    : 'QGIS Server non configurato'}
-              </p>
-              {publicationStatus.statusDetail ? (
-                <p className="mt-2 text-xs text-[var(--pcb-muted)]">{publicationStatus.statusDetail}</p>
-              ) : null}
-              {publicationStatus.capabilitiesUrl ? (
-                <p className="mt-2 break-all text-[11px] text-[var(--pcb-muted)]">
-                  Capabilities {publicationStatus.capabilitiesUrl}
-                </p>
-              ) : null}
-            </div>
+            <GisPublicationLinks publicationStatus={publicationStatus} />
             <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4 text-sm text-[var(--pcb-muted)]">
               Feature mappate: <strong className="text-[var(--pcb-ink)]">{displayedFeatures.length}</strong>
             </div>

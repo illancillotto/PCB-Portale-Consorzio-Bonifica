@@ -692,3 +692,17 @@ Verifiche eseguite:
   - `statusLabel = ok`
   - `statusCode = 200`
   - `available = true`
+
+### 2026-03-23 – Viewer GIS collegato al publication target
+
+Completato:
+
+- accesso operativo dal frontend GIS a:
+  - endpoint OWS QGIS
+  - `GetCapabilities`
+- riuso del contract `publication-status` per la navigazione operativa
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

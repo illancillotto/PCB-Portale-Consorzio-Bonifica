@@ -38,4 +38,5 @@ Stato attuale:
 - viewer GIS reale con Leaflet e feature PostGIS esposte dal backend
 - deep-link GIS da scheda soggetto e scheda particella
 - stato publication target QGIS esposto nella vista GIS
+- accesso operativo dal frontend GIS a endpoint OWS e `GetCapabilities`
 - mappa GIS completa ancora non integrata
