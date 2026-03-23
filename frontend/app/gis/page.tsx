@@ -16,14 +16,27 @@ interface GisPageProps {
   searchParams?: Promise<{
     subjectId?: string;
     parcelId?: string;
+    layers?: string;
   }>;
 }
+
+const validQgisLayers = ['pcb_subject_parcel_links', 'pcb_parcels', 'pcb_subjects'] as const;
 
 export default async function GisPage({ searchParams }: GisPageProps) {
   const session = await requireOperatorSession();
   const filters = searchParams ? await searchParams : {};
   const selectedSubjectId = filters.subjectId;
   const selectedParcelId = filters.parcelId;
+  const initialActiveQgisLayers = (
+    filters.layers
+      ? filters.layers
+          .split(',')
+          .filter(
+            (layerCode): layerCode is (typeof validQgisLayers)[number] =>
+              validQgisLayers.includes(layerCode as (typeof validQgisLayers)[number]),
+          )
+      : [...validQgisLayers]
+  ) as Array<(typeof validQgisLayers)[number]>;
   const [layers, featureLinks, mapFeatures, publicationStatus, subjectParcelLinks] = await Promise.all([
     getGisLayers(session.accessToken),
     getGisFeatureLinks(session.accessToken, {
@@ -61,6 +74,7 @@ export default async function GisPage({ searchParams }: GisPageProps) {
             features={displayedFeatures}
             featureLinks={featureLinks.items}
             subjectParcelLinks={subjectParcelLinks.items}
+            initialActiveQgisLayers={initialActiveQgisLayers}
             selectedSubjectId={selectedSubjectId}
             selectedParcelId={selectedParcelId}
             wmsServiceUrl={publicationStatus.available ? publicationStatus.serviceUrl : null}

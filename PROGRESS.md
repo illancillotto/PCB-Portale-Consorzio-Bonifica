@@ -210,6 +210,7 @@ Nota:
 - risultati `GetFeatureInfo` raffinati sul layer relazionale: completato
 - controllo layer operativo nel viewer GIS: completato
 - legenda cartografica esplicita nel viewer GIS: completato
+- layer attivi del viewer GIS sincronizzati con URL: completato
 - layer relazioni soggetto-particella pubblicato: completato
 - endpoint GIS applicativo relazioni soggetto-particella: completato
 - filtri GIS relazioni per soggetto/particella: completato

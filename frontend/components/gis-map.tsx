@@ -2,7 +2,8 @@
 
 import 'leaflet/dist/leaflet.css';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { startTransition, useEffect, useRef, useState } from 'react';
 import type { Map as LeafletMap } from 'leaflet';
 import type { GisFeatureLink, GisMapFeature, GisSubjectParcelLink } from '../lib/api';
 
@@ -172,6 +173,7 @@ interface GisMapProps {
   features: GisMapFeature[];
   featureLinks: GisFeatureLink[];
   subjectParcelLinks: GisSubjectParcelLink[];
+  initialActiveQgisLayers?: Array<(typeof defaultQgisLayers)[number]>;
   selectedSubjectId?: string;
   selectedParcelId?: string;
   wmsServiceUrl?: string | null;
@@ -182,16 +184,24 @@ export function GisMap({
   features,
   featureLinks,
   subjectParcelLinks,
+  initialActiveQgisLayers,
   selectedSubjectId,
   selectedParcelId,
   wmsServiceUrl,
   wmsProjectFile,
 }: GisMapProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wmsLayerRef = useRef<import('leaflet').TileLayer.WMS | null>(null);
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string | null>(null);
   const [activeQgisLayers, setActiveQgisLayers] =
-    useState<Array<(typeof defaultQgisLayers)[number]>>([...defaultQgisLayers]);
+    useState<Array<(typeof defaultQgisLayers)[number]>>(
+      initialActiveQgisLayers && initialActiveQgisLayers.length > 0
+        ? initialActiveQgisLayers
+        : [...defaultQgisLayers],
+    );
   const [featureInfoState, setFeatureInfoState] = useState<{
     loading: boolean;
     error: string | null;
@@ -439,6 +449,22 @@ export function GisMap({
     }));
     setSelectedFeatureKey(null);
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (activeQgisLayers.length === defaultQgisLayers.length) {
+      params.delete('layers');
+    } else {
+      params.set('layers', activeQgisLayers.join(','));
+    }
+
+    const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+
+    startTransition(() => {
+      router.replace(nextUrl, { scroll: false });
+    });
+  }, [activeQgisLayers, pathname, router, searchParams]);
 
   return (
     <div className="grid gap-4">
