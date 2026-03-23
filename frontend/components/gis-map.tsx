@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import type { Map as LeafletMap } from 'leaflet';
-import type { GisMapFeature } from '../lib/api';
+import type { GisFeatureLink, GisMapFeature, GisSubjectParcelLink } from '../lib/api';
 
 interface QgisFeatureInfoFeature {
   id: string;
@@ -50,8 +50,38 @@ function asOptionalString(value: string | number | boolean | null | undefined) {
   return null;
 }
 
+function getRelatedFeatureLinks(
+  feature: QgisFeatureInfoFeature,
+  featureLinks: GisFeatureLink[],
+) {
+  const subjectId = asOptionalString(feature.properties.subject_id);
+  const parcelId = asOptionalString(feature.properties.parcel_id);
+
+  return featureLinks.filter(
+    (link) =>
+      (subjectId && link.subjectId === subjectId) ||
+      (parcelId && link.parcelId === parcelId),
+  );
+}
+
+function getRelatedSubjectParcelLinks(
+  feature: QgisFeatureInfoFeature,
+  relations: GisSubjectParcelLink[],
+) {
+  const subjectId = asOptionalString(feature.properties.subject_id);
+  const parcelId = asOptionalString(feature.properties.parcel_id);
+
+  return relations.filter(
+    (relation) =>
+      (subjectId && relation.subjectId === subjectId) ||
+      (parcelId && relation.parcelId === parcelId),
+  );
+}
+
 interface GisMapProps {
   features: GisMapFeature[];
+  featureLinks: GisFeatureLink[];
+  subjectParcelLinks: GisSubjectParcelLink[];
   selectedSubjectId?: string;
   selectedParcelId?: string;
   wmsServiceUrl?: string | null;
@@ -60,6 +90,8 @@ interface GisMapProps {
 
 export function GisMap({
   features,
+  featureLinks,
+  subjectParcelLinks,
   selectedSubjectId,
   selectedParcelId,
   wmsServiceUrl,
@@ -311,66 +343,110 @@ export function GisMap({
         ) : null}
         {featureInfoState.features.length > 0 ? (
           <div className="mt-4 grid gap-3">
-            {featureInfoState.features.map((feature) => (
-              <article key={feature.id} className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4">
-                <p className="text-sm font-semibold text-[var(--pcb-ink)]">{feature.id}</p>
-                <div className="mt-3 flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setSelectedFeatureKey(
-                        getFeatureSelectionKey(
-                          asOptionalString(feature.properties.layer_code),
-                          asOptionalString(feature.properties.id),
-                        ),
-                      )
-                    }
-                    className="rounded-full border border-[var(--pcb-line)] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
-                  >
-                    Evidenzia in mappa
-                  </button>
-                  {asOptionalString(feature.properties.subject_id) ? (
-                    <Link
-                      href={`/subjects/${asOptionalString(feature.properties.subject_id)}`}
+            {featureInfoState.features.map((feature) => {
+              const subjectId = asOptionalString(feature.properties.subject_id);
+              const parcelId = asOptionalString(feature.properties.parcel_id);
+              const relatedFeatureLinks = getRelatedFeatureLinks(feature, featureLinks);
+              const relatedSubjectParcelLinks = getRelatedSubjectParcelLinks(
+                feature,
+                subjectParcelLinks,
+              );
+
+              return (
+                <article key={feature.id} className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4">
+                  <p className="text-sm font-semibold text-[var(--pcb-ink)]">{feature.id}</p>
+                  <div className="mt-3 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedFeatureKey(
+                          getFeatureSelectionKey(
+                            asOptionalString(feature.properties.layer_code),
+                            asOptionalString(feature.properties.id),
+                          ),
+                        )
+                      }
                       className="rounded-full border border-[var(--pcb-line)] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
                     >
-                      Apri soggetto
-                    </Link>
-                  ) : null}
-                  {asOptionalString(feature.properties.parcel_id) ? (
-                    <Link
-                      href={`/parcels/${asOptionalString(feature.properties.parcel_id)}`}
-                      className="rounded-full border border-[var(--pcb-line)] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
-                    >
-                      Apri particella
-                    </Link>
-                  ) : null}
-                  {asOptionalString(feature.properties.subject_id) || asOptionalString(feature.properties.parcel_id) ? (
-                    <Link
-                      href={`/gis${asOptionalString(feature.properties.subject_id) ? `?subjectId=${asOptionalString(feature.properties.subject_id)}` : asOptionalString(feature.properties.parcel_id) ? `?parcelId=${asOptionalString(feature.properties.parcel_id)}` : ''}`}
-                      className="rounded-full bg-[var(--pcb-accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white"
-                    >
-                      Apri focus GIS
-                    </Link>
-                  ) : null}
-                </div>
-                {getFeatureSelectionKey(
-                  asOptionalString(feature.properties.layer_code),
-                  asOptionalString(feature.properties.id),
-                ) === selectedFeatureKey ? (
-                  <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
-                    Feature attualmente evidenziata nel viewer
-                  </p>
-                ) : null}
-                <div className="mt-2 grid gap-1 text-xs text-[var(--pcb-muted)]">
-                  {Object.entries(feature.properties).map(([key, value]) => (
-                    <p key={key}>
-                      <strong className="text-[var(--pcb-ink)]">{key}</strong>: {String(value)}
+                      Evidenzia in mappa
+                    </button>
+                    {subjectId ? (
+                      <Link
+                        href={`/subjects/${subjectId}`}
+                        className="rounded-full border border-[var(--pcb-line)] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                      >
+                        Apri soggetto
+                      </Link>
+                    ) : null}
+                    {parcelId ? (
+                      <Link
+                        href={`/parcels/${parcelId}`}
+                        className="rounded-full border border-[var(--pcb-line)] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                      >
+                        Apri particella
+                      </Link>
+                    ) : null}
+                    {subjectId || parcelId ? (
+                      <Link
+                        href={`/gis${subjectId ? `?subjectId=${subjectId}` : parcelId ? `?parcelId=${parcelId}` : ''}`}
+                        className="rounded-full bg-[var(--pcb-accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white"
+                      >
+                        Apri focus GIS
+                      </Link>
+                    ) : null}
+                  </div>
+                  {getFeatureSelectionKey(
+                    asOptionalString(feature.properties.layer_code),
+                    asOptionalString(feature.properties.id),
+                  ) === selectedFeatureKey ? (
+                    <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
+                      Feature attualmente evidenziata nel viewer
                     </p>
-                  ))}
-                </div>
-              </article>
-            ))}
+                  ) : null}
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                        Contesto PCB
+                      </p>
+                      <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+                        Feature links correlati:{' '}
+                        <strong className="text-[var(--pcb-ink)]">{relatedFeatureLinks.length}</strong>
+                      </p>
+                      <p className="mt-1 text-sm text-[var(--pcb-muted)]">
+                        Relazioni soggetto-particella:{' '}
+                        <strong className="text-[var(--pcb-ink)]">{relatedSubjectParcelLinks.length}</strong>
+                      </p>
+                      {relatedFeatureLinks.slice(0, 3).map((link) => (
+                        <p key={link.id} className="mt-2 text-xs text-[var(--pcb-muted)]">
+                          <strong className="text-[var(--pcb-ink)]">{link.layerCode}</strong> · {link.featureExternalId}
+                        </p>
+                      ))}
+                      {relatedSubjectParcelLinks.slice(0, 3).map((relation) => (
+                        <p key={relation.id} className="mt-2 text-xs text-[var(--pcb-muted)]">
+                          <strong className="text-[var(--pcb-ink)]">
+                            {relation.subjectDisplayName ?? relation.cuua}
+                          </strong>{' '}
+                          {'->'} {relation.comune} / F{relation.foglio} / P{relation.particella}
+                          {relation.subalterno ? ` / S${relation.subalterno}` : ''}
+                        </p>
+                      ))}
+                    </div>
+                    <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                        Attributi QGIS
+                      </p>
+                      <div className="mt-2 grid gap-1 text-xs text-[var(--pcb-muted)]">
+                        {Object.entries(feature.properties).map(([key, value]) => (
+                          <p key={key}>
+                            <strong className="text-[var(--pcb-ink)]">{key}</strong>: {String(value)}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         ) : null}
       </div>

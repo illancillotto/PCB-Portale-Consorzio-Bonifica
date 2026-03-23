@@ -59,6 +59,8 @@ export default async function GisPage({ searchParams }: GisPageProps) {
           ) : null}
           <GisMap
             features={displayedFeatures}
+            featureLinks={featureLinks.items}
+            subjectParcelLinks={subjectParcelLinks.items}
             selectedSubjectId={selectedSubjectId}
             selectedParcelId={selectedParcelId}
             wmsServiceUrl={publicationStatus.available ? publicationStatus.serviceUrl : null}
