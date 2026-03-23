@@ -70,6 +70,61 @@ export default async function SubjectDetailPage({ params }: SubjectDetailPagePro
         </SectionCard>
       </section>
 
+      <section className="grid gap-6 lg:grid-cols-2">
+        <SectionCard title="Sorgenti collegate" eyebrow="Sources">
+          {subject.sourceLinks.length === 0 ? (
+            <p className="text-sm text-[var(--pcb-muted)]">Nessun source link disponibile per il soggetto corrente.</p>
+          ) : (
+            <div className="grid gap-3">
+              {subject.sourceLinks.map((link) => (
+                <div
+                  key={`${link.sourceSystem}-${link.sourceRecordId}`}
+                  className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4"
+                >
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                    <p className="text-sm font-semibold text-[var(--pcb-ink)]">{link.sourceSystem}</p>
+                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
+                      {link.isActive ? 'active' : 'inactive'}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-[var(--pcb-muted)]">Record {link.sourceRecordId}</p>
+                  {link.sourceUrl ? (
+                    <p className="mt-1 break-all text-xs text-[var(--pcb-muted)]">{link.sourceUrl}</p>
+                  ) : null}
+                  <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                    Prima vista {new Date(link.firstSeenAt).toLocaleString('it-IT')} · ultima vista{' '}
+                    {new Date(link.lastSeenAt).toLocaleString('it-IT')}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+
+        <SectionCard title="Documenti collegati" eyebrow="Documentale">
+          {subject.documents.length === 0 ? (
+            <p className="text-sm text-[var(--pcb-muted)]">Nessun documento collegato per il soggetto corrente.</p>
+          ) : (
+            <div className="grid gap-3">
+              {subject.documents.map((document) => (
+                <div key={document.id} className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
+                  <p className="text-sm font-semibold text-[var(--pcb-ink)]">{document.fileName}</p>
+                  <p className="mt-1 text-xs text-[var(--pcb-muted)]">Sorgente {document.sourceSystem}</p>
+                  <p className="mt-2 break-all text-xs text-[var(--pcb-muted)]">{document.filePath}</p>
+                  <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                    {document.archiveBucket ?? 'bucket non definito'}
+                    {document.mimeType ? ` · ${document.mimeType}` : ''}
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--pcb-muted)]">
+                    Rilevato {new Date(document.discoveredAt).toLocaleString('it-IT')}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+      </section>
+
       <SectionCard title="Relazioni catastali" eyebrow="Catasto">
         {parcels.parcels.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">Nessuna particella collegata per il soggetto corrente.</p>

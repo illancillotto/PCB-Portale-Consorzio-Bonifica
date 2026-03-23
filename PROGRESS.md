@@ -12,8 +12,8 @@ Regole operative:
 
 ## Stato corrente
 
-- Data ultimo aggiornamento: 2026-03-20
-- Stato progetto: fondazioni completate, backend core collegato a PostgreSQL/PostGIS, frontend integrato alle API reali per soggetti, particelle e ricerca
+- Data ultimo aggiornamento: 2026-03-23
+- Stato progetto: fondazioni completate, backend core collegato a PostgreSQL/PostGIS, frontend integrato alle API reali per soggetti, particelle, ricerca, ingestion monitor e base GIS
 - Ambiente locale verificato:
   - `docker compose up -d pcb-postgres`
   - backend avviabile
@@ -179,9 +179,11 @@ Nota:
 - Audit API base: pronta su DB reale
 - Catasto API base: pronta su DB reale
 - Search API base: pronta su DB reale
-- GIS: solo fondazioni
+- GIS: prima versione applicativa completata
 - Frontend integrazione API: prima versione completata
 - Ingestion monitor frontend: prima versione completata
+- Source links scheda soggetto: prima versione completata
+- Documentale base scheda soggetto: prima versione completata
 - Connectors runtime reali: non iniziati
 - Matching engine: non iniziato
 - Keycloak reale end-to-end: non iniziato
@@ -190,7 +192,7 @@ Nota:
 
 - Docker accessibile ora, ma non ancora usato per Redis, Keycloak e QGIS Server
 - nessun connettore operativo verso sorgenti esterne
-- nessuna persistenza GIS oltre il bootstrap infrastrutturale
+- viewer cartografico GIS non ancora implementato
 
 ### 2026-03-20 – Frontend M3 prima integrazione reale
 
@@ -229,10 +231,10 @@ Verifiche eseguite:
 
 ## Prossimo sviluppo raccomandato
 
-1. Implementare ingestion monitor frontend con lista run e trigger manuale
-2. Aggiungere source links reali e sezioni documentali alla scheda soggetto
-3. Preparare la base GIS applicativa nel frontend
-4. Avviare il primo connector NAS read-only
+1. Avviare il primo connector NAS read-only
+2. Portare il documentale da seed a endpoint dedicato
+3. Introdurre loading/error/empty states più raffinati nelle viste frontend
+4. Estendere GIS foundation verso un viewer cartografico reale
 
 ### 2026-03-20 – Ingestion monitor frontend
 
@@ -243,7 +245,7 @@ Completato:
 - trigger manuale frontend per `connector-nas-catasto`
 - aggiornamento navigazione applicativa
 
-Verifiche previste per chiusura blocco:
+Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
@@ -252,3 +254,53 @@ Verifiche previste per chiusura blocco:
 - `GET /ingestion` verificato con `curl`
 - trigger manuale `connector-nas-catasto` verificato
 - lista run aggiornata verificata dopo il trigger
+
+### 2026-03-23 – Scheda soggetto arricchita con source links e documentale base
+
+Completato:
+
+- script SQL `infra/postgres/init/030-subject-links-and-docs.sql`
+- tabella `docs.document_item`
+- seed minimi reali per:
+  - `anagrafe.subject_source_link`
+  - `docs.document_item`
+- aggregazione source links e documenti dentro la `subject response`
+- aggiornamento scheda soggetto frontend con sezioni:
+  - sorgenti collegate
+  - documenti collegati
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- script `030` applicato al container Postgres
+- `GET /api/v1/subjects/{id}` verificato su `sourceLinks` e `documents`
+- pagina `/subjects/{id}` verificata a runtime via frontend su porta `3010`
+
+### 2026-03-23 – GIS foundation applicativa
+
+Completato:
+
+- script SQL `infra/postgres/init/040-gis-foundation.sql`
+- tabelle:
+  - `gis.layer_catalog`
+  - `gis.feature_link`
+- seed minimi reali per catalogo layer e feature links
+- endpoint backend:
+  - `GET /api/v1/gis/layers`
+  - `GET /api/v1/gis/feature-links`
+- pagina frontend `/gis`
+- aggiornamento navigazione applicativa con sezione GIS
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- script `040` applicato al container Postgres
+- `GET /api/v1/gis/layers` verificato
+- `GET /api/v1/gis/feature-links` verificato
+- pagina `/gis` verificata a runtime via frontend su porta `3010`

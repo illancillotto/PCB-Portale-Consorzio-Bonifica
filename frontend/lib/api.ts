@@ -13,6 +13,25 @@ export interface SubjectNameHistoryItem {
   validTo: string | null;
 }
 
+export interface SubjectSourceLink {
+  sourceSystem: string;
+  sourceRecordId: string;
+  sourceUrl: string | null;
+  isActive: boolean;
+  firstSeenAt: string;
+  lastSeenAt: string;
+}
+
+export interface SubjectDocument {
+  id: string;
+  sourceSystem: string;
+  fileName: string;
+  filePath: string;
+  mimeType: string | null;
+  archiveBucket: string | null;
+  discoveredAt: string;
+}
+
 export interface Subject {
   id: string;
   cuua: string;
@@ -21,6 +40,8 @@ export interface Subject {
   currentDisplayName: string;
   identifiers: SubjectIdentifier[];
   nameHistory: SubjectNameHistoryItem[];
+  sourceLinks: SubjectSourceLink[];
+  documents: SubjectDocument[];
 }
 
 export interface SubjectParcel {
@@ -72,6 +93,29 @@ export interface IngestionRun {
   recordsSuccess: number;
   recordsError: number;
   logExcerpt: string;
+}
+
+export interface GisLayer {
+  id: string;
+  name: string;
+  code: string;
+  ownerModule: string;
+  publicationStatus: string;
+  sourceSystem: string;
+  geometryType: string;
+  metadata: Record<string, unknown>;
+  linkedSubjects: number;
+  linkedParcels: number;
+}
+
+export interface GisFeatureLink {
+  id: string;
+  layerCode: string;
+  featureExternalId: string;
+  subjectId: string | null;
+  parcelId: string | null;
+  validFrom: string | null;
+  validTo: string | null;
 }
 
 interface PaginatedResponse<T> {
@@ -128,4 +172,12 @@ export async function searchAll(query: string) {
 
 export async function getIngestionRuns() {
   return apiFetch<PaginatedResponse<IngestionRun>>('/ingestion/runs');
+}
+
+export async function getGisLayers() {
+  return apiFetch<PaginatedResponse<GisLayer>>('/gis/layers');
+}
+
+export async function getGisFeatureLinks() {
+  return apiFetch<PaginatedResponse<GisFeatureLink>>('/gis/feature-links');
 }

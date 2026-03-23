@@ -25,6 +25,25 @@ interface SubjectNameHistoryRow {
   valid_to: Date | string | null;
 }
 
+interface SubjectSourceLinkRow {
+  source_system: string;
+  source_record_id: string;
+  source_url: string | null;
+  is_active: boolean;
+  first_seen_at: Date | string;
+  last_seen_at: Date | string;
+}
+
+interface SubjectDocumentRow {
+  id: string;
+  source_system: string;
+  file_name: string;
+  file_path: string;
+  mime_type: string | null;
+  archive_bucket: string | null;
+  discovered_at: Date | string;
+}
+
 interface SubjectParcelRow {
   parcel_id: string;
   comune: string;
@@ -241,7 +260,7 @@ export class AnagraficheService {
   }
 
   private async buildSubjectResponse(subject: SubjectRow): Promise<SubjectResponseDto> {
-    const [identifiersResult, historyResult] = await Promise.all([
+    const [identifiersResult, historyResult, sourceLinksResult, documentsResult] = await Promise.all([
       this.databaseService.query<SubjectIdentifierRow>(
         `
           SELECT identifier_type, identifier_value, source_system
@@ -257,6 +276,24 @@ export class AnagraficheService {
           FROM anagrafe.subject_name_history
           WHERE subject_id = $1
           ORDER BY valid_from DESC NULLS LAST, created_at DESC
+        `,
+        [subject.id],
+      ),
+      this.databaseService.query<SubjectSourceLinkRow>(
+        `
+          SELECT source_system, source_record_id, source_url, is_active, first_seen_at, last_seen_at
+          FROM anagrafe.subject_source_link
+          WHERE subject_id = $1
+          ORDER BY last_seen_at DESC, created_at DESC
+        `,
+        [subject.id],
+      ),
+      this.databaseService.query<SubjectDocumentRow>(
+        `
+          SELECT id, source_system, file_name, file_path, mime_type, archive_bucket, discovered_at
+          FROM docs.document_item
+          WHERE subject_id = $1
+          ORDER BY discovered_at DESC, created_at DESC
         `,
         [subject.id],
       ),
@@ -278,6 +315,23 @@ export class AnagraficheService {
         sourceSystem: history.source_system,
         validFrom: history.valid_from ? new Date(history.valid_from).toISOString() : '',
         validTo: history.valid_to ? new Date(history.valid_to).toISOString() : null,
+      })),
+      sourceLinks: sourceLinksResult.rows.map((link) => ({
+        sourceSystem: link.source_system,
+        sourceRecordId: link.source_record_id,
+        sourceUrl: link.source_url,
+        isActive: link.is_active,
+        firstSeenAt: new Date(link.first_seen_at).toISOString(),
+        lastSeenAt: new Date(link.last_seen_at).toISOString(),
+      })),
+      documents: documentsResult.rows.map((document) => ({
+        id: document.id,
+        sourceSystem: document.source_system,
+        fileName: document.file_name,
+        filePath: document.file_path,
+        mimeType: document.mime_type,
+        archiveBucket: document.archive_bucket,
+        discoveredAt: new Date(document.discovered_at).toISOString(),
       })),
     };
   }

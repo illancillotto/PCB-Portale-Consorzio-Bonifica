@@ -56,13 +56,13 @@ Completato:
 
 Non completato:
 
-- frontend integrato con backend reale
+- frontend integrato con backend reale in prima versione
 - GIS applicativo
 - Keycloak end-to-end
 - Redis usato applicativamente
 - connector NAS operativo
 - matching engine
-- documentale
+- documentale dedicato
 - reporting
 
 ## Milestone operative
@@ -113,6 +113,10 @@ Stato:
 
 - in corso
 
+Nota:
+
+- lista run e trigger manuale sono già presenti e verificati
+
 Deliverable previsti:
 
 - client API frontend
@@ -125,7 +129,8 @@ Deliverable previsti:
 Stato attuale:
 
 - completati client API, ricerca reale, lista soggetti, scheda soggetto base, lista/vista particella base
-- da completare loading/error/empty states più raffinati e ingestion monitor
+- completati source links e documentale base nella scheda soggetto
+- da completare loading/error/empty states più raffinati
 
 Dipendenze:
 
@@ -160,6 +165,7 @@ Dipendenze:
 Nota:
 
 - con M3 ormai avviata, M4 è il prossimo blocco raccomandato
+- lista run e trigger manuale sono già verificati
 
 ### M5 – NAS connector operativo
 
@@ -185,6 +191,10 @@ Dipendenze:
 - M2 completata
 - chiarimento config locale NAS/SMB
 
+Nota:
+
+- il documentale base seedato prepara il terreno, ma il connector NAS reale è ancora da implementare
+
 ### M6 – GIS applicativo base
 
 Obiettivo:
@@ -193,7 +203,7 @@ Obiettivo:
 
 Stato:
 
-- da iniziare
+- in corso
 
 Deliverable previsti:
 
@@ -201,6 +211,11 @@ Deliverable previsti:
 - endpoint GIS base
 - prima vista mappa frontend
 - linking tra particelle e soggetti
+
+Stato attuale:
+
+- completati catalogo layer, endpoint GIS base e vista frontend GIS foundation
+- il viewer cartografico reale non è ancora implementato
 
 Dipendenze:
 
@@ -278,12 +293,13 @@ Output:
 
 Stato:
 
-- parzialmente completato
+- quasi completato
 
 Nota:
 
-- overview, identificativi e storico sono presenti
-- i source links dedicati non sono ancora esposti
+- overview, identificativi, storico e source links sono presenti
+- documenti base presenti
+- manca ancora un endpoint documentale dedicato e un viewer
 
 ### Step C
 

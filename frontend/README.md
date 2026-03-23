@@ -27,5 +27,6 @@ Stato attuale:
 - lista soggetti
 - scheda soggetto base
 - lista e vista particella base
+- vista GIS foundation basata su catalogo layer
 - ingestion monitor iniziale
 - autenticazione reale e mappa GIS ancora non integrate

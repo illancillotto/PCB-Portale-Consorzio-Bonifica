@@ -11,6 +11,7 @@ const navigationItems = [
   { href: '/', label: 'Dashboard' },
   { href: '/subjects', label: 'Soggetti' },
   { href: '/parcels', label: 'Particelle' },
+  { href: '/gis', label: 'GIS' },
   { href: '/ingestion', label: 'Ingestion' },
 ];
 

@@ -39,6 +39,7 @@ npm run dev
 - `GET /api/v1/subjects/by-cuua/{cuua}`
 - `GET /api/v1/subjects/{id}/history`
 - `GET /api/v1/subjects/{id}/parcels`
+- `GET /api/v1/subjects/{id}` include source links e documenti collegati
 - `GET /api/v1/ingestion/runs`
 - `GET /api/v1/ingestion/runs/{id}`
 - `POST /api/v1/ingestion/connectors/{connectorName}/run`
@@ -47,3 +48,5 @@ npm run dev
 - `GET /api/v1/parcels/{id}`
 - `GET /api/v1/parcels/{id}/subjects`
 - `GET /api/v1/search?q=...`
+- `GET /api/v1/gis/layers`
+- `GET /api/v1/gis/feature-links`
