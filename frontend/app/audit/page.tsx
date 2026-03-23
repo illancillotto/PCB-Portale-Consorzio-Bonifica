@@ -2,6 +2,7 @@ import { PageShell } from '../../components/page-shell';
 import { SectionCard } from '../../components/section-card';
 import { requireOperatorSession } from '../../lib/auth';
 import { getAuditEvents } from '../../lib/api';
+import Link from 'next/link';
 
 function formatPayload(payload: Record<string, unknown>) {
   const entries = Object.entries(payload);
@@ -16,21 +17,133 @@ function formatPayload(payload: Record<string, unknown>) {
     .join(' · ');
 }
 
-export default async function AuditPage() {
+interface AuditPageProps {
+  searchParams?: Promise<{
+    eventType?: string;
+    actorType?: string;
+  }>;
+}
+
+function buildAuditFilterHref(filters: { eventType?: string; actorType?: string }) {
+  const params = new URLSearchParams();
+
+  if (filters.eventType) {
+    params.set('eventType', filters.eventType);
+  }
+
+  if (filters.actorType) {
+    params.set('actorType', filters.actorType);
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `/audit?${queryString}` : '/audit';
+}
+
+export default async function AuditPage({ searchParams }: AuditPageProps) {
   const session = await requireOperatorSession();
+  const filters = (await searchParams) ?? {};
   const events = await getAuditEvents(session.accessToken);
+  const filteredEvents = events.items.filter((event) => {
+    if (filters.eventType && event.eventType !== filters.eventType) {
+      return false;
+    }
+
+    if (filters.actorType && event.actorType !== filters.actorType) {
+      return false;
+    }
+
+    return true;
+  });
+  const uniqueEventTypes = Array.from(new Set(events.items.map((event) => event.eventType))).sort();
+  const uniqueActorTypes = Array.from(new Set(events.items.map((event) => event.actorType))).sort();
+  const systemEvents = events.items.filter((event) => event.actorType === 'system').length;
+  const operatorEvents = events.items.filter((event) => event.actorType === 'system_operator').length;
 
   return (
     <PageShell
       title="Audit trail"
       description="Eventi operativi e decisioni manuali tracciati dal backend PCB. Vista riservata a operatori autenticati."
     >
+      <SectionCard title="Riepilogo audit" eyebrow="Summary">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Eventi totali</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{events.total}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">System</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{systemEvents}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">System operator</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{operatorEvents}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Ultimo evento</p>
+            <p className="mt-2 text-sm font-semibold text-[var(--pcb-ink)]">
+              {events.items[0] ? new Date(events.items[0].createdAt).toLocaleString('it-IT') : 'n/d'}
+            </p>
+          </article>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Eventi recenti" eyebrow="Audit">
-        {events.items.length === 0 ? (
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildAuditFilterHref({ actorType: filters.actorType })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.eventType
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti gli eventi
+          </Link>
+          {uniqueEventTypes.map((eventType) => (
+            <Link
+              key={eventType}
+              href={buildAuditFilterHref({ eventType, actorType: filters.actorType })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.eventType === eventType
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {eventType}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-6 flex flex-wrap gap-3">
+          <Link
+            href={buildAuditFilterHref({ eventType: filters.eventType })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.actorType
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti gli attori
+          </Link>
+          {uniqueActorTypes.map((actorType) => (
+            <Link
+              key={actorType}
+              href={buildAuditFilterHref({ eventType: filters.eventType, actorType })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.actorType === actorType
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {actorType}
+            </Link>
+          ))}
+        </div>
+        {filteredEvents.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">Nessun evento disponibile.</p>
         ) : (
           <div className="grid gap-4">
-            {events.items.map((event) => (
+            {filteredEvents.map((event) => (
               <article
                 key={event.id}
                 className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"

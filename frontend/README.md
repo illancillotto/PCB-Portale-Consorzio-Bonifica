@@ -56,5 +56,6 @@ Stato attuale:
 - metriche sintetiche ingestion e audit nella dashboard principale per sessioni operatore
 - riepilogo operativo ingestion su lista run e dettaglio run
 - filtri operativi ingestion via query string su lista run e dettaglio run
+- riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

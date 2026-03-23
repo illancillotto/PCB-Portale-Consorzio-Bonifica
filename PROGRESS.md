@@ -218,6 +218,7 @@ Nota:
 - metriche ingestion e audit in dashboard: completato
 - riepilogo operativo ingestion in lista e dettaglio run: completato
 - filtri operativi ingestion in lista e dettaglio run: completato
+- riepilogo audit e filtri operativi dedicati: completato
 - layer relazioni soggetto-particella pubblicato: completato
 - endpoint GIS applicativo relazioni soggetto-particella: completato
 - filtri GIS relazioni per soggetto/particella: completato
