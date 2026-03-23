@@ -1008,3 +1008,18 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Visibilita` esplicita degli stage di run
+
+Completato:
+
+- payload backend delle run arricchito con stato stage `acquisition`, `post-processing`, `normalization`, `matching`
+- monitor `ingestion` aggiornato con badge stage e contatori sintetici
+- dettaglio run aggiornato con snapshot esplicito del post-processing
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

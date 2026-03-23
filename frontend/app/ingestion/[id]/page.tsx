@@ -94,7 +94,11 @@ export default async function IngestionRunDetailPage({
   const unmatchedCount = matchingResults.items.filter(
     (item) => item.decisionStatus === 'unmatched',
   ).length;
-  const autoRefreshEnabled = run.status === 'queued' || run.status === 'running';
+  const autoRefreshEnabled =
+    run.status === 'queued' ||
+    run.status === 'running' ||
+    run.stages.postProcessing.status === 'queued' ||
+    run.stages.postProcessing.status === 'running';
   const subjectOptions = subjects.items.map((subject) => ({
     id: subject.id,
     label: `${subject.currentDisplayName} · ${subject.cuua}`,
@@ -158,6 +162,42 @@ export default async function IngestionRunDetailPage({
         <p className="mt-4 text-sm text-[var(--pcb-muted)]">
           {run.logExcerpt || 'Nessun log excerpt disponibile.'}
         </p>
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Acquisition</p>
+            <div className="mt-3">
+              <StatusChip label={run.stages.acquisition.status} />
+            </div>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Post-processing</p>
+            <div className="mt-3">
+              <StatusChip label={run.stages.postProcessing.status} />
+            </div>
+            <p className="mt-3 text-xs text-[var(--pcb-muted)]">
+              normalize {run.stages.postProcessing.autoNormalize ? 'on' : 'off'} · match{' '}
+              {run.stages.postProcessing.autoMatch ? 'on' : 'off'}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Normalization</p>
+            <div className="mt-3">
+              <StatusChip label={run.stages.normalization.status} />
+            </div>
+            <p className="mt-3 text-xs text-[var(--pcb-muted)]">
+              record scritti {run.stages.normalization.recordsWritten}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Matching</p>
+            <div className="mt-3">
+              <StatusChip label={run.stages.matching.status} />
+            </div>
+            <p className="mt-3 text-xs text-[var(--pcb-muted)]">
+              risultati scritti {run.stages.matching.resultsWritten}
+            </p>
+          </article>
+        </div>
       </SectionCard>
 
       <SectionCard title="Esiti pipeline" eyebrow="Workflow">

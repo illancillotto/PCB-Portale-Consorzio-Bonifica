@@ -84,6 +84,7 @@ Stato attuale:
 - le viste `ingestion` e `ingestion/[id]` si auto-aggiornano quando esistono run `queued` o `running`
 - il trigger manuale ingestion può innescare anche `normalize -> match` lato backend sulla stessa run, se abilitato da configurazione
 - il trigger manuale frontend reindirizza direttamente al dettaglio della run appena creata
+- monitor e dettaglio run mostrano ora gli stage `acquisition`, `post-processing`, `normalization`, `matching`
 - il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS

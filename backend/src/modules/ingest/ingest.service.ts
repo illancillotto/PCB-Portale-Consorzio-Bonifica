@@ -113,6 +113,22 @@ interface PostProcessingConfig {
   autoMatch: boolean;
 }
 
+interface PostProcessingRuntimeState {
+  status: 'running' | 'completed' | 'failed';
+  autoNormalize: boolean;
+  autoMatch: boolean;
+}
+
+interface NormalizationRuntimeState {
+  normalizationStatus?: 'completed' | 'failed' | 'running';
+  normalizedRecordsWritten?: number;
+}
+
+interface MatchingRuntimeState {
+  matchingStatus?: 'completed' | 'failed' | 'running';
+  normalizedRecordsRead?: number;
+}
+
 const connectorCatalog: ConnectorCatalogEntry[] = [
   {
     connectorName: 'connector-nas-catasto',
@@ -156,7 +172,7 @@ export class IngestService {
     );
 
     return {
-      items: result.rows.map((row) => this.mapRun(row)),
+      items: await Promise.all(result.rows.map((row) => this.mapRun(row))),
       total: result.rows.length,
     };
   }
@@ -190,7 +206,7 @@ export class IngestService {
     );
 
     return {
-      items: result.rows.map((row) => this.mapRun(row)),
+      items: await Promise.all(result.rows.map((row) => this.mapRun(row))),
       total: result.rows.length,
     };
   }
@@ -1612,7 +1628,46 @@ export class IngestService {
     }
   }
 
-  private mapRun(row: IngestionRunRow): IngestionRunResponseDto {
+  private async mapRun(row: IngestionRunRow): Promise<IngestionRunResponseDto> {
+    const postProcessingConfig = this.getPostProcessingConfig();
+    const [postProcessingState, normalizationState, matchingState, normalizedCount, matchingCount] =
+      await Promise.all([
+        this.redisService.getJson<PostProcessingRuntimeState>(
+          `pcb:ingest:runs:${row.id}:post-processing`,
+        ),
+        this.redisService.getJson<NormalizationRuntimeState>(
+          `pcb:ingest:runs:${row.id}:normalization`,
+        ),
+        this.redisService.getJson<MatchingRuntimeState>(`pcb:ingest:runs:${row.id}:matching`),
+        this.countNormalizedRecords(row.id),
+        this.countMatchingResults(row.id),
+      ]);
+
+    const acquisitionStatus =
+      row.status === 'failed'
+        ? 'failed'
+        : row.status === 'queued'
+          ? 'queued'
+          : row.status === 'running'
+            ? 'running'
+            : 'completed';
+
+    const postProcessingStatus = postProcessingConfig.autoNormalize
+      ? postProcessingState?.status ?? (row.status === 'completed' ? 'queued' : 'not_configured')
+      : 'not_configured';
+
+    const normalizationStatus =
+      normalizationState?.normalizationStatus ??
+      (normalizedCount > 0 ? 'completed' : postProcessingStatus === 'running' ? 'running' : 'not_started');
+
+    const matchingStatus =
+      matchingState?.matchingStatus ??
+      (matchingCount > 0 ? 'completed' : normalizationStatus === 'completed' && postProcessingConfig.autoMatch
+        ? postProcessingStatus === 'running'
+          ? 'running'
+          : 'not_started'
+        : 'not_started');
+
     return {
       id: row.id,
       connectorName: row.connector_name,
@@ -1624,7 +1679,43 @@ export class IngestService {
       recordsSuccess: row.records_success,
       recordsError: row.records_error,
       logExcerpt: row.log_excerpt ?? '',
+      stages: {
+        acquisition: {
+          status: acquisitionStatus,
+        },
+        postProcessing: {
+          status: postProcessingStatus,
+          autoNormalize: postProcessingConfig.autoNormalize,
+          autoMatch: postProcessingConfig.autoMatch,
+        },
+        normalization: {
+          status: normalizationStatus,
+          recordsWritten: normalizedCount,
+        },
+        matching: {
+          status: matchingStatus,
+          resultsWritten: matchingCount,
+        },
+      },
     };
+  }
+
+  private async countNormalizedRecords(runId: string) {
+    const result = await this.databaseService.query<NumericCountRow>(
+      `SELECT COUNT(*) AS total FROM ingest.ingestion_record_normalized WHERE ingestion_run_id = $1`,
+      [runId],
+    );
+
+    return Number(result.rows[0]?.total ?? 0);
+  }
+
+  private async countMatchingResults(runId: string) {
+    const result = await this.databaseService.query<NumericCountRow>(
+      `SELECT COUNT(*) AS total FROM ingest.matching_result WHERE ingestion_run_id = $1`,
+      [runId],
+    );
+
+    return Number(result.rows[0]?.total ?? 0);
   }
 
   private async getRunRowById(id: string) {

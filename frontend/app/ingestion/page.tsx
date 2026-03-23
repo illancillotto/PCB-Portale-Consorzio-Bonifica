@@ -116,6 +116,9 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
   const runningRuns = runs.items.filter((run) => run.status === 'running').length;
   const completedRuns = runs.items.filter((run) => run.status === 'completed').length;
   const failedRuns = runs.items.filter((run) => run.status === 'failed').length;
+  const postProcessingRunning = runs.items.filter(
+    (run) => run.stages.postProcessing.status === 'running',
+  ).length;
   const totalRecords = runs.items.reduce((total, run) => total + run.recordsTotal, 0);
   const manualConnectors = connectors.items.filter((connector) => connector.triggerMode === 'manual');
 
@@ -154,6 +157,11 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
             {runningRuns > 0 ? (
               <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
                 {runningRuns} run in esecuzione
+              </p>
+            ) : null}
+            {postProcessingRunning > 0 ? (
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                {postProcessingRunning} post-processing attivi
               </p>
             ) : null}
           </article>
@@ -633,6 +641,12 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                   </div>
                   <StatusChip label={run.status} />
                 </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <StatusChip label={`acq ${run.stages.acquisition.status}`} />
+                  <StatusChip label={`post ${run.stages.postProcessing.status}`} />
+                  <StatusChip label={`norm ${run.stages.normalization.status}`} />
+                  <StatusChip label={`match ${run.stages.matching.status}`} />
+                </div>
                 <dl className="mt-4 grid gap-4 text-sm text-[var(--pcb-muted)] md:grid-cols-2 xl:grid-cols-4">
                   <div>
                     <dt className="font-medium text-[var(--pcb-ink)]">Avvio</dt>
@@ -655,6 +669,10 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                 </dl>
                 <p className="mt-4 text-sm text-[var(--pcb-muted)]">
                   {run.logExcerpt || 'Nessun log excerpt disponibile.'}
+                </p>
+                <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+                  normalizzati {run.stages.normalization.recordsWritten} · matching{' '}
+                  {run.stages.matching.resultsWritten}
                 </p>
                 <div className="mt-4">
                   <Link
