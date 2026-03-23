@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -18,6 +19,7 @@ import { MatchingResultResponseDto } from '../dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from '../dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from '../dto/normalized-record-response.dto';
 import { IngestionOrchestrationSummaryResponseDto } from '../dto/orchestration-summary-response.dto';
+import { ListConnectorRunsQueryDto } from '../dto/list-connector-runs-query.dto';
 import { RunMatchingResponseDto } from '../dto/run-matching-response.dto';
 import { StartIngestionRunResponseDto } from '../dto/start-ingestion-run-response.dto';
 
@@ -51,8 +53,9 @@ export class IngestionController {
   @Get('connectors/:connectorName/runs')
   async listRunsByConnector(
     @Param('connectorName') connectorName: string,
+    @Query() query: ListConnectorRunsQueryDto,
   ): Promise<{ items: IngestionRunResponseDto[]; total: number }> {
-    const runs = await this.ingestService.listRunsByConnectorName(connectorName);
+    const runs = await this.ingestService.listRunsByConnectorName(connectorName, query.status);
 
     if (!runs) {
       throw new NotFoundException(`Connector not found for name ${connectorName}`);

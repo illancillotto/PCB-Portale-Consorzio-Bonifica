@@ -14,11 +14,37 @@ interface ConnectorDetailPageProps {
   params: Promise<{
     connectorName: string;
   }>;
+  searchParams?: Promise<{
+    status?: string;
+  }>;
 }
 
-export default async function ConnectorDetailPage({ params }: ConnectorDetailPageProps) {
+function buildConnectorRunsFilterHref(
+  connectorName: string,
+  filters: {
+    status?: string;
+  },
+) {
+  const params = new URLSearchParams();
+
+  if (filters.status) {
+    params.set('status', filters.status);
+  }
+
+  const queryString = params.toString();
+
+  return queryString
+    ? `/ingestion/connectors/${encodeURIComponent(connectorName)}?${queryString}`
+    : `/ingestion/connectors/${encodeURIComponent(connectorName)}`;
+}
+
+export default async function ConnectorDetailPage({
+  params,
+  searchParams,
+}: ConnectorDetailPageProps) {
   const session = await requireOperatorSession();
   const { connectorName } = await params;
+  const filters = (await searchParams) ?? {};
 
   let connector;
 
@@ -28,7 +54,9 @@ export default async function ConnectorDetailPage({ params }: ConnectorDetailPag
     notFound();
   }
 
-  const runs = await getIngestionConnectorRuns(connector.connectorName, session.accessToken);
+  const runs = await getIngestionConnectorRuns(connector.connectorName, session.accessToken, {
+    status: filters.status,
+  });
   const connectorRuns = runs.items;
 
   return (
@@ -160,6 +188,31 @@ export default async function ConnectorDetailPage({ params }: ConnectorDetailPag
       </SectionCard>
 
       <SectionCard title="Run recenti" eyebrow="History">
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildConnectorRunsFilterHref(connector.connectorName, {})}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.status
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti gli stati
+          </Link>
+          {['queued', 'completed', 'failed'].map((status) => (
+            <Link
+              key={status}
+              href={buildConnectorRunsFilterHref(connector.connectorName, { status })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.status === status
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {status}
+            </Link>
+          ))}
+        </div>
         {connectorRuns.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">Nessuna run disponibile per il connector corrente.</p>
         ) : (

@@ -139,10 +139,12 @@ export class IngestService {
     };
   }
 
-  async listRunsByConnectorName(connectorName: string) {
+  async listRunsByConnectorName(connectorName: string, status?: string) {
     if (!this.isSupportedConnector(connectorName)) {
       return null;
     }
+
+    const normalizedStatus = status?.trim();
 
     const result = await this.databaseService.query<IngestionRunRow>(
       `
@@ -159,9 +161,10 @@ export class IngestService {
           log_excerpt
         FROM ingest.ingestion_run
         WHERE connector_name = $1
+          AND ($2::text IS NULL OR status = $2)
         ORDER BY started_at DESC
       `,
-      [connectorName],
+      [connectorName, normalizedStatus || null],
     );
 
     return {

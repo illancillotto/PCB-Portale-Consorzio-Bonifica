@@ -401,9 +401,23 @@ export async function getIngestionConnectorDetail(connectorName: string, accessT
   );
 }
 
-export async function getIngestionConnectorRuns(connectorName: string, accessToken: string) {
+export async function getIngestionConnectorRuns(
+  connectorName: string,
+  accessToken: string,
+  filters?: {
+    status?: string;
+  },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.status) {
+    params.set('status', filters.status);
+  }
+
+  const queryString = params.toString();
+
   return apiFetch<{ items: IngestionRun[]; total: number }>(
-    `/ingestion/connectors/${encodeURIComponent(connectorName)}/runs`,
+    `/ingestion/connectors/${encodeURIComponent(connectorName)}/runs${queryString ? `?${queryString}` : ''}`,
     {
       accessToken,
     },
