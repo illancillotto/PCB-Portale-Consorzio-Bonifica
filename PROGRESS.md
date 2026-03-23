@@ -202,6 +202,7 @@ Nota:
 - primo layer tematico QGIS reale: completato
 - secondo layer tematico QGIS reale: completato
 - overlay WMS QGIS nel viewer frontend: completato
+- `GetFeatureInfo` QGIS dal viewer frontend: completato
 
 ## Blocchi aperti
 
@@ -789,5 +790,19 @@ Completato:
 
 Verifiche eseguite:
 
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
+
+### 2026-03-23 – GetFeatureInfo QGIS dal viewer frontend
+
+Completato:
+
+- route frontend protetta `GET /api/qgis/feature-info`
+- interrogazione `GetFeatureInfo` da click nel viewer GIS
+- pannello risultati nel frontend con attributi del layer pubblicato
+
+Verifiche eseguite:
+
+- verifica manuale `GetFeatureInfo` QGIS in `application/json`
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`

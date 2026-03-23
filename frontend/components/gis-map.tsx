@@ -1,9 +1,20 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Map as LeafletMap } from 'leaflet';
 import type { GisMapFeature } from '../lib/api';
+
+interface QgisFeatureInfoFeature {
+  id: string;
+  type: 'Feature';
+  properties: Record<string, string | number | boolean | null>;
+}
+
+interface QgisFeatureInfoResponse {
+  type: 'FeatureCollection';
+  features: QgisFeatureInfoFeature[];
+}
 
 interface GisMapProps {
   features: GisMapFeature[];
@@ -21,6 +32,15 @@ export function GisMap({
   wmsProjectFile,
 }: GisMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [featureInfoState, setFeatureInfoState] = useState<{
+    loading: boolean;
+    error: string | null;
+    features: QgisFeatureInfoFeature[];
+  }>({
+    loading: false,
+    error: null,
+    features: [],
+  });
 
   useEffect(() => {
     let map: LeafletMap | null = null;
@@ -57,6 +77,59 @@ export function GisMap({
           })
           .addTo(map);
       }
+
+      map.on('click', async (event) => {
+        const size = map?.getSize();
+        const bounds = map?.getBounds();
+
+        if (!map || !size || !bounds || !wmsServiceUrl || !wmsProjectFile) {
+          return;
+        }
+
+        const point = map.latLngToContainerPoint(event.latlng);
+        const params = new URLSearchParams({
+          layers: 'pcb_parcels,pcb_subjects',
+          queryLayers: 'pcb_parcels,pcb_subjects',
+          styles: 'default,default',
+          crs: 'EPSG:4326',
+          bbox: `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`,
+          width: String(size.x),
+          height: String(size.y),
+          i: String(Math.round(point.x)),
+          j: String(Math.round(point.y)),
+          featureCount: '10',
+        });
+
+        setFeatureInfoState({
+          loading: true,
+          error: null,
+          features: [],
+        });
+
+        try {
+          const response = await fetch(`/api/qgis/feature-info?${params.toString()}`, {
+            cache: 'no-store',
+          });
+
+          if (!response.ok) {
+            throw new Error(`GetFeatureInfo failed: ${response.status}`);
+          }
+
+          const data = (await response.json()) as QgisFeatureInfoResponse;
+
+          setFeatureInfoState({
+            loading: false,
+            error: null,
+            features: data.features ?? [],
+          });
+        } catch (error) {
+          setFeatureInfoState({
+            loading: false,
+            error: error instanceof Error ? error.message : 'GetFeatureInfo non disponibile',
+            features: [],
+          });
+        }
+      });
 
       const geoJsonLayer = leaflet.geoJSON(features as unknown as GeoJSON.GeoJsonObject, {
         style(feature) {
@@ -128,9 +201,47 @@ export function GisMap({
   }, [features, selectedSubjectId, selectedParcelId, wmsServiceUrl, wmsProjectFile]);
 
   return (
-    <div
-      ref={containerRef}
-      className="h-[480px] overflow-hidden rounded-[28px] border border-[var(--pcb-line)] shadow-[0_20px_60px_rgba(31,41,51,0.12)]"
-    />
+    <div className="grid gap-4">
+      <div
+        ref={containerRef}
+        className="h-[480px] overflow-hidden rounded-[28px] border border-[var(--pcb-line)] shadow-[0_20px_60px_rgba(31,41,51,0.12)]"
+      />
+      <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
+        <p className="text-sm font-semibold text-[var(--pcb-ink)]">Interrogazione mappa</p>
+        <p className="mt-1 text-xs text-[var(--pcb-muted)]">
+          Clicca sul viewer per interrogare il publication target QGIS con `GetFeatureInfo`.
+        </p>
+        {featureInfoState.loading ? (
+          <p className="mt-3 text-sm text-[var(--pcb-muted)]">Caricamento feature info...</p>
+        ) : null}
+        {featureInfoState.error ? (
+          <p className="mt-3 text-sm text-[#9b3d2e]">{featureInfoState.error}</p>
+        ) : null}
+        {!featureInfoState.loading &&
+        !featureInfoState.error &&
+        featureInfoState.features.length === 0 ? (
+          <p className="mt-3 text-sm text-[var(--pcb-muted)]">Nessun risultato ancora caricato.</p>
+        ) : null}
+        {featureInfoState.features.length > 0 ? (
+          <div className="mt-4 grid gap-3">
+            {featureInfoState.features.map((feature) => (
+              <article
+                key={feature.id}
+                className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4"
+              >
+                <p className="text-sm font-semibold text-[var(--pcb-ink)]">{feature.id}</p>
+                <div className="mt-2 grid gap-1 text-xs text-[var(--pcb-muted)]">
+                  {Object.entries(feature.properties).map(([key, value]) => (
+                    <p key={key}>
+                      <strong className="text-[var(--pcb-ink)]">{key}</strong>: {String(value)}
+                    </p>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }

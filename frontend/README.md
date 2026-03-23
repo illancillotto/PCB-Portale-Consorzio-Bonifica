@@ -41,4 +41,5 @@ Stato attuale:
 - stato publication target QGIS esposto nella vista GIS
 - accesso operativo dal frontend GIS a endpoint OWS e `GetCapabilities`
 - overlay WMS QGIS reale nel viewer GIS sopra il publication target locale
+- `GetFeatureInfo` operativo dal viewer GIS via route frontend dedicata
 - mappa GIS completa ancora non integrata
