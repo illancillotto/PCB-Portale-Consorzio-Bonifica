@@ -7,6 +7,7 @@ import {
   getGisLayers,
   getGisPublicationStatus,
   getGisSubjectParcelLinks,
+  getIngestionOrchestrationSummary,
   getIngestionRuns,
   getParcels,
   getSubjects,
@@ -73,9 +74,13 @@ export default async function HomePage() {
         }))
       : Promise.resolve(null),
     session
-      ? Promise.all([getIngestionRuns(session.accessToken), getAuditEvents(session.accessToken)]).then(
-          ([ingestionRuns, auditEvents]) => ({
+      ? Promise.all([
+          getIngestionRuns(session.accessToken),
+          getIngestionOrchestrationSummary(session.accessToken),
+          getAuditEvents(session.accessToken),
+        ]).then(([ingestionRuns, orchestrationSummary, auditEvents]) => ({
             ingestionRuns,
+            orchestrationSummary,
             auditEvents,
           }),
         )
@@ -169,15 +174,21 @@ export default async function HomePage() {
       <SectionCard title="Metriche ingestion e audit" eyebrow="Ops">
         {operationalMetrics ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <Link
+              href="/ingestion"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
                 Run ingestione
               </p>
               <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
                 {operationalMetrics.ingestionRuns.total}
               </p>
-            </div>
-            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            </Link>
+            <Link
+              href="/ingestion?status=queued"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
                 Run in coda
               </p>
@@ -186,16 +197,22 @@ export default async function HomePage() {
                   operationalMetrics.ingestionRuns.items.filter((run) => run.status === 'queued').length
                 }
               </p>
-            </div>
-            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            </Link>
+            <Link
+              href="/audit"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
                 Eventi audit
               </p>
               <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
                 {operationalMetrics.auditEvents.total}
               </p>
-            </div>
-            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            </Link>
+            <Link
+              href="/operations"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
                 Ultimo evento
               </p>
@@ -204,12 +221,67 @@ export default async function HomePage() {
                   ? new Date(operationalMetrics.auditEvents.items[0].createdAt).toLocaleString('it-IT')
                   : 'n/d'}
               </p>
-            </div>
+            </Link>
           </div>
         ) : (
           <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
             Le metriche di ingestione e audit richiedono sessione operatore attiva. Le viste dettagliate restano
             disponibili nei moduli dedicati.
+          </div>
+        )}
+      </SectionCard>
+
+      <SectionCard title="Ingressi operativi ingestion" eyebrow="Pipeline">
+        {operationalMetrics ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <Link
+              href="/ingestion?status=running&acquisitionStage=running"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Acquisition running
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {operationalMetrics.orchestrationSummary.runningRuns}
+              </p>
+            </Link>
+            <Link
+              href="/ingestion?postProcessingStage=running"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Post-processing running
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {operationalMetrics.orchestrationSummary.postProcessingRunningRuns}
+              </p>
+            </Link>
+            <Link
+              href="/ingestion?normalizationStage=completed"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Normalization completed
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {operationalMetrics.orchestrationSummary.normalizationCompletedRuns}
+              </p>
+            </Link>
+            <Link
+              href="/ingestion?matchingStage=completed"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Matching completed
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {operationalMetrics.orchestrationSummary.matchingCompletedRuns}
+              </p>
+            </Link>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
+            Gli ingressi operativi della pipeline ingestion richiedono sessione operatore attiva.
           </div>
         )}
       </SectionCard>

@@ -466,6 +466,7 @@ Estensioni completate:
 - il monitor run supporta filtri stage URL-shareable per lettura operativa piu` rapida
 - `operations` espone anche i contatori cross-domain degli stage ingestion
 - i contatori stage in `operations` fungono da deep link operativo verso `ingestion`
+- la dashboard principale riusa gli stessi deep link operativi per ingestion e audit
 
 ## Criteri di done per ogni milestone
 

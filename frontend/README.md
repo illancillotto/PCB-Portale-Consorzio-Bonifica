@@ -89,6 +89,7 @@ Stato attuale:
 - il monitor run supporta anche filtri URL-shareable per stage `normalization` e `matching`
 - `operations` mostra anche i contatori cross-domain degli stage ingestion
 - i contatori stage in `operations` sono link operativi al monitor `ingestion` gia` filtrato
+- anche la dashboard principale espone ingressi rapidi verso gli stage operativi di ingestion
 - il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS

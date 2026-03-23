@@ -1061,3 +1061,14 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Deep link stage anche in dashboard
+
+Completato:
+
+- dashboard principale allineata a `operations` con ingressi rapidi verso run, audit e stage ingestion
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
