@@ -107,6 +107,13 @@ export interface IngestionConnectorCatalogItem {
   triggerMode: 'manual' | 'scheduled';
   capabilities: Array<'acquisition' | 'raw_ingest' | 'normalization' | 'matching'>;
   writesToMasterData: false;
+  executionReadiness: {
+    configured: boolean;
+    runnable: boolean;
+    persistenceEnabled: boolean;
+    rootPath: string | null;
+    detail: string;
+  };
   latestRun: {
     id: string;
     status: string;
@@ -123,6 +130,13 @@ export interface IngestionConnectorDetail {
   triggerMode: 'manual' | 'scheduled';
   capabilities: Array<'acquisition' | 'raw_ingest' | 'normalization' | 'matching'>;
   writesToMasterData: false;
+  executionReadiness: {
+    configured: boolean;
+    runnable: boolean;
+    persistenceEnabled: boolean;
+    rootPath: string | null;
+    detail: string;
+  };
   latestRun: {
     id: string;
     status: string;

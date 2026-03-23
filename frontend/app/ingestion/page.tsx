@@ -160,6 +160,14 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
               <p className="mt-2 text-sm text-[var(--pcb-muted)]">
                 Master data: {connector.writesToMasterData ? 'scrittura diretta' : 'mai scrittura diretta'}
               </p>
+              <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+                Runtime: {connector.executionReadiness.detail}
+              </p>
+              {connector.executionReadiness.rootPath ? (
+                <p className="mt-1 break-all text-xs text-[var(--pcb-muted)]">
+                  Root path {connector.executionReadiness.rootPath}
+                </p>
+              ) : null}
               {connector.latestRun ? (
                 <p className="mt-3 text-xs text-[var(--pcb-muted)]">
                   Ultima run {new Date(connector.latestRun.startedAt).toLocaleString('it-IT')} ·{' '}

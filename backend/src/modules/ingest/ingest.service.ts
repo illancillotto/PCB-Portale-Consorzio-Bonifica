@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { existsSync } from 'fs';
 import { AuditService } from '../audit/audit.service';
 import { DatabaseService } from '../core/database/database.service';
 import { RedisService } from '../core/redis/redis.service';
@@ -72,6 +73,14 @@ interface ConnectorCatalogEntry {
   domain: string;
   triggerMode: 'manual' | 'scheduled';
   capabilities: Array<'acquisition' | 'raw_ingest' | 'normalization' | 'matching'>;
+}
+
+interface ConnectorExecutionReadiness {
+  configured: boolean;
+  runnable: boolean;
+  persistenceEnabled: boolean;
+  rootPath: string | null;
+  detail: string;
 }
 
 interface NumericCountRow {
@@ -159,6 +168,7 @@ export class IngestService {
     return {
       items: connectorCatalog.map((connector) => {
         const latestRun = latestRunByConnector.get(connector.connectorName);
+        const executionReadiness = this.getConnectorExecutionReadiness(connector.connectorName);
 
         return {
           connectorName: connector.connectorName,
@@ -168,6 +178,7 @@ export class IngestService {
           triggerMode: connector.triggerMode,
           capabilities: connector.capabilities,
           writesToMasterData: false,
+          executionReadiness,
           latestRun: latestRun
             ? {
                 id: latestRun.id,
@@ -212,6 +223,7 @@ export class IngestService {
     );
 
     const latestRun = runsResult.rows[0] ?? null;
+    const executionReadiness = this.getConnectorExecutionReadiness(connectorName);
 
     return {
       connectorName: connector.connectorName,
@@ -221,6 +233,7 @@ export class IngestService {
       triggerMode: connector.triggerMode,
       capabilities: connector.capabilities,
       writesToMasterData: false,
+      executionReadiness,
       latestRun: latestRun
         ? {
             id: latestRun.id,
@@ -299,6 +312,12 @@ export class IngestService {
   async startManualRun(connectorName: string): Promise<StartIngestionRunResponseDto> {
     if (!this.isSupportedConnector(connectorName)) {
       throw new Error(`Unsupported connector ${connectorName}`);
+    }
+
+    const readiness = this.getConnectorExecutionReadiness(connectorName);
+
+    if (!readiness.runnable) {
+      throw new Error(`Connector ${connectorName} is not runnable: ${readiness.detail}`);
     }
 
     const runId = randomUUID();
@@ -813,6 +832,55 @@ export class IngestService {
 
   private isSupportedConnector(connectorName: string) {
     return connectorCatalog.some((connector) => connector.connectorName === connectorName);
+  }
+
+  private getConnectorExecutionReadiness(connectorName: string): ConnectorExecutionReadiness {
+    if (connectorName === 'connector-nas-catasto') {
+      const rootPath = process.env.PCB_NAS_CATASTO_ROOT ?? null;
+      const persistenceEnabled =
+        process.env.PCB_NAS_CATASTO_PERSIST_INGEST === '1' ||
+        process.env.PCB_NAS_CATASTO_PERSIST_INGEST?.toLowerCase() === 'true';
+
+      if (!rootPath) {
+        return {
+          configured: false,
+          runnable: false,
+          persistenceEnabled,
+          rootPath: null,
+          detail: 'PCB_NAS_CATASTO_ROOT non configurato',
+        };
+      }
+
+      const pathExists = existsSync(rootPath);
+
+      if (!pathExists) {
+        return {
+          configured: true,
+          runnable: false,
+          persistenceEnabled,
+          rootPath,
+          detail: 'root path configurato ma non accessibile nel runtime corrente',
+        };
+      }
+
+      return {
+        configured: true,
+        runnable: true,
+        persistenceEnabled,
+        rootPath,
+        detail: persistenceEnabled
+          ? 'connector eseguibile con persistenza raw ingest attiva'
+          : 'connector eseguibile in modalita` dry-run',
+      };
+    }
+
+    return {
+      configured: false,
+      runnable: false,
+      persistenceEnabled: false,
+      rootPath: null,
+      detail: 'connector registrato senza profilo runtime locale',
+    };
   }
 
   private mapRun(row: IngestionRunRow): IngestionRunResponseDto {

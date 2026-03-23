@@ -69,6 +69,20 @@ export default async function ConnectorDetailPage({ params }: ConnectorDetailPag
             <dd>{connector.capabilities.join(', ')}</dd>
           </div>
         </dl>
+        <div className="mt-4 rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]">
+          <p>
+            <strong className="text-[var(--pcb-ink)]">Runtime:</strong> {connector.executionReadiness.detail}
+          </p>
+          <p className="mt-2">
+            <strong className="text-[var(--pcb-ink)]">Persistenza raw ingest:</strong>{' '}
+            {connector.executionReadiness.persistenceEnabled ? 'attiva' : 'dry-run'}
+          </p>
+          {connector.executionReadiness.rootPath ? (
+            <p className="mt-2 break-all">
+              <strong className="text-[var(--pcb-ink)]">Root path:</strong> {connector.executionReadiness.rootPath}
+            </p>
+          ) : null}
+        </div>
       </SectionCard>
 
       <SectionCard title="Contatori run" eyebrow="Runs">
