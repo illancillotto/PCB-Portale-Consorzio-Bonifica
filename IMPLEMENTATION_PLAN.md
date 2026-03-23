@@ -245,6 +245,7 @@ Stato attuale:
 - completati preset GIS contestuali da dashboard e search
 - completate metriche GIS sintetiche in dashboard
 - completate metriche ingestion e audit in dashboard
+- completato riepilogo operativo ingestion in lista e dettaglio run
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella
 - completato endpoint GIS applicativo dedicato alle relazioni soggetto-particella
 - completati filtri `subjectId` e `parcelId` sull'endpoint GIS relazionale
@@ -254,7 +255,7 @@ Stato attuale:
 Prossimo passo naturale:
 
 - usare il layer relazionale per popup/cartigli ancora piu` mirati nel viewer
-- oppure iniziare il consolidamento del dominio ingestion con viste riepilogative dedicate
+- oppure introdurre filtri operativi nelle viste ingestion
 
 Dipendenze:
 

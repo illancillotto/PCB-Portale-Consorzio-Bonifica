@@ -62,6 +62,12 @@ export default async function IngestionRunDetailPage({
   const reviewCount = matchingResults.items.filter(
     (item) => item.decisionStatus === 'review',
   ).length;
+  const rejectedCount = matchingResults.items.filter(
+    (item) => item.decisionStatus === 'rejected',
+  ).length;
+  const unmatchedCount = matchingResults.items.filter(
+    (item) => item.decisionStatus === 'unmatched',
+  ).length;
   const subjectOptions = subjects.items.map((subject) => ({
     id: subject.id,
     label: `${subject.currentDisplayName} · ${subject.cuua}`,
@@ -112,7 +118,7 @@ export default async function IngestionRunDetailPage({
       </SectionCard>
 
       <SectionCard title="Esiti pipeline" eyebrow="Workflow">
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Record normalizzati</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
@@ -126,6 +132,14 @@ export default async function IngestionRunDetailPage({
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Da review</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{reviewCount}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Unmatched</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{unmatchedCount}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Rifiutati</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{rejectedCount}</p>
           </article>
         </div>
       </SectionCard>

@@ -9,6 +9,10 @@ import { getIngestionRuns } from '../../lib/api';
 export default async function IngestionPage() {
   const session = await requireOperatorSession();
   const runs = await getIngestionRuns(session.accessToken);
+  const queuedRuns = runs.items.filter((run) => run.status === 'queued').length;
+  const completedRuns = runs.items.filter((run) => run.status === 'completed').length;
+  const failedRuns = runs.items.filter((run) => run.status === 'failed').length;
+  const totalRecords = runs.items.reduce((total, run) => total + run.recordsTotal, 0);
 
   return (
     <PageShell
@@ -16,6 +20,32 @@ export default async function IngestionPage() {
       description="Monitor iniziale delle run di acquisizione. La pagina usa il backend reale e permette il trigger manuale del connector NAS placeholder."
       actions={<IngestionRunTrigger connectorName="connector-nas-catasto" />}
     >
+      <SectionCard title="Riepilogo operativo" eyebrow="Summary">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Run totali</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{runs.total}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Run completate</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{completedRuns}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Run in coda</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{queuedRuns}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Record osservati</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{totalRecords}</p>
+            {failedRuns > 0 ? (
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
+                {failedRuns} run con errori
+              </p>
+            ) : null}
+          </article>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Run disponibili" eyebrow="Ingestion">
         {runs.items.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">Nessuna run disponibile.</p>
