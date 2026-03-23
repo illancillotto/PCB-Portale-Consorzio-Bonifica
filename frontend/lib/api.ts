@@ -203,6 +203,23 @@ export interface GisPublicationStatus {
   checkedAt: string;
 }
 
+export interface GisSubjectParcelLink {
+  id: string;
+  subjectId: string;
+  cuua: string;
+  subjectDisplayName: string | null;
+  parcelId: string;
+  comune: string;
+  foglio: string;
+  particella: string;
+  subalterno: string | null;
+  relationType: string;
+  title: string | null;
+  quota: number | null;
+  validFrom: string | null;
+  validTo: string | null;
+}
+
 export interface IntegrationStatusItem {
   key: 'postgres' | 'redis' | 'keycloak' | 'qgis';
   label: string;
@@ -324,6 +341,12 @@ export async function getGisMapFeatures(accessToken: string) {
 
 export async function getGisPublicationStatus(accessToken: string) {
   return apiFetch<GisPublicationStatus>('/gis/publication-status', {
+    accessToken,
+  });
+}
+
+export async function getGisSubjectParcelLinks(accessToken: string) {
+  return apiFetch<PaginatedResponse<GisSubjectParcelLink>>('/gis/subject-parcel-links', {
     accessToken,
   });
 }

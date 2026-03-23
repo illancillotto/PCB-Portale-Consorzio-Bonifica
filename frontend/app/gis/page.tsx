@@ -9,6 +9,7 @@ import {
   getGisLayers,
   getGisMapFeatures,
   getGisPublicationStatus,
+  getGisSubjectParcelLinks,
 } from '../../lib/api';
 
 interface GisPageProps {
@@ -23,11 +24,12 @@ export default async function GisPage({ searchParams }: GisPageProps) {
   const filters = searchParams ? await searchParams : {};
   const selectedSubjectId = filters.subjectId;
   const selectedParcelId = filters.parcelId;
-  const [layers, featureLinks, mapFeatures, publicationStatus] = await Promise.all([
+  const [layers, featureLinks, mapFeatures, publicationStatus, subjectParcelLinks] = await Promise.all([
     getGisLayers(session.accessToken),
     getGisFeatureLinks(session.accessToken),
     getGisMapFeatures(session.accessToken),
     getGisPublicationStatus(session.accessToken),
+    getGisSubjectParcelLinks(session.accessToken),
   ]);
   const focusedFeatures = mapFeatures.items.filter(
     (feature) =>
@@ -121,6 +123,34 @@ export default async function GisPage({ searchParams }: GisPageProps) {
           </div>
         </SectionCard>
       </section>
+
+      <SectionCard title="Relazioni soggetto-particella" eyebrow="Domain">
+        <div className="grid gap-4">
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4 text-sm text-[var(--pcb-muted)]">
+            Relazioni GIS applicative disponibili:{' '}
+            <strong className="text-[var(--pcb-ink)]">{subjectParcelLinks.total}</strong>
+          </div>
+          {subjectParcelLinks.items.map((relation) => (
+            <article key={relation.id} className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">
+                  {relation.subjectDisplayName ?? relation.cuua} {'->'} {relation.comune} / foglio {relation.foglio} / particella {relation.particella}
+                  {relation.subalterno ? ` / sub ${relation.subalterno}` : ''}
+                </h3>
+                <StatusChip label={relation.relationType} />
+              </div>
+              <p className="mt-2 text-sm text-[var(--pcb-muted)]">CUUA {relation.cuua}</p>
+              <p className="mt-1 text-sm text-[var(--pcb-muted)]">
+                {relation.title ?? 'Titolo non specificato'}
+                {relation.quota !== null ? ` · quota ${relation.quota}` : ''}
+              </p>
+              <p className="mt-1 text-xs text-[var(--pcb-muted)]">
+                Dal {relation.validFrom ? new Date(relation.validFrom).toLocaleString('it-IT') : 'n/a'}
+              </p>
+            </article>
+          ))}
+        </div>
+      </SectionCard>
     </PageShell>
   );
 }

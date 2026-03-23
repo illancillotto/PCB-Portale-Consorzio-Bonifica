@@ -207,6 +207,7 @@ Nota:
 - evidenziazione feature da `GetFeatureInfo`: completato
 - sync inverso viewer-pannello GIS: completato
 - layer relazioni soggetto-particella pubblicato: completato
+- endpoint GIS applicativo relazioni soggetto-particella: completato
 
 ## Blocchi aperti
 
@@ -867,3 +868,18 @@ Verifiche eseguite:
 - `SELECT ... FROM gis.v_qgis_subject_parcel_links`
 - `GetCapabilities` verificato con `pcb_subject_parcel_links`
 - `GetMap` verificato con `pcb_subject_parcel_links`
+
+### 2026-03-23 – Endpoint GIS applicativo relazioni
+
+Completato:
+
+- endpoint backend protetto `GET /api/v1/gis/subject-parcel-links`
+- integrazione frontend della vista GIS con elenco relazioni applicative
+- allineamento tra publication target QGIS e API applicativa PCB sullo stesso layer di relazione
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

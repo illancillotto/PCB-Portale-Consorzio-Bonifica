@@ -7,6 +7,7 @@ import { GisFeatureLinkResponseDto } from '../dto/feature-link-response.dto';
 import { GisLayerResponseDto } from '../dto/layer-response.dto';
 import { GisMapFeatureResponseDto } from '../dto/map-feature-response.dto';
 import { GisPublicationStatusResponseDto } from '../dto/publication-status-response.dto';
+import { GisSubjectParcelLinkResponseDto } from '../dto/subject-parcel-link-response.dto';
 
 @Controller({
   path: 'gis',
@@ -30,6 +31,11 @@ export class GisController {
   @Get('map-features')
   async listMapFeatures(): Promise<{ items: GisMapFeatureResponseDto[]; total: number }> {
     return this.gisService.listMapFeatures();
+  }
+
+  @Get('subject-parcel-links')
+  async listSubjectParcelLinks(): Promise<{ items: GisSubjectParcelLinkResponseDto[]; total: number }> {
+    return this.gisService.listSubjectParcelLinks();
   }
 
   @Get('publication-status')

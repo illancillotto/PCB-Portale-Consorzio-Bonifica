@@ -4,6 +4,7 @@ import { GisFeatureLinkResponseDto } from './dto/feature-link-response.dto';
 import { GisLayerResponseDto } from './dto/layer-response.dto';
 import { GisMapFeatureResponseDto } from './dto/map-feature-response.dto';
 import { GisPublicationStatusResponseDto } from './dto/publication-status-response.dto';
+import { GisSubjectParcelLinkResponseDto } from './dto/subject-parcel-link-response.dto';
 
 interface GisLayerRow {
   id: string;
@@ -38,6 +39,23 @@ interface GisMapFeatureRow {
   valid_from: Date | string | null;
   valid_to: Date | string | null;
   geometry_geojson: string;
+}
+
+interface GisSubjectParcelLinkRow {
+  id: string;
+  subject_id: string;
+  cuua: string;
+  subject_display_name: string | null;
+  parcel_id: string;
+  comune: string;
+  foglio: string;
+  particella: string;
+  subalterno: string | null;
+  relation_type: string;
+  title: string | null;
+  quota: string | null;
+  valid_from: Date | string | null;
+  valid_to: Date | string | null;
 }
 
 @Injectable()
@@ -218,6 +236,50 @@ export class GisService {
           validFrom: row.valid_from ? new Date(row.valid_from).toISOString() : null,
           validTo: row.valid_to ? new Date(row.valid_to).toISOString() : null,
         },
+      })),
+      total: result.rows.length,
+    };
+  }
+
+  async listSubjectParcelLinks(): Promise<{ items: GisSubjectParcelLinkResponseDto[]; total: number }> {
+    const result = await this.databaseService.query<GisSubjectParcelLinkRow>(
+      `
+        SELECT
+          id,
+          subject_id,
+          cuua,
+          subject_display_name,
+          parcel_id,
+          comune,
+          foglio,
+          particella,
+          subalterno,
+          relation_type,
+          title,
+          quota::text,
+          valid_from,
+          valid_to
+        FROM gis.v_qgis_subject_parcel_links
+        ORDER BY subject_display_name NULLS LAST, comune, foglio, particella
+      `,
+    );
+
+    return {
+      items: result.rows.map((row) => ({
+        id: row.id,
+        subjectId: row.subject_id,
+        cuua: row.cuua,
+        subjectDisplayName: row.subject_display_name,
+        parcelId: row.parcel_id,
+        comune: row.comune,
+        foglio: row.foglio,
+        particella: row.particella,
+        subalterno: row.subalterno,
+        relationType: row.relation_type,
+        title: row.title,
+        quota: row.quota === null ? null : Number(row.quota),
+        validFrom: row.valid_from ? new Date(row.valid_from).toISOString() : null,
+        validTo: row.valid_to ? new Date(row.valid_to).toISOString() : null,
       })),
       total: result.rows.length,
     };
