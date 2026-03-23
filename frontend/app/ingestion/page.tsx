@@ -232,7 +232,10 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                     {connector.connectorName} · {connector.sourceSystem}
                   </p>
                 </div>
-                <StatusChip label={connector.latestRun?.status ?? 'idle'} />
+                <div className="flex flex-wrap gap-2">
+                  <StatusChip label={connector.operationalStatus} />
+                  <StatusChip label={connector.latestRun?.status ?? 'idle'} />
+                </div>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 <StatusChip

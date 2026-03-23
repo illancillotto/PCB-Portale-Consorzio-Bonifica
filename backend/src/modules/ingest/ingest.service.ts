@@ -223,6 +223,7 @@ export class IngestService {
           critical: 0,
           warning: 0,
         };
+        const operationalStatus = this.resolveConnectorOperationalStatus(issueCounters);
 
         return {
           connectorName: connector.connectorName,
@@ -232,6 +233,7 @@ export class IngestService {
           triggerMode: connector.triggerMode,
           capabilities: connector.capabilities,
           writesToMasterData: false,
+          operationalStatus,
           executionReadiness,
           latestRun: latestRun
             ? {
@@ -462,6 +464,7 @@ export class IngestService {
         noCompletedRuns: 0,
       },
     );
+    const operationalStatus = this.resolveConnectorOperationalStatus(issueCounters);
 
     return {
       connectorName: connector.connectorName,
@@ -471,6 +474,7 @@ export class IngestService {
       triggerMode: connector.triggerMode,
       capabilities: connector.capabilities,
       writesToMasterData: false,
+      operationalStatus,
       executionReadiness,
       latestRun: latestRun
         ? {
@@ -520,6 +524,22 @@ export class IngestService {
       issueTypeCounters,
       issues: connectorIssues.items,
     };
+  }
+
+  private resolveConnectorOperationalStatus(issueCounters: {
+    total: number;
+    critical: number;
+    warning: number;
+  }): 'healthy' | 'warning' | 'critical' {
+    if (issueCounters.critical > 0) {
+      return 'critical';
+    }
+
+    if (issueCounters.warning > 0) {
+      return 'warning';
+    }
+
+    return 'healthy';
   }
 
   async getOrchestrationSummary(): Promise<IngestionOrchestrationSummaryResponseDto> {

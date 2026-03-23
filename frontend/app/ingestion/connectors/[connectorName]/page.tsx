@@ -104,7 +104,10 @@ export default async function ConnectorDetailPage({
               {connector.connectorName} · {connector.sourceSystem}
             </p>
           </div>
-          <StatusChip label={connector.latestRun?.status ?? 'idle'} />
+          <div className="flex flex-wrap gap-2">
+            <StatusChip label={connector.operationalStatus} />
+            <StatusChip label={connector.latestRun?.status ?? 'idle'} />
+          </div>
         </div>
         <dl className="mt-5 grid gap-4 text-sm text-[var(--pcb-muted)] md:grid-cols-2 xl:grid-cols-4">
           <div>

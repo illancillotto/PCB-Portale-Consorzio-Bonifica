@@ -6,6 +6,7 @@ export interface IngestionConnectorDetailResponseDto {
   triggerMode: 'manual' | 'scheduled';
   capabilities: Array<'acquisition' | 'raw_ingest' | 'normalization' | 'matching'>;
   writesToMasterData: false;
+  operationalStatus: 'healthy' | 'warning' | 'critical';
   executionReadiness: {
     configured: boolean;
     runnable: boolean;

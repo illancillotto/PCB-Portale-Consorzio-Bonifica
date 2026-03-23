@@ -76,6 +76,7 @@ Stato attuale:
 - il dettaglio connector usa un payload backend unico per profilo, contatori e issue aperte
 - il dettaglio connector supporta anche filtro `issueType` oltre a `issueSeverity`
 - il dettaglio connector mostra anche un riepilogo per tipo di issue
+- catalogo e dettaglio connector mostrano anche uno stato operativo sintetico `healthy/warning/critical`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
