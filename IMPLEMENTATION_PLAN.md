@@ -233,11 +233,12 @@ Stato attuale:
 - completato overlay WMS pubblicato nel viewer frontend GIS
 - completato `GetFeatureInfo` operativo dal viewer frontend GIS
 - completati link navigabili dai risultati `GetFeatureInfo`
+- completata evidenziazione automatica in mappa della feature selezionata via `GetFeatureInfo`
 
 Prossimo passo naturale:
 
 - introdurre una vista QGIS dedicata alle relazioni soggetto-particella
-- oppure introdurre evidenziazione automatica in mappa della feature selezionata via `GetFeatureInfo`
+- oppure introdurre sync inverso tra selezione mappa e pannello risultati
 
 Dipendenze:
 

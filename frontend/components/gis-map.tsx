@@ -17,6 +17,14 @@ interface QgisFeatureInfoResponse {
   features: QgisFeatureInfoFeature[];
 }
 
+function getFeatureSelectionKey(layerCode: string | null, id: string | null) {
+  if (!layerCode || !id) {
+    return null;
+  }
+
+  return `${layerCode}:${id}`;
+}
+
 function asOptionalString(value: string | number | boolean | null | undefined) {
   if (typeof value === 'string' && value !== 'NULL' && value.trim().length > 0) {
     return value;
@@ -41,6 +49,7 @@ export function GisMap({
   wmsProjectFile,
 }: GisMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [selectedFeatureKey, setSelectedFeatureKey] = useState<string | null>(null);
   const [featureInfoState, setFeatureInfoState] = useState<{
     loading: boolean;
     error: string | null;
@@ -125,49 +134,70 @@ export function GisMap({
           }
 
           const data = (await response.json()) as QgisFeatureInfoResponse;
+          const nextFeatures = data.features ?? [];
+          const firstFeature = nextFeatures[0];
 
           setFeatureInfoState({
             loading: false,
             error: null,
-            features: data.features ?? [],
+            features: nextFeatures,
           });
+          setSelectedFeatureKey(
+            getFeatureSelectionKey(
+              asOptionalString(firstFeature?.properties.layer_code),
+              asOptionalString(firstFeature?.properties.id),
+            ),
+          );
         } catch (error) {
           setFeatureInfoState({
             loading: false,
             error: error instanceof Error ? error.message : 'GetFeatureInfo non disponibile',
             features: [],
           });
+          setSelectedFeatureKey(null);
         }
       });
 
       const geoJsonLayer = leaflet.geoJSON(features as unknown as GeoJSON.GeoJsonObject, {
         style(feature) {
           const layerCode = feature?.properties?.layerCode;
-          const isSelected =
+          const isFocusedByRoute =
             feature?.properties?.subjectId === selectedSubjectId ||
             feature?.properties?.parcelId === selectedParcelId;
+          const isSelectedByFeatureInfo =
+            getFeatureSelectionKey(
+              typeof layerCode === 'string' ? layerCode : null,
+              typeof feature?.id === 'string' ? feature.id : null,
+            ) === selectedFeatureKey;
+          const isSelected = isFocusedByRoute || isSelectedByFeatureInfo;
 
           if (layerCode === 'pcb_parcels') {
             return {
               color: isSelected ? '#235347' : '#3d6d64',
-              weight: isSelected ? 4 : 2,
+              weight: isSelected ? 5 : 2,
               fillColor: isSelected ? '#4d9988' : '#78a59a',
-              fillOpacity: isSelected ? 0.5 : 0.35,
+              fillOpacity: isSelected ? 0.62 : 0.35,
             };
           }
 
           return {
             color: isSelected ? '#8f2d17' : '#c85d3a',
-            weight: isSelected ? 4 : 2,
+            weight: isSelected ? 5 : 2,
           };
         },
         pointToLayer(feature, latlng) {
-          const isSelected =
+          const isFocusedByRoute =
             feature.properties?.subjectId === selectedSubjectId ||
             feature.properties?.parcelId === selectedParcelId;
+          const isSelectedByFeatureInfo =
+            getFeatureSelectionKey(
+              typeof feature.properties?.layerCode === 'string' ? feature.properties.layerCode : null,
+              typeof feature.id === 'string' ? feature.id : null,
+            ) === selectedFeatureKey;
+          const isSelected = isFocusedByRoute || isSelectedByFeatureInfo;
 
           return leaflet.circleMarker(latlng, {
-            radius: isSelected ? 11 : 8,
+            radius: isSelected ? 13 : 8,
             color: isSelected ? '#712714' : '#8f3a21',
             weight: isSelected ? 3 : 2,
             fillColor: isSelected ? '#e67d4a' : '#d88a58',
@@ -207,7 +237,7 @@ export function GisMap({
         map.remove();
       }
     };
-  }, [features, selectedSubjectId, selectedParcelId, wmsServiceUrl, wmsProjectFile]);
+  }, [features, selectedSubjectId, selectedParcelId, selectedFeatureKey, wmsServiceUrl, wmsProjectFile]);
 
   return (
     <div className="grid gap-4">
@@ -237,6 +267,20 @@ export function GisMap({
               <article key={feature.id} className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4">
                 <p className="text-sm font-semibold text-[var(--pcb-ink)]">{feature.id}</p>
                 <div className="mt-3 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedFeatureKey(
+                        getFeatureSelectionKey(
+                          asOptionalString(feature.properties.layer_code),
+                          asOptionalString(feature.properties.id),
+                        ),
+                      )
+                    }
+                    className="rounded-full border border-[var(--pcb-line)] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                  >
+                    Evidenzia in mappa
+                  </button>
                   {asOptionalString(feature.properties.subject_id) ? (
                     <Link
                       href={`/subjects/${asOptionalString(feature.properties.subject_id)}`}
@@ -262,6 +306,14 @@ export function GisMap({
                     </Link>
                   ) : null}
                 </div>
+                {getFeatureSelectionKey(
+                  asOptionalString(feature.properties.layer_code),
+                  asOptionalString(feature.properties.id),
+                ) === selectedFeatureKey ? (
+                  <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
+                    Feature attualmente evidenziata nel viewer
+                  </p>
+                ) : null}
                 <div className="mt-2 grid gap-1 text-xs text-[var(--pcb-muted)]">
                   {Object.entries(feature.properties).map(([key, value]) => (
                     <p key={key}>
