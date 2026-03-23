@@ -27,19 +27,17 @@ export default async function GisPage({ searchParams }: GisPageProps) {
   const [layers, featureLinks, mapFeatures, publicationStatus, subjectParcelLinks] = await Promise.all([
     getGisLayers(session.accessToken),
     getGisFeatureLinks(session.accessToken),
-    getGisMapFeatures(session.accessToken),
+    getGisMapFeatures(session.accessToken, {
+      subjectId: selectedSubjectId,
+      parcelId: selectedParcelId,
+    }),
     getGisPublicationStatus(session.accessToken),
     getFilteredGisSubjectParcelLinks(session.accessToken, {
       subjectId: selectedSubjectId,
       parcelId: selectedParcelId,
     }),
   ]);
-  const focusedFeatures = mapFeatures.items.filter(
-    (feature) =>
-      (!selectedSubjectId || feature.properties.subjectId === selectedSubjectId) &&
-      (!selectedParcelId || feature.properties.parcelId === selectedParcelId),
-  );
-  const displayedFeatures = focusedFeatures.length > 0 ? focusedFeatures : mapFeatures.items;
+  const displayedFeatures = mapFeatures.items;
 
   return (
     <PageShell
@@ -53,7 +51,7 @@ export default async function GisPage({ searchParams }: GisPageProps) {
               Focus attivo:
               {selectedSubjectId ? ` soggetto ${selectedSubjectId}` : ''}
               {selectedParcelId ? ` particella ${selectedParcelId}` : ''}
-              {focusedFeatures.length === 0 ? ' · nessuna feature dedicata trovata, vista completa mostrata' : ''}
+              {displayedFeatures.length === 0 ? ' · nessuna feature dedicata trovata' : ''}
             </div>
           ) : null}
           <GisMap

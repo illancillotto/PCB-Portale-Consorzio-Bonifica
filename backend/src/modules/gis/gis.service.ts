@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../core/database/database.service';
 import { GisFeatureLinkResponseDto } from './dto/feature-link-response.dto';
 import { GisLayerResponseDto } from './dto/layer-response.dto';
+import { ListGisMapFeaturesQueryDto } from './dto/list-map-features-query.dto';
 import { GisMapFeatureResponseDto } from './dto/map-feature-response.dto';
 import { ListGisSubjectParcelLinksQueryDto } from './dto/list-subject-parcel-links-query.dto';
 import { GisPublicationStatusResponseDto } from './dto/publication-status-response.dto';
@@ -202,7 +203,23 @@ export class GisService {
     };
   }
 
-  async listMapFeatures(): Promise<{ items: GisMapFeatureResponseDto[]; total: number }> {
+  async listMapFeatures(
+    query: ListGisMapFeaturesQueryDto = {},
+  ): Promise<{ items: GisMapFeatureResponseDto[]; total: number }> {
+    const filters: string[] = ['fl.geometry IS NOT NULL'];
+    const values: string[] = [];
+
+    if (query.subjectId) {
+      values.push(query.subjectId);
+      filters.push(`fl.subject_id = $${values.length}`);
+    }
+
+    if (query.parcelId) {
+      values.push(query.parcelId);
+      filters.push(`fl.parcel_id = $${values.length}`);
+    }
+
+    const whereClause = `WHERE ${filters.join(' AND ')}`;
     const result = await this.databaseService.query<GisMapFeatureRow>(
       `
         SELECT
@@ -218,9 +235,10 @@ export class GisService {
         FROM gis.feature_link fl
         INNER JOIN gis.layer_catalog lc
           ON lc.id = fl.layer_id
-        WHERE fl.geometry IS NOT NULL
+        ${whereClause}
         ORDER BY lc.code, fl.feature_external_id
       `,
+      values,
     );
 
     return {

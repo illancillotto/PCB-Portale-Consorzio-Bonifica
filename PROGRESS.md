@@ -209,6 +209,7 @@ Nota:
 - layer relazioni soggetto-particella pubblicato: completato
 - endpoint GIS applicativo relazioni soggetto-particella: completato
 - filtri GIS relazioni per soggetto/particella: completato
+- filtri GIS `map-features` per soggetto/particella: completato
 
 ## Blocchi aperti
 

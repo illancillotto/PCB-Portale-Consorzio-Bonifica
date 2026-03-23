@@ -333,8 +333,23 @@ export async function getGisFeatureLinks(accessToken: string) {
   });
 }
 
-export async function getGisMapFeatures(accessToken: string) {
-  return apiFetch<PaginatedResponse<GisMapFeature>>('/gis/map-features', {
+export async function getGisMapFeatures(
+  accessToken: string,
+  filters?: { subjectId?: string; parcelId?: string },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.subjectId) {
+    params.set('subjectId', filters.subjectId);
+  }
+
+  if (filters?.parcelId) {
+    params.set('parcelId', filters.parcelId);
+  }
+
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+
+  return apiFetch<PaginatedResponse<GisMapFeature>>(`/gis/map-features${suffix}`, {
     accessToken,
   });
 }

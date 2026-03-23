@@ -238,11 +238,12 @@ Stato attuale:
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella
 - completato endpoint GIS applicativo dedicato alle relazioni soggetto-particella
 - completati filtri `subjectId` e `parcelId` sull'endpoint GIS relazionale
+- completati filtri `subjectId` e `parcelId` sull'endpoint GIS `map-features`
 
 Prossimo passo naturale:
 
-- introdurre interrogazione più precisa del layer relazionale via `GetFeatureInfo`
-- oppure introdurre filtri analoghi su `map-features` per ridurre il carico lato client
+- introdurre interrogazione piu` precisa del layer relazionale via `GetFeatureInfo`
+- oppure estendere `feature-links` con gli stessi filtri contestuali
 
 Dipendenze:
 
