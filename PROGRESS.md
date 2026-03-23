@@ -220,6 +220,7 @@ Nota:
 - filtri operativi ingestion in lista e dettaglio run: completato
 - catalogo connector orchestrato nel backend e visibile in ingestion UI: completato
 - summary backend di orchestration ingestion: completato
+- trigger manuali ingestion derivati dal catalogo connector: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

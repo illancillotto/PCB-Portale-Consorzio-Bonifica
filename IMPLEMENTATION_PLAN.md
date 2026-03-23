@@ -249,6 +249,7 @@ Stato attuale:
 - completati filtri operativi ingestion in lista e dettaglio run
 - completato catalogo connector orchestrato nel dominio ingestion
 - completato summary backend di orchestration ingestion
+- completati trigger manuali ingestion derivati dal catalogo connector
 - completato riepilogo audit con filtri operativi dedicati
 - completata osservabilita` cross-domain nella vista `operations`
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella

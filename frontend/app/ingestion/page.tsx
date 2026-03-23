@@ -57,12 +57,22 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
   const completedRuns = runs.items.filter((run) => run.status === 'completed').length;
   const failedRuns = runs.items.filter((run) => run.status === 'failed').length;
   const totalRecords = runs.items.reduce((total, run) => total + run.recordsTotal, 0);
+  const manualConnectors = connectors.items.filter((connector) => connector.triggerMode === 'manual');
 
   return (
     <PageShell
       title="Ingestion monitor"
       description="Monitor iniziale delle run di acquisizione. La pagina usa il backend reale e permette il trigger manuale del connector NAS placeholder."
-      actions={<IngestionRunTrigger connectorName="connector-nas-catasto" />}
+      actions={
+        <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
+          {manualConnectors.map((connector) => (
+            <IngestionRunTrigger
+              key={connector.connectorName}
+              connectorName={connector.connectorName}
+            />
+          ))}
+        </div>
+      }
     >
       <SectionCard title="Riepilogo operativo" eyebrow="Summary">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
