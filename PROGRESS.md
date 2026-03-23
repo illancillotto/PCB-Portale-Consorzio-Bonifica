@@ -241,6 +241,7 @@ Nota:
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
 - feed issue connector ordinato backend-side per severita` e connector: completato
+- orchestration summary esteso con conteggio `healthyConnectors`: completato
 - riepilogo audit e filtri operativi dedicati: completato
 - `operations` consolidata come punto unico di osservabilita`: completato
 - layer relazioni soggetto-particella pubblicato: completato

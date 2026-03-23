@@ -589,6 +589,9 @@ export class IngestService {
       this.getConnectorExecutionReadiness(connector.connectorName),
     );
     const connectorIssues = await this.listConnectorOperationalIssues();
+    const healthyConnectors =
+      connectorCatalog.length -
+      new Set(connectorIssues.items.map((item) => item.connectorName)).size;
     const [queuedRunsResult, failedRunsResult, normalizedRecordsResult, reviewQueueResult, latestRunResult] =
       await Promise.all([
         this.databaseService.query<NumericCountRow>(
@@ -616,6 +619,7 @@ export class IngestService {
       persistentConnectors: readinessByConnector.filter(
         (item) => item.runnable && item.persistenceEnabled,
       ).length,
+      healthyConnectors,
       criticalConnectorIssues: connectorIssues.items.filter((item) => item.severity === 'critical').length,
       warningConnectorIssues: connectorIssues.items.filter((item) => item.severity === 'warning').length,
       blockedConnectors: readinessByConnector.filter((item) => !item.runnable).length,

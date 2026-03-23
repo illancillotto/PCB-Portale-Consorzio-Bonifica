@@ -199,7 +199,13 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
             </p>
           </article>
         </div>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Connector healthy</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.healthyConnectors}
+            </p>
+          </article>
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Issue critiche connector</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">

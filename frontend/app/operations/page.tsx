@@ -177,6 +177,12 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
       <SectionCard title="Connector attention" eyebrow="Ingestion">
         <div className="mb-4 grid gap-4 md:grid-cols-3">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Connector healthy</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {orchestrationSummary.healthyConnectors}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Issue critiche</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
               {orchestrationSummary.criticalConnectorIssues}

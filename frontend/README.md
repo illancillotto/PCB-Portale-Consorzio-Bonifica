@@ -69,6 +69,7 @@ Stato attuale:
 - `operations` mostra anche issue connector cross-domain con severita` e link rapidi
 - issue connector nel monitor ingestion filtrabili via query string su `issueSeverity` e `issueType`
 - riepiloghi `ingestion` e `operations` usano anche contatori backend sintetici su issue connector
+- i riepiloghi usano anche il conteggio backend dei connector `healthy`
 - anche `operations` espone filtri URL-shareable su `issueSeverity` e `issueType`
 - `ingestion` e `operations` supportano anche filtro issue per `issueConnector`
 - catalogo e dettaglio connector mostrano anche i contatori di issue aperte
