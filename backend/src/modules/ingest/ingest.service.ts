@@ -223,6 +223,8 @@ export class IngestService {
     );
 
     const latestRun = runsResult.rows[0] ?? null;
+    const lastCompletedRun = runsResult.rows.find((row) => row.status === 'completed') ?? null;
+    const lastFailedRun = runsResult.rows.find((row) => row.status === 'failed') ?? null;
     const executionReadiness = this.getConnectorExecutionReadiness(connectorName);
 
     return {
@@ -242,11 +244,41 @@ export class IngestService {
             endedAt: latestRun.ended_at ? new Date(latestRun.ended_at).toISOString() : null,
           }
         : null,
+      lastCompletedRun: lastCompletedRun
+        ? {
+            id: lastCompletedRun.id,
+            status: lastCompletedRun.status,
+            startedAt: new Date(lastCompletedRun.started_at).toISOString(),
+            endedAt: lastCompletedRun.ended_at
+              ? new Date(lastCompletedRun.ended_at).toISOString()
+              : null,
+            recordsTotal: lastCompletedRun.records_total,
+            recordsSuccess: lastCompletedRun.records_success,
+            recordsError: lastCompletedRun.records_error,
+          }
+        : null,
+      lastFailedRun: lastFailedRun
+        ? {
+            id: lastFailedRun.id,
+            status: lastFailedRun.status,
+            startedAt: new Date(lastFailedRun.started_at).toISOString(),
+            endedAt: lastFailedRun.ended_at ? new Date(lastFailedRun.ended_at).toISOString() : null,
+            recordsTotal: lastFailedRun.records_total,
+            recordsSuccess: lastFailedRun.records_success,
+            recordsError: lastFailedRun.records_error,
+            logExcerpt: lastFailedRun.log_excerpt ?? '',
+          }
+        : null,
       runCounters: {
         total: runsResult.rows.length,
         queued: runsResult.rows.filter((row) => row.status === 'queued').length,
         completed: runsResult.rows.filter((row) => row.status === 'completed').length,
         failed: runsResult.rows.filter((row) => row.status === 'failed').length,
+      },
+      executionStats: {
+        recordsObservedTotal: runsResult.rows.reduce((total, row) => total + row.records_total, 0),
+        recordsSucceededTotal: runsResult.rows.reduce((total, row) => total + row.records_success, 0),
+        recordsErroredTotal: runsResult.rows.reduce((total, row) => total + row.records_error, 0),
       },
     };
   }

@@ -253,6 +253,7 @@ Stato attuale:
 - completato dettaglio per singolo connector nel dominio ingestion
 - completata esposizione readiness runtime dei connector
 - completato uso della readiness runtime nel monitor ingestion e nei trigger manuali
+- completato storico operativo sintetico per singolo connector nel dominio ingestion
 - completato riepilogo audit con filtri operativi dedicati
 - completata osservabilita` cross-domain nella vista `operations`
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella

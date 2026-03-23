@@ -19,10 +19,34 @@ export interface IngestionConnectorDetailResponseDto {
     startedAt: string;
     endedAt: string | null;
   } | null;
+  lastCompletedRun: {
+    id: string;
+    status: string;
+    startedAt: string;
+    endedAt: string | null;
+    recordsTotal: number;
+    recordsSuccess: number;
+    recordsError: number;
+  } | null;
+  lastFailedRun: {
+    id: string;
+    status: string;
+    startedAt: string;
+    endedAt: string | null;
+    recordsTotal: number;
+    recordsSuccess: number;
+    recordsError: number;
+    logExcerpt: string;
+  } | null;
   runCounters: {
     total: number;
     queued: number;
     completed: number;
     failed: number;
+  };
+  executionStats: {
+    recordsObservedTotal: number;
+    recordsSucceededTotal: number;
+    recordsErroredTotal: number;
   };
 }

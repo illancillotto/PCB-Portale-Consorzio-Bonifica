@@ -62,6 +62,7 @@ Stato attuale:
 - dettaglio per singolo connector nel dominio ingestion
 - readiness runtime dei connector esposta in catalogo e dettaglio
 - trigger manuale ingestion bloccato in UI quando il connector non e` eseguibile
+- dettaglio connector con storico operativo sintetico su ultimo completamento, ultimo fallimento e volumi osservati
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB

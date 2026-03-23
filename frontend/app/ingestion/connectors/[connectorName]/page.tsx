@@ -114,6 +114,51 @@ export default async function ConnectorDetailPage({ params }: ConnectorDetailPag
         </div>
       </SectionCard>
 
+      <SectionCard title="Storico operativo" eyebrow="Execution">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Record osservati</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {connector.executionStats.recordsObservedTotal}
+            </p>
+            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+              successi {connector.executionStats.recordsSucceededTotal} · errori{' '}
+              {connector.executionStats.recordsErroredTotal}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Ultimo completamento</p>
+            {connector.lastCompletedRun ? (
+              <>
+                <p className="mt-2 text-sm font-semibold text-[var(--pcb-ink)]">
+                  {new Date(connector.lastCompletedRun.startedAt).toLocaleString('it-IT')}
+                </p>
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  {connector.lastCompletedRun.recordsSuccess}/{connector.lastCompletedRun.recordsTotal} successi
+                </p>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-[var(--pcb-muted)]">Nessuna run completata.</p>
+            )}
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Ultimo fallimento</p>
+            {connector.lastFailedRun ? (
+              <>
+                <p className="mt-2 text-sm font-semibold text-[var(--pcb-ink)]">
+                  {new Date(connector.lastFailedRun.startedAt).toLocaleString('it-IT')}
+                </p>
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  {connector.lastFailedRun.recordsError} errori · {connector.lastFailedRun.logExcerpt || 'senza log'}
+                </p>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-[var(--pcb-muted)]">Nessun fallimento registrato.</p>
+            )}
+          </article>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Run recenti" eyebrow="History">
         {connectorRuns.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">Nessuna run disponibile per il connector corrente.</p>
