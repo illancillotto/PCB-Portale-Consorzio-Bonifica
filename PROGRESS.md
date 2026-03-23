@@ -13,11 +13,13 @@ Regole operative:
 ## Stato corrente
 
 - Data ultimo aggiornamento: 2026-03-23
-- Stato progetto: fondazioni completate, backend core collegato a PostgreSQL/PostGIS, frontend integrato alle API reali per soggetti, particelle, ricerca, ingestion monitor e base GIS
+- Stato progetto: fondazioni completate, backend core collegato a PostgreSQL/PostGIS, frontend integrato alle API reali per soggetti, particelle, ricerca, ingestion monitor e base GIS, primo connector NAS read-only persistente su `ingest`, normalizzazione iniziale `raw -> normalized` disponibile nel backend
 - Ambiente locale verificato:
   - `docker compose up -d pcb-postgres`
+  - `docker compose up -d pcb-redis`
   - backend avviabile
   - API core testate contro database reale
+  - Redis operativo e verificato lato backend
 
 ## Vincoli attivi
 
@@ -182,16 +184,24 @@ Nota:
 - GIS: prima versione applicativa completata
 - Frontend integrazione API: prima versione completata
 - Ingestion monitor frontend: prima versione completata
+- Ingestion run detail frontend: prima versione completata
 - Source links scheda soggetto: prima versione completata
 - Documentale base scheda soggetto: prima versione completata
-- Connectors runtime reali: non iniziati
-- Matching engine: non iniziato
-- Keycloak reale end-to-end: non iniziato
+- Connector NAS read-only: persistenza `ingest` completata
+- Normalizzazione `raw -> normalized`: prima versione backend completata
+- Matching engine: versione raffinata `CUUA/source-link/canonical-name` completata
+- Matching review UI: prima versione completata
+- Matching manual subject assignment: prima versione completata
+- Audit decisioni manuali matching: completato
+- Audit passaggi automatici ingest: completato
+- Redis operativo backend: completato
+- Keycloak realm import + JWT verification backend: completato
+- Keycloak protezione applicativa estesa: non iniziato
 
 ## Blocchi aperti
 
-- Docker accessibile ora, ma non ancora usato per Redis, Keycloak e QGIS Server
-- nessun connettore operativo verso sorgenti esterne
+- Keycloak e QGIS Server ancora predisposti ma non operativi
+- matching ancora rule-based, ma ora con priorita` `CUUA/identifier`, `source-link` e `canonical-name`
 - viewer cartografico GIS non ancora implementato
 
 ### 2026-03-20 – Frontend M3 prima integrazione reale
@@ -231,10 +241,188 @@ Verifiche eseguite:
 
 ## Prossimo sviluppo raccomandato
 
-1. Avviare il primo connector NAS read-only
-2. Portare il documentale da seed a endpoint dedicato
-3. Introdurre loading/error/empty states più raffinati nelle viste frontend
-4. Estendere GIS foundation verso un viewer cartografico reale
+1. Portare il documentale da seed a endpoint dedicato
+2. Introdurre loading/error/empty states più raffinati nelle viste frontend
+3. Estendere GIS foundation verso un viewer cartografico reale
+4. Estendere Keycloak dal backend al frontend oppure procedere con viewer GIS reale
+
+### 2026-03-23 – Keycloak backend reale
+
+Completato:
+
+- import automatico realm `pcb` in `docker compose`
+- utenti seed `pcb.operator` e `pcb.admin`
+- client `pcb-backend` e `pcb-frontend`
+- discovery OpenID Connect reale lato backend
+- validazione JWT via JWKS in modulo `auth`
+- endpoint protetti:
+  - `GET /api/v1/auth/session`
+  - `GET /api/v1/auth/operator-access`
+
+Verifiche eseguite:
+
+- `docker compose up -d pcb-keycloak`
+- discovery realm `pcb` verificata su porta `8180`
+- lint e build backend
+- token reale ottenuto via password grant per `pcb.operator`
+- `GET /api/v1/auth/session` verificato con bearer token valido
+- `GET /api/v1/auth/operator-access` verificato con ruolo `pcb-operator`
+
+### 2026-03-23 – Redis operativo backend
+
+Completato:
+
+- modulo Redis in `backend/src/modules/core/redis`
+- health backend con `PING` Redis
+- metadata sistema con stato Redis
+- uso applicativo Redis nel dominio `ingest` per:
+  - marker ultima run manuale
+  - stato effimero di normalizzazione
+  - stato effimero di matching
+
+Verifiche eseguite:
+
+- backend build e lint
+- runtime backend con Redis reale
+- `GET /api/v1/health`
+- `GET /api/v1/system/modules`
+
+### 2026-03-23 – Audit passaggi automatici ingest
+
+Completato:
+
+- scrittura eventi audit automatici per:
+  - richiesta run manuale
+  - normalizzazione
+  - matching
+- payload minimi coerenti con stato pipeline
+
+Verifiche eseguite:
+
+- backend build e lint
+- trigger reale di run manuale verificato
+- normalizzazione e matching reali verificati
+- eventi audit verificati via API
+
+### 2026-03-23 – Audit decisioni manuali matching
+
+Completato:
+
+- scrittura esplicita di eventi in `audit.audit_event` per:
+  - conferma match
+  - conferma no-match
+  - assegnazione manuale soggetto
+- esposizione del `payload` anche nell'API audit
+
+Verifiche eseguite:
+
+- backend build e lint
+- decisione manuale verificata contro backend reale
+- evento audit verificato via API
+
+### 2026-03-23 – Matching manual subject assignment
+
+Completato:
+
+- endpoint backend per assegnazione manuale soggetto a `matching_result`
+- select frontend con soggetti esistenti per chiudere i casi residui
+- accettazione automatica del risultato dopo assegnazione manuale
+
+Verifiche eseguite:
+
+- backend build e lint
+- frontend build e lint
+- assegnazione manuale verificata contro backend reale
+
+### 2026-03-23 – Matching refinement CUUA/source-link aware
+
+Completato:
+
+- priorita` di match su `CUUA` e identificativi
+- regole `source-link aware`
+- regole su nome soggetto canonico
+- riduzione dei casi `review/unmatched` evitabili nel backend `ingest`
+
+Verifiche eseguite:
+
+- backend build e lint
+- re-run matching su run reale del connector NAS
+- verifica miglioramento esiti in `ingest.matching_result`
+
+### 2026-03-23 – Ingestion run detail frontend
+
+Completato:
+
+- pagina dettaglio run in `frontend/app/ingestion/[id]/page.tsx`
+- link dal monitor lista al dettaglio run
+- visualizzazione record normalizzati
+- visualizzazione risultati di matching
+- trigger manuali frontend per:
+  - `normalize`
+  - `match`
+
+Verifiche eseguite:
+
+- frontend build e lint
+- pagina dettaglio verificata contro backend reale
+
+### 2026-03-23 – Matching review operativa
+
+Completato:
+
+- endpoint backend per:
+  - conferma match
+  - conferma no-match
+- pulsanti UI per chiudere manualmente i casi review/unmatched/matched
+- stato visuale migliorato dei badge di stato
+
+Verifiche eseguite:
+
+- backend build e lint
+- frontend build e lint
+- decisioni manuali verificate contro backend reale
+
+### 2026-03-23 – Normalizzazione iniziale ingest
+
+Completato:
+
+- normalizzazione avviabile da backend su `ingest.ingestion_record_raw`
+- persistenza in `ingest.ingestion_record_normalized`
+- endpoint backend:
+  - `POST /api/v1/ingestion/runs/{id}/normalize`
+  - `GET /api/v1/ingestion/runs/{id}/normalized-records`
+- regole iniziali di normalizzazione per `connector-nas-catasto`:
+  - segmentazione path
+  - bucket letter
+  - subject key normalizzata
+  - classificazione documentale base
+  - metadati file system
+
+Verifiche eseguite:
+
+- backend build e lint
+- normalizzazione eseguita su run reale persistita dal connector NAS
+- verifica record in `ingest.ingestion_record_normalized`
+
+### 2026-03-23 – Matching engine base
+
+Completato:
+
+- matching avviabile da backend su `ingest.ingestion_record_normalized`
+- persistenza esiti in `ingest.matching_result`
+- endpoint backend:
+  - `POST /api/v1/ingestion/runs/{id}/match`
+  - `GET /api/v1/ingestion/runs/{id}/matching-results`
+- regole iniziali:
+  - ignore su directory strutturali senza indizi soggetto
+  - match esatto su `normalizedSubjectKey` vs nome soggetto o identificativo
+  - coda review su documenti con indizio soggetto non risolto
+
+Verifiche eseguite:
+
+- backend build e lint
+- matching eseguito su run reale del connector NAS
+- verifica record in `ingest.matching_result`
 
 ### 2026-03-20 – Ingestion monitor frontend
 
@@ -304,3 +492,52 @@ Verifiche eseguite:
 - `GET /api/v1/gis/layers` verificato
 - `GET /api/v1/gis/feature-links` verificato
 - pagina `/gis` verificata a runtime via frontend su porta `3010`
+
+### 2026-03-23 – Connector NAS catasto read-only
+
+Completato:
+
+- configurazione esplicita per `connector-nas-catasto`
+- scansione ricorsiva filesystem read-only
+- classificazione directory e file
+- rilevazione bucket alfabetico
+- estrazione chiave potenziale soggetto dal path
+- hashing opzionale dei file
+- CLI locale con output JSON strutturato di run
+- aggiornamento documentazione tecnica connectors
+
+Verifiche eseguite:
+
+- `npm run lint --workspace connectors`
+- `npm run build --workspace connectors`
+- esecuzione sample locale:
+  - `PCB_NAS_CATASTO_ROOT=/tmp/pcb-nas-sample npm run run:nas-catasto --workspace connectors`
+- output verificato con:
+  - `directoriesScanned = 5`
+  - `filesScanned = 2`
+  - `bucketLetter` coerente
+  - `potentialSubjectKey` coerente
+  - `fileHash` valorizzato
+
+### 2026-03-23 – Connector NAS persistito in ingest
+
+Completato:
+
+- accesso PostgreSQL dal package `connectors`
+- persistenza in:
+  - `ingest.ingestion_run`
+  - `ingest.ingestion_record_raw`
+- modalita `dry-run` e `persisted` nello stesso CLI
+- configurazione `PCB_NAS_CATASTO_PERSIST_INGEST`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace connectors`
+- `npm run build --workspace connectors`
+- esecuzione persistita con:
+  - `PCB_NAS_CATASTO_ROOT=/tmp/pcb-nas-sample PCB_NAS_CATASTO_PERSIST_INGEST=true node connectors/dist/connectors/connector-nas-catasto/cli.js`
+- risultato verificato:
+  - `ingestionRunId` valorizzato
+  - `recordsPersisted = 7`
+  - `ingest.ingestion_run` da `3` a `4`
+  - `ingest.ingestion_record_raw` da `0` a `7`

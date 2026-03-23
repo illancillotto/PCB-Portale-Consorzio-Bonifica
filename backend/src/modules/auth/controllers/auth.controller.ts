@@ -1,15 +1,43 @@
-import { Controller, Get } from '@nestjs/common';
-import { KeycloakPlaceholderService } from '../services/keycloak-placeholder.service';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Roles } from '../decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../guards/keycloak-auth.guard';
+import { KeycloakRolesGuard } from '../guards/keycloak-roles.guard';
+import { KeycloakService } from '../services/keycloak.service';
 
 @Controller({
   path: 'auth',
   version: '1',
 })
 export class AuthController {
-  constructor(private readonly keycloakPlaceholderService: KeycloakPlaceholderService) {}
+  constructor(private readonly keycloakService: KeycloakService) {}
 
   @Get('keycloak')
   getKeycloakStatus() {
-    return this.keycloakPlaceholderService.getConfigurationStatus();
+    return this.keycloakService.getConfigurationStatus();
+  }
+
+  @Get('keycloak/discovery')
+  async getKeycloakDiscoveryStatus() {
+    return this.keycloakService.getDiscoveryStatus();
+  }
+
+  @UseGuards(KeycloakAuthGuard)
+  @Get('session')
+  getSession(@Req() request: { user: unknown }) {
+    return {
+      authenticated: true,
+      principal: request.user,
+    };
+  }
+
+  @UseGuards(KeycloakAuthGuard, KeycloakRolesGuard)
+  @Roles('pcb-operator')
+  @Get('operator-access')
+  getOperatorAccess(@Req() request: { user: unknown }) {
+    return {
+      authorized: true,
+      requiredRoles: ['pcb-operator'],
+      principal: request.user,
+    };
   }
 }

@@ -1,6 +1,17 @@
-import { Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { IngestService } from '../ingest.service';
 import { IngestionRunResponseDto } from '../dto/ingestion-run-response.dto';
+import { MatchingResultResponseDto } from '../dto/matching-result-response.dto';
+import { NormalizeRunResponseDto } from '../dto/normalize-run-response.dto';
+import { NormalizedRecordResponseDto } from '../dto/normalized-record-response.dto';
+import { RunMatchingResponseDto } from '../dto/run-matching-response.dto';
 import { StartIngestionRunResponseDto } from '../dto/start-ingestion-run-response.dto';
 
 @Controller({
@@ -24,6 +35,120 @@ export class IngestionController {
     }
 
     return run;
+  }
+
+  @Post('runs/:id/normalize')
+  async normalizeRun(@Param('id') id: string): Promise<NormalizeRunResponseDto> {
+    const result = await this.ingestService.normalizeRun(id);
+
+    if (!result) {
+      throw new NotFoundException(`Ingestion run not found for id ${id}`);
+    }
+
+    return result;
+  }
+
+  @Get('runs/:id/normalized-records')
+  async listNormalizedRecords(
+    @Param('id') id: string,
+  ): Promise<{ items: NormalizedRecordResponseDto[]; total: number }> {
+    const result = await this.ingestService.listNormalizedRecordsByRunId(id);
+
+    if (!result) {
+      throw new NotFoundException(`Ingestion run not found for id ${id}`);
+    }
+
+    return result;
+  }
+
+  @Post('runs/:id/match')
+  async runMatching(@Param('id') id: string): Promise<RunMatchingResponseDto> {
+    const result = await this.ingestService.runMatching(id);
+
+    if (!result) {
+      throw new NotFoundException(`Ingestion run not found for id ${id}`);
+    }
+
+    return result;
+  }
+
+  @Get('runs/:id/matching-results')
+  async listMatchingResults(
+    @Param('id') id: string,
+  ): Promise<{ items: MatchingResultResponseDto[]; total: number }> {
+    const result = await this.ingestService.listMatchingResultsByRunId(id);
+
+    if (!result) {
+      throw new NotFoundException(`Ingestion run not found for id ${id}`);
+    }
+
+    return result;
+  }
+
+  @Post('runs/:id/matching-results/:resultId/:action')
+  async confirmMatchingResult(
+    @Param('id') id: string,
+    @Param('resultId') resultId: string,
+    @Param('action') action: 'confirm-match' | 'confirm-no-match',
+  ): Promise<MatchingResultResponseDto> {
+    if (action !== 'confirm-match' && action !== 'confirm-no-match') {
+      throw new BadRequestException(`Unsupported matching action ${action}`);
+    }
+
+    try {
+      const result = await this.ingestService.confirmMatchingResult(id, resultId, action);
+
+      if (result === null) {
+        throw new NotFoundException(`Ingestion run not found for id ${id}`);
+      }
+
+      if (!result) {
+        throw new NotFoundException(`Matching result not found for id ${resultId}`);
+      }
+
+      return result;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      const message =
+        error instanceof Error ? error.message : 'Matching decision could not be applied';
+      throw new BadRequestException(message);
+    }
+  }
+
+  @Post('runs/:id/matching-results/:resultId/assign-subject/:subjectId')
+  async assignSubjectToMatchingResult(
+    @Param('id') id: string,
+    @Param('resultId') resultId: string,
+    @Param('subjectId') subjectId: string,
+  ): Promise<MatchingResultResponseDto> {
+    try {
+      const result = await this.ingestService.assignSubjectToMatchingResult(
+        id,
+        resultId,
+        subjectId,
+      );
+
+      if (result === null) {
+        throw new NotFoundException(`Ingestion run not found for id ${id}`);
+      }
+
+      if (!result) {
+        throw new NotFoundException(`Matching result not found for id ${resultId}`);
+      }
+
+      return result;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      const message =
+        error instanceof Error ? error.message : 'Manual subject assignment could not be applied';
+      throw new BadRequestException(message);
+    }
   }
 
   @Post('connectors/:connectorName/run')

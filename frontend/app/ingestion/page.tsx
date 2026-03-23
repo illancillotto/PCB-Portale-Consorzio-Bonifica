@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { IngestionRunTrigger } from '../../components/ingestion-run-trigger';
 import { PageShell } from '../../components/page-shell';
 import { SectionCard } from '../../components/section-card';
@@ -54,7 +55,17 @@ export default async function IngestionPage() {
                     <dd className="break-all">{run.id}</dd>
                   </div>
                 </dl>
-                <p className="mt-4 text-sm text-[var(--pcb-muted)]">{run.logExcerpt || 'Nessun log excerpt disponibile.'}</p>
+                <p className="mt-4 text-sm text-[var(--pcb-muted)]">
+                  {run.logExcerpt || 'Nessun log excerpt disponibile.'}
+                </p>
+                <div className="mt-4">
+                  <Link
+                    href={`/ingestion/${run.id}`}
+                    className="text-sm font-semibold text-[var(--pcb-accent)]"
+                  >
+                    Apri dettaglio run
+                  </Link>
+                </div>
               </article>
             ))}
           </div>

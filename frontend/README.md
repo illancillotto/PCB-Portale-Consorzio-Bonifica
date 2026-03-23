@@ -29,4 +29,5 @@ Stato attuale:
 - lista e vista particella base
 - vista GIS foundation basata su catalogo layer
 - ingestion monitor iniziale
+- dettaglio run ingestion con normalized e matching
 - autenticazione reale e mappa GIS ancora non integrate

@@ -31,12 +31,14 @@ services:
     image: quay.io/keycloak/keycloak:26.1
     container_name: pcb-keycloak
     restart: unless-stopped
-    command: ["start-dev"]
+    command: ["start-dev", "--import-realm"]
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
     ports:
-      - "8080:8080"
+      - "${PCB_KEYCLOAK_PORT:-8180}:8080"
+    volumes:
+      - ./infra/keycloak/import:/opt/keycloak/data/import:ro
 
   pcb-qgis-server:
     image: qgis/qgis-server:latest

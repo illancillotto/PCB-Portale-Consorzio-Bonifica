@@ -9,7 +9,7 @@ export class SystemController {
   constructor(private readonly systemMetadataService: SystemMetadataService) {}
 
   @Get('modules')
-  getModules() {
+  async getModules() {
     return this.systemMetadataService.getBootstrapMetadata();
   }
 }

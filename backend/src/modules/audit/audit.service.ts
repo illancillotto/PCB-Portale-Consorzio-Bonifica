@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { DatabaseService } from '../core/database/database.service';
 import { AuditEventResponseDto } from './dto/audit-event-response.dto';
 
@@ -10,6 +11,7 @@ interface AuditEventRow {
   source_module: string;
   entity_type: string;
   entity_id: string;
+  payload_jsonb: Record<string, unknown>;
   created_at: Date | string;
 }
 
@@ -32,6 +34,7 @@ export class AuditService {
           source_module,
           entity_type,
           entity_id,
+          payload_jsonb,
           created_at
         FROM audit.audit_event
         ORDER BY created_at DESC
@@ -44,6 +47,42 @@ export class AuditService {
     };
   }
 
+  async recordEvent(input: {
+    eventType: string;
+    actorType: string;
+    actorId?: string | null;
+    sourceModule: string;
+    entityType: string;
+    entityId: string;
+    payload?: Record<string, unknown>;
+  }) {
+    await this.databaseService.query(
+      `
+        INSERT INTO audit.audit_event (
+          id,
+          event_type,
+          actor_type,
+          actor_id,
+          source_module,
+          entity_type,
+          entity_id,
+          payload_jsonb
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
+      `,
+      [
+        randomUUID(),
+        input.eventType,
+        input.actorType,
+        input.actorId ?? null,
+        input.sourceModule,
+        input.entityType,
+        input.entityId,
+        JSON.stringify(input.payload ?? {}),
+      ],
+    );
+  }
+
   private mapEvent(row: AuditEventRow): AuditEventResponseDto {
     return {
       id: row.id,
@@ -53,6 +92,7 @@ export class AuditService {
       sourceModule: row.source_module,
       entityType: row.entity_type,
       entityId: row.entity_id,
+      payload: row.payload_jsonb ?? {},
       createdAt: new Date(row.created_at).toISOString(),
     };
   }

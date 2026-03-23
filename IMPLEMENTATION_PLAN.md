@@ -57,11 +57,10 @@ Completato:
 Non completato:
 
 - frontend integrato con backend reale in prima versione
-- GIS applicativo
-- Keycloak end-to-end
-- Redis usato applicativamente
-- connector NAS operativo
-- matching engine
+- GIS viewer cartografico completo
+- Keycloak end-to-end completo lato frontend
+- connector NAS operativo con matching
+- matching engine con workflow base
 - documentale dedicato
 - reporting
 
@@ -155,7 +154,8 @@ Deliverable previsti:
 Stato attuale:
 
 - schermata lista run e trigger manuale implementati
-- dettaglio run dedicato non ancora implementato
+- dettaglio run dedicato implementato
+- visibilità frontend su normalized e matching implementata
 
 Dipendenze:
 
@@ -175,7 +175,7 @@ Obiettivo:
 
 Stato:
 
-- da iniziare
+- in corso
 
 Deliverable previsti:
 
@@ -186,6 +186,12 @@ Deliverable previsti:
 - scrittura in raw ingest
 - tracciamento `ingestion_run`
 
+Stato attuale:
+
+- completati config, scansione ricorsiva, metadati, hashing, CLI locale e persistenza in `ingest`
+- completata la normalizzazione iniziale nel backend `ingest`
+- da completare collegamento a matching
+
 Dipendenze:
 
 - M2 completata
@@ -193,7 +199,8 @@ Dipendenze:
 
 Nota:
 
-- il documentale base seedato prepara il terreno, ma il connector NAS reale è ancora da implementare
+- il connector reale ora copre `source -> raw ingest`
+- la normalizzazione è orchestrata nel backend per mantenere separati i confini del modular monolith
 
 ### M6 – GIS applicativo base
 
@@ -230,7 +237,7 @@ Obiettivo:
 
 Stato:
 
-- da iniziare
+- in corso
 
 Deliverable previsti:
 
@@ -238,6 +245,15 @@ Deliverable previsti:
 - ruoli applicativi iniziali
 - guard backend
 - protezione API non pubbliche
+
+Stato attuale:
+
+- completato realm locale importato via compose
+- completata discovery reale lato backend
+- completata validazione JWT via JWKS
+- completata prima guard backend verificata su endpoint auth
+- da completare integrazione login frontend
+- da completare protezione selettiva delle API non pubbliche del portale
 
 Dipendenze:
 
@@ -251,7 +267,24 @@ Obiettivo:
 
 Stato:
 
-- da iniziare
+- in corso
+
+Deliverable previsti:
+
+- regole iniziali di matching su CUUA e indizi documentali
+- persistenza in `ingest.matching_result`
+- API di ispezione esito matching
+
+Stato attuale:
+
+- completate persistenza risultati e API di esecuzione/ispezione
+- completate prime regole deterministic/review su `normalizedSubjectKey`
+- completata review operativa base in UI
+- completato raffinamento matching `CUUA-first`, `source-link-aware` e `canonical-name`
+- completata assegnazione manuale soggetto nei casi review residui
+- completato audit esplicito delle decisioni manuali di matching
+- completato audit automatico dei passaggi chiave `run/normalize/match`
+- completato Redis operativo backend su health/runtime e marker ingest
 
 Deliverable previsti:
 

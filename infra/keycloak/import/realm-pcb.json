@@ -1,0 +1,101 @@
+{
+  "realm": "pcb",
+  "enabled": true,
+  "displayName": "PCB",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "resetPasswordAllowed": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "pcb-admin",
+        "description": "PCB platform administrators"
+      },
+      {
+        "name": "pcb-operator",
+        "description": "PCB backoffice operators"
+      },
+      {
+        "name": "pcb-reader",
+        "description": "PCB read-only users"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "pcb-backend",
+      "name": "PCB Backend",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "change-me",
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "standardFlowEnabled": true,
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://127.0.0.1:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+      ]
+    },
+    {
+      "clientId": "pcb-frontend",
+      "name": "PCB Frontend",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "directAccessGrantsEnabled": false,
+      "standardFlowEnabled": true,
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://127.0.0.1:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "pcb.operator",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "PCB",
+      "lastName": "Operator",
+      "email": "pcb.operator@example.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "pcb.operator",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "pcb-operator"
+      ]
+    },
+    {
+      "username": "pcb.admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "PCB",
+      "lastName": "Admin",
+      "email": "pcb.admin@example.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "pcb.admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "pcb-admin",
+        "pcb-operator"
+      ]
+    }
+  ]
+}

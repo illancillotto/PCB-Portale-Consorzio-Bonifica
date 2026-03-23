@@ -95,6 +95,45 @@ export interface IngestionRun {
   logExcerpt: string;
 }
 
+export interface NormalizedRecord {
+  id: string;
+  ingestionRunId: string;
+  sourceRecordId: string;
+  normalizationStatus: string;
+  normalized: {
+    connectorName?: string;
+    sourceSystem?: string;
+    recordType?: string;
+    filesystem?: {
+      relativePath?: string;
+      bucketLetter?: string | null;
+      fileName?: string | null;
+      fileExtension?: string | null;
+      sizeBytes?: number | null;
+    };
+    subjectHints?: {
+      potentialSubjectKey?: string | null;
+      normalizedSubjectKey?: string | null;
+    };
+    documentHints?: {
+      documentFamily?: string | null;
+    };
+  };
+  createdAt: string;
+}
+
+export interface MatchingResult {
+  id: string;
+  ingestionRunId: string;
+  sourceRecordId: string;
+  matchedSubjectId: string | null;
+  matchingScore: number;
+  decisionType: string;
+  decisionStatus: string;
+  notes: string | null;
+  createdAt: string;
+}
+
 export interface GisLayer {
   id: string;
   name: string;
@@ -172,6 +211,22 @@ export async function searchAll(query: string) {
 
 export async function getIngestionRuns() {
   return apiFetch<PaginatedResponse<IngestionRun>>('/ingestion/runs');
+}
+
+export async function getIngestionRun(id: string) {
+  return apiFetch<IngestionRun>(`/ingestion/runs/${id}`);
+}
+
+export async function getNormalizedRecords(id: string) {
+  return apiFetch<PaginatedResponse<NormalizedRecord>>(
+    `/ingestion/runs/${id}/normalized-records`,
+  );
+}
+
+export async function getMatchingResults(id: string) {
+  return apiFetch<PaginatedResponse<MatchingResult>>(
+    `/ingestion/runs/${id}/matching-results`,
+  );
 }
 
 export async function getGisLayers() {
