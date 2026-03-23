@@ -211,6 +211,7 @@ Nota:
 - controllo layer operativo nel viewer GIS: completato
 - legenda cartografica esplicita nel viewer GIS: completato
 - layer attivi del viewer GIS sincronizzati con URL: completato
+- preset operativi GIS condivisibili: completato
 - layer relazioni soggetto-particella pubblicato: completato
 - endpoint GIS applicativo relazioni soggetto-particella: completato
 - filtri GIS relazioni per soggetto/particella: completato

@@ -49,5 +49,6 @@ Stato attuale:
 - controllo layer operativo nel viewer GIS per overlay WMS e `GetFeatureInfo`
 - legenda cartografica esplicita per layer, simboli e ruolo di overlay WMS/GeoJSON
 - layer attivi del viewer GIS sincronizzati con la URL tramite query `layers=...`
+- preset operativi GIS condivisibili via URL: `completo`, `relazioni`, `catasto`, `soggetti`
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

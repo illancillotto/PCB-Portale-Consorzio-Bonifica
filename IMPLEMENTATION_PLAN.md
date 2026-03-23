@@ -240,6 +240,7 @@ Stato attuale:
 - completato controllo layer operativo nel viewer GIS
 - completata legenda cartografica esplicita nel viewer GIS
 - completata sincronizzazione URL dei layer attivi del viewer GIS
+- completati preset operativi GIS condivisibili
 - completata vista/overlay tematico dedicato alle relazioni soggetto-particella
 - completato endpoint GIS applicativo dedicato alle relazioni soggetto-particella
 - completati filtri `subjectId` e `parcelId` sull'endpoint GIS relazionale
@@ -249,7 +250,7 @@ Stato attuale:
 Prossimo passo naturale:
 
 - usare il layer relazionale per popup/cartigli ancora piu` mirati nel viewer
-- oppure introdurre preset operativi GIS per casi d'uso frequenti
+- oppure aggiungere azioni rapide per aprire preset GIS da soggetti, particelle e operations
 
 Dipendenze:
 

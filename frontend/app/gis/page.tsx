@@ -17,6 +17,7 @@ interface GisPageProps {
     subjectId?: string;
     parcelId?: string;
     layers?: string;
+    preset?: string;
   }>;
 }
 

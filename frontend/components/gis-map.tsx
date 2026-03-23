@@ -44,6 +44,39 @@ const qgisLayerLegendStyles: Record<
   },
 };
 
+const qgisLayerPresets = [
+  {
+    key: 'completo',
+    label: 'Vista completa',
+    layers: [...defaultQgisLayers],
+  },
+  {
+    key: 'relazioni',
+    label: 'Solo relazioni',
+    layers: ['pcb_subject_parcel_links'],
+  },
+  {
+    key: 'catasto',
+    label: 'Catasto',
+    layers: ['pcb_subject_parcel_links', 'pcb_parcels'],
+  },
+  {
+    key: 'soggetti',
+    label: 'Soggetti',
+    layers: ['pcb_subjects'],
+  },
+] as const;
+
+function normalizeLayerSet(layers: readonly string[]) {
+  return [...layers].sort().join(',');
+}
+
+function getPresetForLayers(layers: readonly string[]) {
+  const normalizedLayers = normalizeLayerSet(layers);
+
+  return qgisLayerPresets.find((preset) => normalizeLayerSet(preset.layers) === normalizedLayers) ?? null;
+}
+
 function toFeatureInfoFeature(feature: GisMapFeature): QgisFeatureInfoFeature {
   return {
     id: `${feature.properties.layerCode}.${feature.id}`,
@@ -450,13 +483,40 @@ export function GisMap({
     setSelectedFeatureKey(null);
   }
 
+  function applyQgisPreset(presetKey: (typeof qgisLayerPresets)[number]['key']) {
+    const preset = qgisLayerPresets.find((currentPreset) => currentPreset.key === presetKey);
+
+    if (!preset) {
+      return;
+    }
+
+    setActiveQgisLayers(
+      [...preset.layers].sort(
+        (left, right) => defaultQgisLayers.indexOf(left) - defaultQgisLayers.indexOf(right),
+      ) as Array<(typeof defaultQgisLayers)[number]>,
+    );
+    setFeatureInfoState({
+      loading: false,
+      error: null,
+      features: [],
+    });
+    setSelectedFeatureKey(null);
+  }
+
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
+    const activePreset = getPresetForLayers(activeQgisLayers);
 
     if (activeQgisLayers.length === defaultQgisLayers.length) {
       params.delete('layers');
     } else {
       params.set('layers', activeQgisLayers.join(','));
+    }
+
+    if (activePreset) {
+      params.set('preset', activePreset.key);
+    } else {
+      params.delete('preset');
     }
 
     const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
@@ -474,6 +534,26 @@ export function GisMap({
       />
       <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
         <div className="mb-4 grid gap-3 rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-bg)]/55 p-4">
+          <div className="flex flex-wrap gap-3">
+            {qgisLayerPresets.map((preset) => {
+              const isActive = getPresetForLayers(activeQgisLayers)?.key === preset.key;
+
+              return (
+                <button
+                  key={preset.key}
+                  type="button"
+                  onClick={() => applyQgisPreset(preset.key)}
+                  className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                    isActive
+                      ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                      : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
+          </div>
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
             Layer operativi
           </p>
