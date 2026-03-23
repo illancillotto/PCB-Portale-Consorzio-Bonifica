@@ -4,6 +4,7 @@ import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
 import {
   getAuditEvents,
+  getIngestionConnectors,
   getGisPublicationStatus,
   getGisSubjectParcelLinks,
   getIngestionConnectorIssues,
@@ -15,18 +16,30 @@ import Link from 'next/link';
 
 interface OperationsPageProps {
   searchParams?: Promise<{
+    connectorOperationalStatus?: 'healthy' | 'warning' | 'critical';
+    connectorTriggerMode?: 'manual' | 'scheduled';
     issueConnector?: string;
     issueSeverity?: 'warning' | 'critical';
     issueType?: string;
   }>;
 }
 
-function buildIssueFilterHref(filters: {
+function buildOperationsHref(filters: {
+  connectorOperationalStatus?: 'healthy' | 'warning' | 'critical';
+  connectorTriggerMode?: 'manual' | 'scheduled';
   issueConnector?: string;
   issueSeverity?: 'warning' | 'critical';
   issueType?: string;
 }) {
   const params = new URLSearchParams();
+
+  if (filters.connectorOperationalStatus) {
+    params.set('connectorOperationalStatus', filters.connectorOperationalStatus);
+  }
+
+  if (filters.connectorTriggerMode) {
+    params.set('connectorTriggerMode', filters.connectorTriggerMode);
+  }
 
   if (filters.issueConnector) {
     params.set('issueConnector', filters.issueConnector);
@@ -48,10 +61,22 @@ function buildIssueFilterHref(filters: {
 export default async function OperationsPage({ searchParams }: OperationsPageProps) {
   const session = await requireOperatorSession();
   const filters = (await searchParams) ?? {};
-  const [integrations, ingestionRuns, connectorIssues, orchestrationSummary, auditEvents, publicationStatus, subjectParcelLinks] =
-    await Promise.all([
+  const [
+    integrations,
+    ingestionRuns,
+    connectors,
+    connectorIssues,
+    orchestrationSummary,
+    auditEvents,
+    publicationStatus,
+    subjectParcelLinks,
+  ] = await Promise.all([
       getSystemIntegrations(session.accessToken),
       getIngestionRuns(session.accessToken),
+      getIngestionConnectors(session.accessToken, {
+        operationalStatus: filters.connectorOperationalStatus,
+        triggerMode: filters.connectorTriggerMode,
+      }),
       getIngestionConnectorIssues(session.accessToken, {
         connectorName: filters.issueConnector,
         severity: filters.issueSeverity,
@@ -203,7 +228,9 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         </div>
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
-            href={buildIssueFilterHref({
+            href={buildOperationsHref({
+              connectorOperationalStatus: filters.connectorOperationalStatus,
+              connectorTriggerMode: filters.connectorTriggerMode,
               issueSeverity: filters.issueSeverity,
               issueType: filters.issueType,
             })}
@@ -218,7 +245,9 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
           {Array.from(new Set(connectorIssues.items.map((issue) => issue.connectorName))).map((connectorName) => (
             <Link
               key={connectorName}
-              href={buildIssueFilterHref({
+              href={buildOperationsHref({
+                connectorOperationalStatus: filters.connectorOperationalStatus,
+                connectorTriggerMode: filters.connectorTriggerMode,
                 issueConnector: connectorName,
                 issueSeverity: filters.issueSeverity,
                 issueType: filters.issueType,
@@ -235,7 +264,9 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         </div>
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
-            href={buildIssueFilterHref({
+            href={buildOperationsHref({
+              connectorOperationalStatus: filters.connectorOperationalStatus,
+              connectorTriggerMode: filters.connectorTriggerMode,
               issueConnector: filters.issueConnector,
               issueType: filters.issueType,
             })}
@@ -250,7 +281,9 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
           {(['critical', 'warning'] as const).map((severity) => (
             <Link
               key={severity}
-              href={buildIssueFilterHref({
+              href={buildOperationsHref({
+                connectorOperationalStatus: filters.connectorOperationalStatus,
+                connectorTriggerMode: filters.connectorTriggerMode,
                 issueConnector: filters.issueConnector,
                 issueSeverity: severity,
                 issueType: filters.issueType,
@@ -267,7 +300,9 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         </div>
         <div className="mb-6 flex flex-wrap gap-3">
           <Link
-            href={buildIssueFilterHref({
+            href={buildOperationsHref({
+              connectorOperationalStatus: filters.connectorOperationalStatus,
+              connectorTriggerMode: filters.connectorTriggerMode,
               issueConnector: filters.issueConnector,
               issueSeverity: filters.issueSeverity,
             })}
@@ -283,7 +318,9 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
             (issueType) => (
               <Link
                 key={issueType}
-                href={buildIssueFilterHref({
+                href={buildOperationsHref({
+                  connectorOperationalStatus: filters.connectorOperationalStatus,
+                  connectorTriggerMode: filters.connectorTriggerMode,
                   issueConnector: filters.issueConnector,
                   issueSeverity: filters.issueSeverity,
                   issueType,
@@ -338,6 +375,128 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
             ))}
           </div>
         )}
+      </SectionCard>
+
+      <SectionCard title="Catalogo connector" eyebrow="Orchestration">
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildOperationsHref({
+              connectorTriggerMode: filters.connectorTriggerMode,
+              issueConnector: filters.issueConnector,
+              issueSeverity: filters.issueSeverity,
+              issueType: filters.issueType,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.connectorOperationalStatus
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti gli stati
+          </Link>
+          {(['critical', 'warning', 'healthy'] as const).map((operationalStatus) => (
+            <Link
+              key={operationalStatus}
+              href={buildOperationsHref({
+                connectorOperationalStatus: operationalStatus,
+                connectorTriggerMode: filters.connectorTriggerMode,
+                issueConnector: filters.issueConnector,
+                issueSeverity: filters.issueSeverity,
+                issueType: filters.issueType,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.connectorOperationalStatus === operationalStatus
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {operationalStatus}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-6 flex flex-wrap gap-3">
+          <Link
+            href={buildOperationsHref({
+              connectorOperationalStatus: filters.connectorOperationalStatus,
+              issueConnector: filters.issueConnector,
+              issueSeverity: filters.issueSeverity,
+              issueType: filters.issueType,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.connectorTriggerMode
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti i trigger
+          </Link>
+          {(['manual', 'scheduled'] as const).map((triggerMode) => (
+            <Link
+              key={triggerMode}
+              href={buildOperationsHref({
+                connectorOperationalStatus: filters.connectorOperationalStatus,
+                connectorTriggerMode: triggerMode,
+                issueConnector: filters.issueConnector,
+                issueSeverity: filters.issueSeverity,
+                issueType: filters.issueType,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.connectorTriggerMode === triggerMode
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {triggerMode}
+            </Link>
+          ))}
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {connectors.items.map((connector) => (
+            <article
+              key={connector.connectorName}
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-[var(--pcb-ink)]">
+                    {connector.displayName}
+                  </h2>
+                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                    {connector.connectorName}
+                  </p>
+                </div>
+                <StatusChip label={connector.operationalStatus} />
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <StatusChip label={connector.triggerMode} />
+                <StatusChip label={connector.executionReadiness.runnable ? 'runnable' : 'blocked'} />
+              </div>
+              <p className="mt-4 text-sm text-[var(--pcb-muted)]">
+                Issue aperte {connector.issueCounters.total} · critiche {connector.issueCounters.critical} ·
+                warning {connector.issueCounters.warning}
+              </p>
+              <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+                {connector.executionReadiness.detail}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-4 text-sm">
+                <Link
+                  href={`/ingestion/connectors/${connector.connectorName}`}
+                  className="font-semibold text-[var(--pcb-accent)]"
+                >
+                  Apri connector
+                </Link>
+                {connector.latestRun ? (
+                  <Link
+                    href={`/ingestion/${connector.latestRun.id}`}
+                    className="font-semibold text-[var(--pcb-accent)]"
+                  >
+                    Ultima run
+                  </Link>
+                ) : null}
+              </div>
+            </article>
+          ))}
+        </div>
       </SectionCard>
     </PageShell>
   );

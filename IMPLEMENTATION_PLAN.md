@@ -452,6 +452,13 @@ Stato:
 
 - completato
 
+Estensioni completate:
+
+- issue connector cross-domain in `operations`
+- filtri URL-shareable issue connector in `operations`
+- catalogo connector operativo in `operations`
+- filtri URL-shareable del catalogo su stato operativo e trigger mode
+
 ## Criteri di done per ogni milestone
 
 - codice coerente con modular monolith

@@ -80,6 +80,7 @@ Stato attuale:
 - catalogo e dettaglio connector mostrano anche uno stato operativo sintetico `healthy/warning/critical`
 - il catalogo connector nel monitor ingestion arriva gia` ordinato per priorita` operativa
 - il catalogo connector supporta filtri URL-shareable su `connectorOperationalStatus` e `connectorTriggerMode`
+- `operations` espone anche il catalogo connector con gli stessi filtri URL-shareable su `connectorOperationalStatus` e `connectorTriggerMode`
 - il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS

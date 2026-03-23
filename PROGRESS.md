@@ -940,3 +940,16 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-23 – Catalogo connector anche in operations
+
+Completato:
+
+- vista `operations` allineata al monitor `ingestion` con catalogo connector operativo
+- filtri URL-shareable su `connectorOperationalStatus` e `connectorTriggerMode` anche in `operations`
+- preservazione dei filtri issue nello stesso contesto operativo
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
