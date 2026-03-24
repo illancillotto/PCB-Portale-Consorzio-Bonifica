@@ -55,6 +55,18 @@ export default async function SubjectDetailPage({ params }: SubjectDetailPagePro
             >
               Preset soggetti
             </Link>
+            <Link
+              href={`/audit?entityType=subject&entityId=${subject.id}`}
+              className="inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+            >
+              Audit soggetto
+            </Link>
+            <Link
+              href="/operations"
+              className="inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+            >
+              Operations
+            </Link>
           </div>
         </div>
       }

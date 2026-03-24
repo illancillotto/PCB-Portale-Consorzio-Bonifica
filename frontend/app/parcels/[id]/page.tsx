@@ -50,6 +50,18 @@ export default async function ParcelDetailPage({ params }: ParcelDetailPageProps
             >
               Preset relazioni
             </Link>
+            <Link
+              href={`/audit?entityType=parcel&entityId=${parcel.id}`}
+              className="inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+            >
+              Audit particella
+            </Link>
+            <Link
+              href="/operations"
+              className="inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+            >
+              Operations
+            </Link>
           </div>
         </div>
       }

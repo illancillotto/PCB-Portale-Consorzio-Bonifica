@@ -248,6 +248,7 @@ Nota:
 - vista `operations` arricchita con riepilogo audit per modulo sorgente e deep link ai filtri audit: completato
 - dashboard principale arricchita con ingressi audit per modulo sorgente: completato
 - dashboard principale arricchita con ingressi audit per attore: completato
+- schede soggetto e particella arricchite con ingressi audit contestuali per entita`: completato
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
 - feed issue connector ordinato backend-side per severita` e connector: completato

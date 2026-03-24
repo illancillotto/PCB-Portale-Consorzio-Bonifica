@@ -138,6 +138,7 @@ Stato attuale:
 - completato riepilogo audit per modulo nella vista `operations`, con deep link verso `audit`
 - completati ingressi audit per modulo anche nella dashboard principale
 - completati ingressi audit per attore anche nella dashboard principale
+- completati ingressi audit contestuali anche nelle schede soggetto e particella
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:
