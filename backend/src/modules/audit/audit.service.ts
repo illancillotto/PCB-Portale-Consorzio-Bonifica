@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { DatabaseService } from '../core/database/database.service';
 import { AuditEventResponseDto } from './dto/audit-event-response.dto';
+import { AuditSummaryResponseDto } from './dto/audit-summary-response.dto';
 import { ListAuditEventsQueryDto } from './dto/list-audit-events-query.dto';
 
 interface AuditEventRow {
@@ -16,6 +17,11 @@ interface AuditEventRow {
   created_at: Date | string;
 }
 
+interface AuditCounterRow {
+  key: string;
+  total: string;
+}
+
 @Injectable()
 export class AuditService {
   constructor(private readonly databaseService: DatabaseService) {}
@@ -24,7 +30,7 @@ export class AuditService {
     return ['auth', 'sensitive_read', 'master_update', 'connector_run', 'matching_review', 'gis_update'];
   }
 
-  async listEvents(filters: ListAuditEventsQueryDto = {}) {
+  private buildFilterQuery(filters: ListAuditEventsQueryDto = {}) {
     const clauses: string[] = [];
     const params: string[] = [];
 
@@ -55,6 +61,12 @@ export class AuditService {
 
     const whereClause = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
 
+    return { params, whereClause };
+  }
+
+  async listEvents(filters: ListAuditEventsQueryDto = {}) {
+    const { params, whereClause } = this.buildFilterQuery(filters);
+
     const result = await this.databaseService.query<AuditEventRow>(
       `
         SELECT
@@ -77,6 +89,79 @@ export class AuditService {
     return {
       items: result.rows.map((row) => this.mapEvent(row)),
       total: result.rows.length,
+    };
+  }
+
+  async getSummary(filters: ListAuditEventsQueryDto = {}): Promise<AuditSummaryResponseDto> {
+    const { params, whereClause } = this.buildFilterQuery(filters);
+    const filteredCte = `
+      WITH filtered_events AS (
+        SELECT
+          actor_type,
+          source_module,
+          created_at
+        FROM audit.audit_event
+        ${whereClause}
+      )
+    `;
+
+    const [summaryResult, sourceModuleResult, actorTypeResult] = await Promise.all([
+      this.databaseService.query<{
+        total: string;
+        system_events: string;
+        system_operator_events: string;
+        latest_created_at: Date | string | null;
+      }>(
+        `
+          ${filteredCte}
+          SELECT
+            COUNT(*)::text AS total,
+            COUNT(*) FILTER (WHERE actor_type = 'system')::text AS system_events,
+            COUNT(*) FILTER (WHERE actor_type = 'system_operator')::text AS system_operator_events,
+            MAX(created_at) AS latest_created_at
+          FROM filtered_events
+        `,
+        params,
+      ),
+      this.databaseService.query<AuditCounterRow>(
+        `
+          ${filteredCte}
+          SELECT source_module AS key, COUNT(*)::text AS total
+          FROM filtered_events
+          GROUP BY source_module
+          ORDER BY COUNT(*) DESC, source_module ASC
+        `,
+        params,
+      ),
+      this.databaseService.query<AuditCounterRow>(
+        `
+          ${filteredCte}
+          SELECT actor_type AS key, COUNT(*)::text AS total
+          FROM filtered_events
+          GROUP BY actor_type
+          ORDER BY COUNT(*) DESC, actor_type ASC
+        `,
+        params,
+      ),
+    ]);
+
+    const summary = summaryResult.rows[0];
+
+    return {
+      total: Number(summary?.total ?? 0),
+      systemEvents: Number(summary?.system_events ?? 0),
+      systemOperatorEvents: Number(summary?.system_operator_events ?? 0),
+      latestCreatedAt: summary?.latest_created_at
+        ? new Date(summary.latest_created_at).toISOString()
+        : null,
+      bySourceModule: sourceModuleResult.rows.map((row) => ({
+        sourceModule: row.key,
+        total: Number(row.total),
+      })),
+      byActorType: actorTypeResult.rows.map((row) => ({
+        actorType: row.key,
+        total: Number(row.total),
+      })),
     };
   }
 

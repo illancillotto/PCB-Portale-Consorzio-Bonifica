@@ -3,7 +3,7 @@ import { PageShell } from '../components/page-shell';
 import { SearchForm } from '../components/search-form';
 import { SectionCard } from '../components/section-card';
 import {
-  getAuditEvents,
+  getAuditSummary,
   getGisLayers,
   getGisPublicationStatus,
   getGisSubjectParcelLinks,
@@ -77,42 +77,17 @@ export default async function HomePage() {
       ? Promise.all([
           getIngestionRuns(session.accessToken),
           getIngestionOrchestrationSummary(session.accessToken),
-          getAuditEvents(session.accessToken),
-        ]).then(([ingestionRuns, orchestrationSummary, auditEvents]) => ({
+          getAuditSummary(session.accessToken),
+        ]).then(([ingestionRuns, orchestrationSummary, auditSummary]) => ({
             ingestionRuns,
             orchestrationSummary,
-            auditEvents,
+            auditSummary,
           }),
         )
       : Promise.resolve(null),
   ]);
-  const auditBySourceModule = operationalMetrics
-    ? Array.from(
-        new Map(
-          operationalMetrics.auditEvents.items.map((event) => [
-            event.sourceModule,
-            operationalMetrics.auditEvents.items.filter(
-              (candidate) => candidate.sourceModule === event.sourceModule,
-            ).length,
-          ]),
-        ).entries(),
-      )
-        .map(([sourceModule, total]) => ({ sourceModule, total }))
-        .sort((left, right) => right.total - left.total || left.sourceModule.localeCompare(right.sourceModule))
-    : [];
-  const auditByActorType = operationalMetrics
-    ? Array.from(
-        new Map(
-          operationalMetrics.auditEvents.items.map((event) => [
-            event.actorType,
-            operationalMetrics.auditEvents.items.filter((candidate) => candidate.actorType === event.actorType)
-              .length,
-          ]),
-        ).entries(),
-      )
-        .map(([actorType, total]) => ({ actorType, total }))
-        .sort((left, right) => right.total - left.total || left.actorType.localeCompare(right.actorType))
-    : [];
+  const auditBySourceModule = operationalMetrics ? operationalMetrics.auditSummary.bySourceModule : [];
+  const auditByActorType = operationalMetrics ? operationalMetrics.auditSummary.byActorType : [];
 
   return (
     <PageShell
@@ -233,7 +208,7 @@ export default async function HomePage() {
                 Eventi audit
               </p>
               <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-                {operationalMetrics.auditEvents.total}
+                {operationalMetrics.auditSummary.total}
               </p>
             </Link>
             <Link
@@ -244,8 +219,8 @@ export default async function HomePage() {
                 Ultimo evento
               </p>
               <p className="mt-2 text-sm font-semibold text-[var(--pcb-ink)]">
-                {operationalMetrics.auditEvents.items[0]
-                  ? new Date(operationalMetrics.auditEvents.items[0].createdAt).toLocaleString('it-IT')
+                {operationalMetrics.auditSummary.latestCreatedAt
+                  ? new Date(operationalMetrics.auditSummary.latestCreatedAt).toLocaleString('it-IT')
                   : 'n/d'}
               </p>
             </Link>
@@ -269,7 +244,7 @@ export default async function HomePage() {
                 Tutti i moduli
               </p>
               <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-                {operationalMetrics.auditEvents.total}
+                {operationalMetrics.auditSummary.total}
               </p>
             </Link>
             {auditBySourceModule.map((item) => (
@@ -303,7 +278,7 @@ export default async function HomePage() {
                 Tutti gli attori
               </p>
               <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-                {operationalMetrics.auditEvents.total}
+                {operationalMetrics.auditSummary.total}
               </p>
             </Link>
             {auditByActorType.map((item) => (

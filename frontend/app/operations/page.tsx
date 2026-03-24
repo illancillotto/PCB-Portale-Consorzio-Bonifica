@@ -3,7 +3,7 @@ import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
 import {
-  getAuditEvents,
+  getAuditSummary,
   getIngestionConnectors,
   getGisPublicationStatus,
   getGisSubjectParcelLinks,
@@ -67,7 +67,7 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
     connectors,
     connectorIssues,
     orchestrationSummary,
-    auditEvents,
+    auditSummary,
     publicationStatus,
     subjectParcelLinks,
   ] = await Promise.all([
@@ -83,25 +83,12 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         issueType: filters.issueType,
       }),
       getIngestionOrchestrationSummary(session.accessToken),
-      getAuditEvents(session.accessToken),
+      getAuditSummary(session.accessToken),
       getGisPublicationStatus(session.accessToken),
       getGisSubjectParcelLinks(session.accessToken),
     ]);
   const queuedRuns = ingestionRuns.items.filter((run) => run.status === 'queued').length;
   const failedRuns = ingestionRuns.items.filter((run) => run.status === 'failed').length;
-  const systemOperatorAuditEvents = auditEvents.items.filter(
-    (event) => event.actorType === 'system_operator',
-  ).length;
-  const auditBySourceModule = Array.from(
-    new Map(
-      auditEvents.items.map((event) => [
-        event.sourceModule,
-        auditEvents.items.filter((candidate) => candidate.sourceModule === event.sourceModule).length,
-      ]),
-    ).entries(),
-  )
-    .map(([sourceModule, total]) => ({ sourceModule, total }))
-    .sort((left, right) => right.total - left.total || left.sourceModule.localeCompare(right.sourceModule));
 
   return (
     <PageShell
@@ -129,7 +116,7 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Audit system operator</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {systemOperatorAuditEvents}
+              {auditSummary.systemOperatorEvents}
             </p>
           </article>
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
@@ -216,9 +203,9 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
           >
             <p className="text-sm text-[var(--pcb-muted)]">Tutti gli eventi</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{auditEvents.total}</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{auditSummary.total}</p>
           </Link>
-          {auditBySourceModule.map((item) => (
+          {auditSummary.bySourceModule.map((item) => (
             <Link
               key={item.sourceModule}
               href={`/audit?sourceModule=${encodeURIComponent(item.sourceModule)}`}

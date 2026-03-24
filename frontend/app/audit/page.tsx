@@ -1,7 +1,7 @@
 import { PageShell } from '../../components/page-shell';
 import { SectionCard } from '../../components/section-card';
 import { requireOperatorSession } from '../../lib/auth';
-import { getAuditEvents } from '../../lib/api';
+import { getAuditEvents, getAuditSummary } from '../../lib/api';
 import Link from 'next/link';
 
 function readPayloadString(payload: Record<string, unknown>, key: string) {
@@ -118,17 +118,13 @@ function buildAuditFilterHref(filters: {
 export default async function AuditPage({ searchParams }: AuditPageProps) {
   const session = await requireOperatorSession();
   const filters = (await searchParams) ?? {};
-  const events = await getAuditEvents(session.accessToken, filters);
+  const [events, summary] = await Promise.all([
+    getAuditEvents(session.accessToken, filters),
+    getAuditSummary(session.accessToken, filters),
+  ]);
   const filteredEvents = events.items;
   const uniqueEventTypes = Array.from(new Set(events.items.map((event) => event.eventType))).sort();
   const uniqueActorTypes = Array.from(new Set(events.items.map((event) => event.actorType))).sort();
-  const uniqueSourceModules = Array.from(new Set(events.items.map((event) => event.sourceModule))).sort();
-  const sourceModuleCounters = uniqueSourceModules.map((sourceModule) => ({
-    sourceModule,
-    total: events.items.filter((event) => event.sourceModule === sourceModule).length,
-  }));
-  const systemEvents = events.items.filter((event) => event.actorType === 'system').length;
-  const operatorEvents = events.items.filter((event) => event.actorType === 'system_operator').length;
   const activeFilters = [
     filters.eventType ? `evento: ${filters.eventType}` : null,
     filters.actorType ? `attore: ${filters.actorType}` : null,
@@ -176,7 +172,7 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
           >
             <p className="text-sm text-[var(--pcb-muted)]">Eventi totali</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{events.total}</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{summary.total}</p>
           </Link>
           <Link
             href={buildAuditFilterHref({
@@ -189,7 +185,7 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
           >
             <p className="text-sm text-[var(--pcb-muted)]">System</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{systemEvents}</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{summary.systemEvents}</p>
           </Link>
           <Link
             href={buildAuditFilterHref({
@@ -202,7 +198,7 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
           >
             <p className="text-sm text-[var(--pcb-muted)]">System operator</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{operatorEvents}</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{summary.systemOperatorEvents}</p>
           </Link>
           <Link
             href={buildAuditFilterHref({
@@ -216,7 +212,7 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
           >
             <p className="text-sm text-[var(--pcb-muted)]">Ultimo evento</p>
             <p className="mt-2 text-sm font-semibold text-[var(--pcb-ink)]">
-              {events.items[0] ? new Date(events.items[0].createdAt).toLocaleString('it-IT') : 'n/d'}
+              {summary.latestCreatedAt ? new Date(summary.latestCreatedAt).toLocaleString('it-IT') : 'n/d'}
             </p>
           </Link>
         </div>
@@ -224,7 +220,7 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
 
       <SectionCard title="Moduli sorgente" eyebrow="Source modules">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {sourceModuleCounters.map((item) => (
+          {summary.bySourceModule.map((item) => (
             <Link
               key={item.sourceModule}
               href={buildAuditFilterHref({
@@ -332,21 +328,23 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
           >
             Tutti i moduli
           </Link>
-          {uniqueSourceModules.map((sourceModule) => (
+          {summary.bySourceModule.map((item) => (
             <Link
-              key={sourceModule}
+              key={item.sourceModule}
               href={buildAuditFilterHref({
                 eventType: filters.eventType,
                 actorType: filters.actorType,
-                sourceModule,
+                sourceModule: item.sourceModule,
+                entityType: filters.entityType,
+                entityId: filters.entityId,
               })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
-                filters.sourceModule === sourceModule
+                filters.sourceModule === item.sourceModule
                   ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
                   : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
               }`}
             >
-              {sourceModule}
+              {item.sourceModule}
             </Link>
           ))}
         </div>

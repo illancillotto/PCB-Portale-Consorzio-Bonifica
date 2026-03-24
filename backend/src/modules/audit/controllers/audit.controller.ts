@@ -4,6 +4,7 @@ import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
 import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
 import { AuditService } from '../audit.service';
 import { AuditEventResponseDto } from '../dto/audit-event-response.dto';
+import { AuditSummaryResponseDto } from '../dto/audit-summary-response.dto';
 import { ListAuditEventsQueryDto } from '../dto/list-audit-events-query.dto';
 
 @Controller({
@@ -20,5 +21,10 @@ export class AuditController {
     @Query() query: ListAuditEventsQueryDto,
   ): Promise<{ items: AuditEventResponseDto[]; total: number }> {
     return this.auditService.listEvents(query);
+  }
+
+  @Get('summary')
+  async getSummary(@Query() query: ListAuditEventsQueryDto): Promise<AuditSummaryResponseDto> {
+    return this.auditService.getSummary(query);
   }
 }

@@ -64,6 +64,8 @@ npm run dev
 - `POST /api/v1/ingestion/connectors/{connectorName}/run`
 - `GET /api/v1/audit/events`
   supporta filtri query `eventType`, `actorType`, `sourceModule`, `entityType` e `entityId`
+- `GET /api/v1/audit/summary`
+  supporta gli stessi filtri di `audit/events` e restituisce contatori per attore e modulo
 
 Note matching:
 

@@ -303,6 +303,21 @@ export interface AuditEvent {
   createdAt: string;
 }
 
+export interface AuditSummary {
+  total: number;
+  systemEvents: number;
+  systemOperatorEvents: number;
+  latestCreatedAt: string | null;
+  bySourceModule: Array<{
+    sourceModule: string;
+    total: number;
+  }>;
+  byActorType: Array<{
+    actorType: string;
+    total: number;
+  }>;
+}
+
 export interface GisLayer {
   id: string;
   name: string;
@@ -694,6 +709,45 @@ export async function getAuditEvents(
   const suffix = params.toString() ? `?${params.toString()}` : '';
 
   return apiFetch<PaginatedResponse<AuditEvent>>(`/audit/events${suffix}`, {
+    accessToken,
+  });
+}
+
+export async function getAuditSummary(
+  accessToken: string,
+  filters?: {
+    eventType?: string;
+    actorType?: string;
+    sourceModule?: string;
+    entityType?: string;
+    entityId?: string;
+  },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.eventType) {
+    params.set('eventType', filters.eventType);
+  }
+
+  if (filters?.actorType) {
+    params.set('actorType', filters.actorType);
+  }
+
+  if (filters?.sourceModule) {
+    params.set('sourceModule', filters.sourceModule);
+  }
+
+  if (filters?.entityType) {
+    params.set('entityType', filters.entityType);
+  }
+
+  if (filters?.entityId) {
+    params.set('entityId', filters.entityId);
+  }
+
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+
+  return apiFetch<AuditSummary>(`/audit/summary${suffix}`, {
     accessToken,
   });
 }
