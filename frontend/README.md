@@ -113,6 +113,7 @@ Stato attuale:
 - anche i dettagli `subject` e `parcel` mostrano contatori audit contestuali dal summary backend
 - `subjects`, `parcels` e `search` usano summary audit bulk per mostrare contatori contestuali senza query per-card
 - App Router espone ora loading/error states condivisi a livello root per tutto il frontend PCB
+- gli empty states principali del frontend usano ora un componente condiviso per viste lista e monitor operative
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

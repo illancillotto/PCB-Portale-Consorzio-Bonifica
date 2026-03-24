@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { EmptyState } from '../../components/empty-state';
 import { PageShell } from '../../components/page-shell';
 import { SearchForm } from '../../components/search-form';
 import { SectionCard } from '../../components/section-card';
@@ -33,7 +34,12 @@ export default async function SubjectsPage({ searchParams }: SubjectsPageProps) 
     >
       <SectionCard title={query ? `Risultati per "${query}"` : 'Elenco soggetti'} eyebrow="Anagrafiche">
         {response.items.length === 0 ? (
-          <p className="text-sm text-[var(--pcb-muted)]">Nessun soggetto trovato con i filtri correnti.</p>
+          <EmptyState
+            title="Nessun soggetto trovato"
+            description="Non risultano soggetti coerenti con il filtro corrente nell'anagrafe master PCB."
+            actionHref="/subjects"
+            actionLabel="Azzera filtri"
+          />
         ) : (
           <div className="grid gap-4">
             {response.items.map((subject) => (

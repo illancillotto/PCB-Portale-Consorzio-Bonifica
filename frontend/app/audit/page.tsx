@@ -1,4 +1,5 @@
 import { PageShell } from '../../components/page-shell';
+import { EmptyState } from '../../components/empty-state';
 import { SectionCard } from '../../components/section-card';
 import { requireOperatorSession } from '../../lib/auth';
 import { getAuditEvents, getAuditSummary } from '../../lib/api';
@@ -349,7 +350,12 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
           ))}
         </div>
         {filteredEvents.length === 0 ? (
-          <p className="text-sm text-[var(--pcb-muted)]">Nessun evento disponibile.</p>
+          <EmptyState
+            title="Nessun evento audit disponibile"
+            description="I filtri correnti non restituiscono eventi tracciati nel dominio audit."
+            actionHref="/audit"
+            actionLabel="Azzera filtri"
+          />
         ) : (
           <div className="grid gap-4">
             {filteredEvents.map((event) => {

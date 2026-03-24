@@ -147,6 +147,7 @@ Stato attuale:
 - completati contatori audit contestuali anche nei dettagli `subject` e `parcel`
 - completato endpoint bulk `audit/entity-summaries` e suo riuso negli entry point `subjects`, `parcels`, `search`
 - completati loading/error states condivisi nel frontend App Router
+- completati empty states condivisi sui principali entry point frontend
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:

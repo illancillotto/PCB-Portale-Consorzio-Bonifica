@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { EmptyState } from '../../components/empty-state';
 import { PageShell } from '../../components/page-shell';
 import { SearchForm } from '../../components/search-form';
 import { SectionCard } from '../../components/section-card';
@@ -77,11 +78,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       <SectionCard title={query ? `Risultati per "${query}"` : 'Inserisci un criterio di ricerca'} eyebrow="Search">
         {!query ? (
-          <p className="text-sm text-[var(--pcb-muted)]">
-            Prova CUUA, nominativo, comune, foglio o particella.
-          </p>
+          <EmptyState
+            title="Nessun criterio inserito"
+            description="Avvia la ricerca con CUUA, nominativo, comune, foglio o particella per ottenere risultati trasversali PCB."
+          />
         ) : results.items.length === 0 ? (
-          <p className="text-sm text-[var(--pcb-muted)]">Nessun risultato trovato.</p>
+          <EmptyState
+            title="Nessun risultato trovato"
+            description="La ricerca non ha restituito soggetti o particelle con il criterio corrente."
+            actionHref="/search"
+            actionLabel="Azzera ricerca"
+          />
         ) : (
           <div className="grid gap-4">
             <div className="grid gap-3 md:grid-cols-3">
@@ -127,9 +134,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </div>
 
             {filteredItems.length === 0 ? (
-              <p className="text-sm text-[var(--pcb-muted)]">
-                Nessun risultato per il filtro selezionato.
-              </p>
+              <EmptyState
+                title="Filtro senza risultati"
+                description="I risultati esistono, ma non nel tipo selezionato. Puoi tornare alla vista completa."
+                actionHref={`/search?q=${encodeURIComponent(query)}`}
+                actionLabel="Mostra tutti"
+              />
             ) : null}
 
             {filteredItems.map((item) => (

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { EmptyState } from '../../components/empty-state';
 import { IngestionAutoRefresh } from '../../components/ingestion-auto-refresh';
 import { IngestionRunTrigger } from '../../components/ingestion-run-trigger';
 import { PageShell } from '../../components/page-shell';
@@ -849,7 +850,12 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
           ))}
         </div>
         {filteredRuns.length === 0 ? (
-          <p className="text-sm text-[var(--pcb-muted)]">Nessuna run disponibile.</p>
+          <EmptyState
+            title="Nessuna run disponibile"
+            description="Non esistono run coerenti con i filtri correnti nel monitor ingestion."
+            actionHref="/ingestion"
+            actionLabel="Azzera filtri"
+          />
         ) : (
           <div className="grid gap-4">
             {filteredRuns.map((run) => (
