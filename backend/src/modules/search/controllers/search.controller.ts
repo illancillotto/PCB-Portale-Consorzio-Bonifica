@@ -1,4 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
+import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
 import { SearchService } from '../search.service';
 import { SearchQueryDto } from '../dto/search-query.dto';
 import { SearchResultDto } from '../dto/search-result.dto';
@@ -7,6 +10,8 @@ import { SearchResultDto } from '../dto/search-result.dto';
   path: 'search',
   version: '1',
 })
+@UseGuards(KeycloakAuthGuard, KeycloakRolesGuard)
+@Roles('pcb-operator')
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 

@@ -120,6 +120,7 @@ Stato attuale:
 - i trigger client-side operativi reindirizzano al login contestuale quando la sessione scade durante un'azione
 - dashboard, ricerca, liste soggetti e liste particelle sono ora trattate come viste operative protette
 - la navigazione globale instrada gli utenti non autenticati verso `login` con ritorno contestuale alla vista richiesta
+- le API di business `subjects`, `parcels` e `search` passano ora sempre da bearer token esplicito
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

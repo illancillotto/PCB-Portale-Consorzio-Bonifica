@@ -20,7 +20,7 @@ export default async function ParcelDetailPage({ params }: ParcelDetailPageProps
 
   try {
     [parcel, auditSummary] = await Promise.all([
-      getParcel(id),
+      getParcel(id, session.accessToken),
       getAuditSummary(session.accessToken, {
         entityType: 'parcel',
         entityId: id,

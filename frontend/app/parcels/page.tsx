@@ -8,7 +8,7 @@ import { requireOperatorSession } from '../../lib/auth';
 
 export default async function ParcelsPage() {
   const session = await requireOperatorSession('/parcels');
-  const response = await getParcels();
+  const response = await getParcels(session.accessToken);
   const auditSummaries = await getAuditEntitySummaries(session.accessToken, {
     entityType: 'parcel',
     entityIds: response.items.map((parcel) => parcel.id),

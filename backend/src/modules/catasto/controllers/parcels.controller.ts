@@ -1,4 +1,7 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, UseGuards } from '@nestjs/common';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
+import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
 import { CatastoService } from '../catasto.service';
 import { ParcelResponseDto } from '../dto/parcel-response.dto';
 
@@ -6,6 +9,8 @@ import { ParcelResponseDto } from '../dto/parcel-response.dto';
   path: 'parcels',
   version: '1',
 })
+@UseGuards(KeycloakAuthGuard, KeycloakRolesGuard)
+@Roles('pcb-operator')
 export class ParcelsController {
   constructor(private readonly catastoService: CatastoService) {}
 

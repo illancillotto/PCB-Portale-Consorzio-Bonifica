@@ -443,30 +443,42 @@ async function apiFetch<T>(path: string, options?: ApiFetchOptions): Promise<T> 
   return response.json() as Promise<T>;
 }
 
-export async function getSubjects(query?: string) {
+export async function getSubjects(accessToken: string, query?: string) {
   const suffix = query ? `?q=${encodeURIComponent(query)}` : '';
 
-  return apiFetch<PaginatedResponse<Subject>>(`/subjects${suffix}`);
+  return apiFetch<PaginatedResponse<Subject>>(`/subjects${suffix}`, {
+    accessToken,
+  });
 }
 
-export async function getSubject(id: string) {
-  return apiFetch<Subject>(`/subjects/${id}`);
+export async function getSubject(id: string, accessToken: string) {
+  return apiFetch<Subject>(`/subjects/${id}`, {
+    accessToken,
+  });
 }
 
-export async function getSubjectParcels(id: string) {
-  return apiFetch<{ subjectId: string; parcels: SubjectParcel[] }>(`/subjects/${id}/parcels`);
+export async function getSubjectParcels(id: string, accessToken: string) {
+  return apiFetch<{ subjectId: string; parcels: SubjectParcel[] }>(`/subjects/${id}/parcels`, {
+    accessToken,
+  });
 }
 
-export async function getParcels() {
-  return apiFetch<PaginatedResponse<Parcel>>('/parcels');
+export async function getParcels(accessToken: string) {
+  return apiFetch<PaginatedResponse<Parcel>>('/parcels', {
+    accessToken,
+  });
 }
 
-export async function getParcel(id: string) {
-  return apiFetch<Parcel>(`/parcels/${id}`);
+export async function getParcel(id: string, accessToken: string) {
+  return apiFetch<Parcel>(`/parcels/${id}`, {
+    accessToken,
+  });
 }
 
-export async function searchAll(query: string) {
-  return apiFetch<PaginatedResponse<SearchResult>>(`/search?q=${encodeURIComponent(query)}`);
+export async function searchAll(query: string, accessToken: string) {
+  return apiFetch<PaginatedResponse<SearchResult>>(`/search?q=${encodeURIComponent(query)}`, {
+    accessToken,
+  });
 }
 
 export async function getIngestionRuns(accessToken: string) {

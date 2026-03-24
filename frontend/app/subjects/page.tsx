@@ -19,7 +19,7 @@ export default async function SubjectsPage({ searchParams }: SubjectsPageProps) 
   const session = await requireOperatorSession(
     query ? `/subjects?${new URLSearchParams({ q: query }).toString()}` : '/subjects',
   );
-  const response = await getSubjects(query || undefined);
+  const response = await getSubjects(session.accessToken, query || undefined);
   const auditSummaries = await getAuditEntitySummaries(session.accessToken, {
     entityType: 'subject',
     entityIds: response.items.map((subject) => subject.id),

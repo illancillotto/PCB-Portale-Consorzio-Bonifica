@@ -115,6 +115,9 @@ API protette da ruolo `pcb-operator`:
 - tutte le route `GET/POST /api/v1/ingestion/...`
 - tutte le route `GET /api/v1/gis/...`
 - tutte le route `GET /api/v1/audit/...`
+- tutte le route `GET /api/v1/subjects/...`
+- tutte le route `GET /api/v1/parcels/...`
+- tutte le route `GET /api/v1/search...`
 
 Il dominio `gis` espone anche lo stato del publication target QGIS Server via `GET /api/v1/gis/publication-status`.
 Il controllo usa `PCB_QGIS_SERVER_URL` e `PCB_QGIS_PROJECT_FILE` per verificare `GetCapabilities` sul route pubblico `/ows/`.

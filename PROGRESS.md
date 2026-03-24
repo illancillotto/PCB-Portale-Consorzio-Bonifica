@@ -1183,3 +1183,25 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-24 – Access policy backend sui domini di business
+
+Completato:
+
+- protezione Keycloak con ruolo `pcb-operator` estesa agli endpoint:
+  - `subjects`
+  - `parcels`
+  - `search`
+- riallineamento del client frontend per usare bearer token esplicito anche su:
+  - dashboard
+  - search
+  - liste soggetti e particelle
+  - dettagli soggetto e particella
+  - dettaglio run ingestion per assegnazione soggetto
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

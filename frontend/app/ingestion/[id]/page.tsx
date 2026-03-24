@@ -80,7 +80,7 @@ export default async function IngestionRunDetailPage({
   const [normalizedRecords, matchingResults, subjects, runAuditSummary, ingestAuditSummary] = await Promise.all([
     getNormalizedRecords(id, session.accessToken),
     getMatchingResults(id, session.accessToken),
-    getSubjects(),
+    getSubjects(session.accessToken),
     getAuditSummary(session.accessToken, {
       entityType: 'ingestion_run',
       entityId: run.id,

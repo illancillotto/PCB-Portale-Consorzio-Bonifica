@@ -24,7 +24,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       }).toString()}`
     : '/search';
   const session = await requireOperatorSession(nextPath);
-  const results = query ? await searchAll(query) : { items: [], total: 0 };
+  const results = query ? await searchAll(query, session.accessToken) : { items: [], total: 0 };
   const subjectAuditSummaries = await getAuditEntitySummaries(session.accessToken, {
     entityType: 'subject',
     entityIds: results.items.filter((item) => item.type === 'subject').map((item) => item.id),

@@ -22,8 +22,8 @@ export default async function SubjectDetailPage({ params }: SubjectDetailPagePro
 
   try {
     [subject, parcels, auditSummary] = await Promise.all([
-      getSubject(id),
-      getSubjectParcels(id),
+      getSubject(id, session.accessToken),
+      getSubjectParcels(id, session.accessToken),
       getAuditSummary(session.accessToken, {
         entityType: 'subject',
         entityId: id,

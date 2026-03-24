@@ -1,4 +1,7 @@
-import { Controller, Get, NotFoundException, Param, Query } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, Query, UseGuards } from '@nestjs/common';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
+import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
 import { AnagraficheService } from '../anagrafiche.service';
 import { ListSubjectsQueryDto } from '../dto/list-subjects-query.dto';
 
@@ -6,6 +9,8 @@ import { ListSubjectsQueryDto } from '../dto/list-subjects-query.dto';
   path: 'subjects',
   version: '1',
 })
+@UseGuards(KeycloakAuthGuard, KeycloakRolesGuard)
+@Roles('pcb-operator')
 export class SubjectsController {
   constructor(private readonly anagraficheService: AnagraficheService) {}
 

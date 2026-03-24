@@ -154,6 +154,7 @@ Stato attuale:
 - completato redirect contestuale al login anche durante le azioni operative client-side
 - completata classificazione operativa anche di dashboard, search e liste business
 - completata navigazione globale coerente con la nuova access policy
+- completata formalizzazione backend della stessa policy su `subjects`, `parcels`, `search`
 - da completare eventuali notice ancora più specifici per sessioni degradate
 
 Dipendenze:

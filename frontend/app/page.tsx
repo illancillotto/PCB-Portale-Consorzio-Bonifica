@@ -60,8 +60,8 @@ const moduleCards = [
 export default async function HomePage() {
   const session = await requireOperatorSession('/');
   const [subjects, parcels, gisMetrics, operationalMetrics] = await Promise.all([
-    getSubjects(),
-    getParcels(),
+    getSubjects(session.accessToken),
+    getParcels(session.accessToken),
     Promise.all([
       getGisLayers(session.accessToken),
       getGisPublicationStatus(session.accessToken),
