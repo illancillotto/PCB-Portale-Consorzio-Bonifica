@@ -1205,3 +1205,23 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-24 – Classificazione endpoint tecnici e interni
+
+Completato:
+
+- `GET /api/v1/health` mantenuto come endpoint tecnico pubblico
+- protezione `pcb-operator` estesa agli endpoint runtime/configurazione:
+  - `GET /api/v1/system/modules`
+  - `GET /api/v1/system/integrations`
+  - `GET /api/v1/auth/keycloak`
+  - `GET /api/v1/auth/keycloak/discovery`
+- formalizzazione documentale del confine tra:
+  - endpoint tecnici pubblici
+  - endpoint operativi protetti
+  - endpoint autenticati ma non role-gated
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`

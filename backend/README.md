@@ -112,12 +112,20 @@ Note matching:
 
 API protette da ruolo `pcb-operator`:
 
+- tutte le route `GET /api/v1/system/...` tranne `GET /api/v1/health`
+- tutte le route `GET /api/v1/auth/keycloak...`
+- tutte le route `GET /api/v1/auth/operator-access`
 - tutte le route `GET/POST /api/v1/ingestion/...`
 - tutte le route `GET /api/v1/gis/...`
 - tutte le route `GET /api/v1/audit/...`
 - tutte le route `GET /api/v1/subjects/...`
 - tutte le route `GET /api/v1/parcels/...`
 - tutte le route `GET /api/v1/search...`
+
+Endpoint tecnici pubblici:
+
+- `GET /api/v1/health`
+- `GET /api/v1/auth/session` richiede token valido ma non ruolo operatore
 
 Il dominio `gis` espone anche lo stato del publication target QGIS Server via `GET /api/v1/gis/publication-status`.
 Il controllo usa `PCB_QGIS_SERVER_URL` e `PCB_QGIS_PROJECT_FILE` per verificare `GetCapabilities` sul route pubblico `/ows/`.

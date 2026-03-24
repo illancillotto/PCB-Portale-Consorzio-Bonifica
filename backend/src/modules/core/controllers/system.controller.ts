@@ -14,6 +14,8 @@ export class SystemController {
   constructor(private readonly systemMetadataService: SystemMetadataService) {}
 
   @Get('modules')
+  @UseGuards(KeycloakAuthGuard, KeycloakRolesGuard)
+  @Roles('pcb-operator')
   async getModules() {
     return this.systemMetadataService.getBootstrapMetadata();
   }

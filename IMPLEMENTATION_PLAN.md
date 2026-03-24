@@ -155,6 +155,7 @@ Stato attuale:
 - completata classificazione operativa anche di dashboard, search e liste business
 - completata navigazione globale coerente con la nuova access policy
 - completata formalizzazione backend della stessa policy su `subjects`, `parcels`, `search`
+- completata classificazione dei runtime endpoint tra pubblico tecnico e interno operativo
 - da completare eventuali notice ancora più specifici per sessioni degradate
 
 Dipendenze:

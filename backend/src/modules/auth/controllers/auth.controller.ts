@@ -12,11 +12,15 @@ export class AuthController {
   constructor(private readonly keycloakService: KeycloakService) {}
 
   @Get('keycloak')
+  @UseGuards(KeycloakAuthGuard, KeycloakRolesGuard)
+  @Roles('pcb-operator')
   getKeycloakStatus() {
     return this.keycloakService.getConfigurationStatus();
   }
 
   @Get('keycloak/discovery')
+  @UseGuards(KeycloakAuthGuard, KeycloakRolesGuard)
+  @Roles('pcb-operator')
   async getKeycloakDiscoveryStatus() {
     return this.keycloakService.getDiscoveryStatus();
   }
