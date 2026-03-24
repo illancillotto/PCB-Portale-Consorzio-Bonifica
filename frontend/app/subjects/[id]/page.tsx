@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { PageShell } from '../../../components/page-shell';
 import { SectionCard } from '../../../components/section-card';
 import { StatusChip } from '../../../components/status-chip';
-import { getSubject, getSubjectParcels } from '../../../lib/api';
+import { getAuditSummary, getSubject, getSubjectParcels } from '../../../lib/api';
+import { requireOperatorSession } from '../../../lib/auth';
 
 interface SubjectDetailPageProps {
   params: Promise<{
@@ -12,13 +13,22 @@ interface SubjectDetailPageProps {
 }
 
 export default async function SubjectDetailPage({ params }: SubjectDetailPageProps) {
+  const session = await requireOperatorSession();
   const { id } = await params;
 
   let subject;
   let parcels;
+  let auditSummary;
 
   try {
-    [subject, parcels] = await Promise.all([getSubject(id), getSubjectParcels(id)]);
+    [subject, parcels, auditSummary] = await Promise.all([
+      getSubject(id),
+      getSubjectParcels(id),
+      getAuditSummary(session.accessToken, {
+        entityType: 'subject',
+        entityId: id,
+      }),
+    ]);
   } catch {
     notFound();
   }
@@ -101,6 +111,35 @@ export default async function SubjectDetailPage({ params }: SubjectDetailPagePro
           </div>
         </SectionCard>
       </section>
+
+      <SectionCard title="Contesto audit" eyebrow="Audit">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Eventi soggetto</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{auditSummary.total}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">System operator</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {auditSummary.systemOperatorEvents}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Ultimo evento</p>
+            <p className="mt-2 text-sm font-semibold text-[var(--pcb-ink)]">
+              {auditSummary.latestCreatedAt
+                ? new Date(auditSummary.latestCreatedAt).toLocaleString('it-IT')
+                : 'n/d'}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Moduli coinvolti</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {auditSummary.bySourceModule.length}
+            </p>
+          </article>
+        </div>
+      </SectionCard>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <SectionCard title="Sorgenti collegate" eyebrow="Sources">

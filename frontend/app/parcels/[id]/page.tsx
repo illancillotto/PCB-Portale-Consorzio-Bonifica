@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageShell } from '../../../components/page-shell';
 import { SectionCard } from '../../../components/section-card';
-import { getParcel } from '../../../lib/api';
+import { getAuditSummary, getParcel } from '../../../lib/api';
+import { requireOperatorSession } from '../../../lib/auth';
 
 interface ParcelDetailPageProps {
   params: Promise<{
@@ -11,12 +12,20 @@ interface ParcelDetailPageProps {
 }
 
 export default async function ParcelDetailPage({ params }: ParcelDetailPageProps) {
+  const session = await requireOperatorSession();
   const { id } = await params;
 
   let parcel;
+  let auditSummary;
 
   try {
-    parcel = await getParcel(id);
+    [parcel, auditSummary] = await Promise.all([
+      getParcel(id),
+      getAuditSummary(session.accessToken, {
+        entityType: 'parcel',
+        entityId: id,
+      }),
+    ]);
   } catch {
     notFound();
   }
@@ -87,6 +96,35 @@ export default async function ParcelDetailPage({ params }: ParcelDetailPageProps
             </dd>
           </div>
         </dl>
+      </SectionCard>
+
+      <SectionCard title="Contesto audit" eyebrow="Audit">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Eventi particella</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{auditSummary.total}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">System operator</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {auditSummary.systemOperatorEvents}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Ultimo evento</p>
+            <p className="mt-2 text-sm font-semibold text-[var(--pcb-ink)]">
+              {auditSummary.latestCreatedAt
+                ? new Date(auditSummary.latestCreatedAt).toLocaleString('it-IT')
+                : 'n/d'}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Moduli coinvolti</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {auditSummary.bySourceModule.length}
+            </p>
+          </article>
+        </div>
       </SectionCard>
 
       <SectionCard title="Soggetti collegati" eyebrow="Relations">
