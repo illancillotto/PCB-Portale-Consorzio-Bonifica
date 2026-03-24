@@ -63,7 +63,7 @@ npm run dev
 - `POST /api/v1/ingestion/runs/{id}/matching-results/{resultId}/assign-subject/{subjectId}`
 - `POST /api/v1/ingestion/connectors/{connectorName}/run`
 - `GET /api/v1/audit/events`
-  supporta filtri query `eventType`, `actorType` e `sourceModule`
+  supporta filtri query `eventType`, `actorType`, `sourceModule`, `entityType` e `entityId`
 
 Note matching:
 

@@ -661,7 +661,13 @@ export async function getSystemIntegrations(accessToken: string) {
 
 export async function getAuditEvents(
   accessToken: string,
-  filters?: { eventType?: string; actorType?: string; sourceModule?: string },
+  filters?: {
+    eventType?: string;
+    actorType?: string;
+    sourceModule?: string;
+    entityType?: string;
+    entityId?: string;
+  },
 ) {
   const params = new URLSearchParams();
 
@@ -675,6 +681,14 @@ export async function getAuditEvents(
 
   if (filters?.sourceModule) {
     params.set('sourceModule', filters.sourceModule);
+  }
+
+  if (filters?.entityType) {
+    params.set('entityType', filters.entityType);
+  }
+
+  if (filters?.entityId) {
+    params.set('entityId', filters.entityId);
   }
 
   const suffix = params.toString() ? `?${params.toString()}` : '';

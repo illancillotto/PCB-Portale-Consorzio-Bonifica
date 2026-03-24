@@ -43,6 +43,16 @@ export class AuditService {
       clauses.push(`source_module = $${params.length}`);
     }
 
+    if (filters.entityType) {
+      params.push(filters.entityType);
+      clauses.push(`entity_type = $${params.length}`);
+    }
+
+    if (filters.entityId) {
+      params.push(filters.entityId);
+      clauses.push(`entity_id = $${params.length}`);
+    }
+
     const whereClause = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
 
     const result = await this.databaseService.query<AuditEventRow>(

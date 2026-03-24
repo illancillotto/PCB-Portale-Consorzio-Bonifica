@@ -156,11 +156,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     Preset operativo
                   </Link>
                   <Link
-                    href={item.type === 'subject' ? '/audit' : '/operations'}
+                    href={
+                      item.type === 'subject'
+                        ? `/audit?entityType=subject&entityId=${item.id}`
+                        : `/audit?entityType=parcel&entityId=${item.id}`
+                    }
                     className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
                   >
-                    {item.type === 'subject' ? 'Apri audit' : 'Apri operations'}
+                    Audit contestuale
                   </Link>
+                  {item.type === 'parcel' ? (
+                    <Link
+                      href="/operations"
+                      className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+                    >
+                      Apri operations
+                    </Link>
+                  ) : null}
                 </div>
               </article>
             ))}

@@ -95,6 +95,7 @@ Stato attuale:
 - la vista `search` espone anche shortcut operativi diretti a `operations`, `audit`, `ingestion` e GIS completo
 - i risultati della `search` offrono azioni esplicite verso scheda PCB, GIS contestuale e ingressi operativi applicativi
 - la vista `search` supporta anche filtro URL-shareable per tipo risultato e riepilogo sintetico `totale/soggetti/particelle`
+- la `search` apre anche `audit` contestuale per entita` tramite filtri su `entityType` e `entityId`
 - il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - riepilogo audit e filtri operativi via query string anche su `sourceModule`

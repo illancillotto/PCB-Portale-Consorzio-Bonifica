@@ -76,6 +76,8 @@ interface AuditPageProps {
     eventType?: string;
     actorType?: string;
     sourceModule?: string;
+    entityType?: string;
+    entityId?: string;
   }>;
 }
 
@@ -83,6 +85,8 @@ function buildAuditFilterHref(filters: {
   eventType?: string;
   actorType?: string;
   sourceModule?: string;
+  entityType?: string;
+  entityId?: string;
 }) {
   const params = new URLSearchParams();
 
@@ -96,6 +100,14 @@ function buildAuditFilterHref(filters: {
 
   if (filters.sourceModule) {
     params.set('sourceModule', filters.sourceModule);
+  }
+
+  if (filters.entityType) {
+    params.set('entityType', filters.entityType);
+  }
+
+  if (filters.entityId) {
+    params.set('entityId', filters.entityId);
   }
 
   const queryString = params.toString();
@@ -130,6 +142,8 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
               actorType: filters.actorType,
               eventType: filters.eventType,
               sourceModule: filters.sourceModule,
+              entityType: filters.entityType,
+              entityId: filters.entityId,
             })}
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
           >
@@ -141,6 +155,8 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
               actorType: 'system',
               eventType: filters.eventType,
               sourceModule: filters.sourceModule,
+              entityType: filters.entityType,
+              entityId: filters.entityId,
             })}
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
           >
@@ -152,6 +168,8 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
               actorType: 'system_operator',
               eventType: filters.eventType,
               sourceModule: filters.sourceModule,
+              entityType: filters.entityType,
+              entityId: filters.entityId,
             })}
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
           >
@@ -163,6 +181,8 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
               actorType: filters.actorType,
               eventType: filters.eventType,
               sourceModule: filters.sourceModule,
+              entityType: filters.entityType,
+              entityId: filters.entityId,
             })}
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
           >
@@ -183,6 +203,8 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
                 eventType: filters.eventType,
                 actorType: filters.actorType,
                 sourceModule: item.sourceModule,
+                entityType: filters.entityType,
+                entityId: filters.entityId,
               })}
               className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
             >
@@ -199,6 +221,8 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
             href={buildAuditFilterHref({
               actorType: filters.actorType,
               sourceModule: filters.sourceModule,
+              entityType: filters.entityType,
+              entityId: filters.entityId,
             })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.eventType
@@ -215,6 +239,8 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
                 eventType,
                 actorType: filters.actorType,
                 sourceModule: filters.sourceModule,
+                entityType: filters.entityType,
+                entityId: filters.entityId,
               })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.eventType === eventType
@@ -231,6 +257,8 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
             href={buildAuditFilterHref({
               eventType: filters.eventType,
               sourceModule: filters.sourceModule,
+              entityType: filters.entityType,
+              entityId: filters.entityId,
             })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.actorType
@@ -247,6 +275,8 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
                 eventType: filters.eventType,
                 actorType,
                 sourceModule: filters.sourceModule,
+                entityType: filters.entityType,
+                entityId: filters.entityId,
               })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.actorType === actorType
@@ -263,6 +293,8 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
             href={buildAuditFilterHref({
               eventType: filters.eventType,
               actorType: filters.actorType,
+              entityType: filters.entityType,
+              entityId: filters.entityId,
             })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.sourceModule
