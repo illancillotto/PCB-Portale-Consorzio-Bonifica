@@ -139,6 +139,7 @@ Stato attuale:
 - completati ingressi audit per modulo anche nella dashboard principale
 - completati ingressi audit per attore anche nella dashboard principale
 - completati ingressi audit contestuali anche nelle schede soggetto e particella
+- completati shortcut operativi anche nelle liste soggetti e particelle
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:

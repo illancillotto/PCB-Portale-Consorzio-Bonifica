@@ -28,9 +28,8 @@ export default async function SubjectsPage({ searchParams }: SubjectsPageProps) 
         ) : (
           <div className="grid gap-4">
             {response.items.map((subject) => (
-              <Link
+              <article
                 key={subject.id}
-                href={`/subjects/${subject.id}`}
                 className="rounded-[20px] border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
               >
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -52,7 +51,27 @@ export default async function SubjectsPage({ searchParams }: SubjectsPageProps) 
                     <p>{subject.identifiers.map((item) => item.value).join(' · ')}</p>
                   </div>
                 </div>
-              </Link>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link
+                    href={`/subjects/${subject.id}`}
+                    className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+                  >
+                    Apri scheda
+                  </Link>
+                  <Link
+                    href={`/gis?subjectId=${subject.id}&preset=relazioni&layers=pcb_subject_parcel_links`}
+                    className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+                  >
+                    Apri GIS
+                  </Link>
+                  <Link
+                    href={`/audit?entityType=subject&entityId=${subject.id}`}
+                    className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+                  >
+                    Audit soggetto
+                  </Link>
+                </div>
+              </article>
             ))}
           </div>
         )}
