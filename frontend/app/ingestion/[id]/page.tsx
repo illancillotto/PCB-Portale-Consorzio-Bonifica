@@ -162,6 +162,26 @@ export default async function IngestionRunDetailPage({
         <p className="mt-4 text-sm text-[var(--pcb-muted)]">
           {run.logExcerpt || 'Nessun log excerpt disponibile.'}
         </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            href={`/audit?entityType=ingestion_run&entityId=${run.id}`}
+            className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+          >
+            Audit run
+          </Link>
+          <Link
+            href="/audit?sourceModule=ingest"
+            className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+          >
+            Audit ingestion
+          </Link>
+          <Link
+            href="/operations"
+            className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+          >
+            Operations
+          </Link>
+        </div>
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Acquisition</p>

@@ -106,6 +106,7 @@ Stato attuale:
 - anche la dashboard principale espone ingressi audit per attore con deep link diretti a `audit`
 - anche le schede soggetto e particella espongono ingressi audit contestuali per entita`
 - anche le liste soggetti e particelle espongono shortcut operativi verso scheda, GIS e audit contestuale
+- lista run e dettaglio run di `ingestion` espongono shortcut diretti al trail `audit` della run e del modulo ingest
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

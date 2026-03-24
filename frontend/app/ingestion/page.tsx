@@ -901,12 +901,24 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                   normalizzati {run.stages.normalization.recordsWritten} · matching{' '}
                   {run.stages.matching.resultsWritten}
                 </p>
-                <div className="mt-4">
+                <div className="mt-4 flex flex-wrap gap-3">
                   <Link
                     href={`/ingestion/${run.id}${filters.status || filters.connector ? `?fromStatus=${filters.status ?? ''}&fromConnector=${filters.connector ?? ''}` : ''}`}
                     className="text-sm font-semibold text-[var(--pcb-accent)]"
                   >
                     Apri dettaglio run
+                  </Link>
+                  <Link
+                    href={`/audit?entityType=ingestion_run&entityId=${run.id}`}
+                    className="text-sm font-semibold text-[var(--pcb-accent)]"
+                  >
+                    Audit run
+                  </Link>
+                  <Link
+                    href={`/audit?sourceModule=ingest&entityType=ingestion_run&entityId=${run.id}`}
+                    className="text-sm font-semibold text-[var(--pcb-accent)]"
+                  >
+                    Audit ingest
                   </Link>
                 </div>
               </article>
