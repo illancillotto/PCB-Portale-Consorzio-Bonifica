@@ -66,6 +66,8 @@ npm run dev
   supporta filtri query `eventType`, `actorType`, `sourceModule`, `entityType` e `entityId`
 - `GET /api/v1/audit/summary`
   supporta gli stessi filtri di `audit/events` e restituisce contatori per attore e modulo
+- `GET /api/v1/audit/entity-summaries`
+  restituisce summary bulk per `entityType` e lista `entityId`, utile per liste e ricerca
 
 Note matching:
 

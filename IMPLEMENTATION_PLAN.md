@@ -145,6 +145,7 @@ Stato attuale:
 - completato summary backend dedicato per `audit`, usato dalle principali viste operative
 - completati contatori audit contestuali nei dettagli `ingestion` di run e connector
 - completati contatori audit contestuali anche nei dettagli `subject` e `parcel`
+- completato endpoint bulk `audit/entity-summaries` e suo riuso negli entry point `subjects`, `parcels`, `search`
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:

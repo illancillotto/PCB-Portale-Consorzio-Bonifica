@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { DatabaseService } from '../core/database/database.service';
 import { AuditEventResponseDto } from './dto/audit-event-response.dto';
+import { AuditEntitySummaryResponseDto } from './dto/audit-entity-summary-response.dto';
 import { AuditSummaryResponseDto } from './dto/audit-summary-response.dto';
 import { ListAuditEventsQueryDto } from './dto/list-audit-events-query.dto';
 
@@ -20,6 +21,15 @@ interface AuditEventRow {
 interface AuditCounterRow {
   key: string;
   total: string;
+}
+
+interface AuditEntitySummaryRow {
+  entity_type: string;
+  entity_id: string;
+  total: string;
+  system_events: string;
+  system_operator_events: string;
+  latest_created_at: Date | string | null;
 }
 
 @Injectable()
@@ -162,6 +172,45 @@ export class AuditService {
         actorType: row.key,
         total: Number(row.total),
       })),
+    };
+  }
+
+  async getEntitySummaries(
+    entityType?: string,
+    entityIds: string[] = [],
+  ): Promise<{ items: AuditEntitySummaryResponseDto[]; total: number }> {
+    if (!entityType || entityIds.length === 0) {
+      return { items: [], total: 0 };
+    }
+
+    const result = await this.databaseService.query<AuditEntitySummaryRow>(
+      `
+        SELECT
+          entity_type,
+          entity_id,
+          COUNT(*)::text AS total,
+          COUNT(*) FILTER (WHERE actor_type = 'system')::text AS system_events,
+          COUNT(*) FILTER (WHERE actor_type = 'system_operator')::text AS system_operator_events,
+          MAX(created_at) AS latest_created_at
+        FROM audit.audit_event
+        WHERE entity_type = $1
+          AND entity_id = ANY($2::text[])
+        GROUP BY entity_type, entity_id
+        ORDER BY entity_id
+      `,
+      [entityType, entityIds],
+    );
+
+    return {
+      items: result.rows.map((row) => ({
+        entityType: row.entity_type,
+        entityId: row.entity_id,
+        total: Number(row.total),
+        systemEvents: Number(row.system_events),
+        systemOperatorEvents: Number(row.system_operator_events),
+        latestCreatedAt: row.latest_created_at ? new Date(row.latest_created_at).toISOString() : null,
+      })),
+      total: result.rows.length,
     };
   }
 

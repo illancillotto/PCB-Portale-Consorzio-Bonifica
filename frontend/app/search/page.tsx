@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { PageShell } from '../../components/page-shell';
 import { SearchForm } from '../../components/search-form';
 import { SectionCard } from '../../components/section-card';
-import { searchAll } from '../../lib/api';
+import { getAuditEntitySummaries, searchAll } from '../../lib/api';
+import { getOptionalSession } from '../../lib/auth';
 
 interface SearchPageProps {
   searchParams?: Promise<{
@@ -12,10 +13,25 @@ interface SearchPageProps {
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
+  const session = await getOptionalSession();
   const params = (await searchParams) ?? {};
   const query = params.q?.trim() ?? '';
   const requestedType = params.type;
   const results = query ? await searchAll(query) : { items: [], total: 0 };
+  const subjectAuditSummaries = session
+    ? await getAuditEntitySummaries(session.accessToken, {
+        entityType: 'subject',
+        entityIds: results.items.filter((item) => item.type === 'subject').map((item) => item.id),
+      })
+    : { items: [], total: 0 };
+  const parcelAuditSummaries = session
+    ? await getAuditEntitySummaries(session.accessToken, {
+        entityType: 'parcel',
+        entityIds: results.items.filter((item) => item.type === 'parcel').map((item) => item.id),
+      })
+    : { items: [], total: 0 };
+  const subjectAuditSummaryMap = new Map(subjectAuditSummaries.items.map((item) => [item.entityId, item]));
+  const parcelAuditSummaryMap = new Map(parcelAuditSummaries.items.map((item) => [item.entityId, item]));
   const subjectCount = results.items.filter((item) => item.type === 'subject').length;
   const parcelCount = results.items.filter((item) => item.type === 'parcel').length;
   const filteredItems = requestedType
@@ -128,6 +144,41 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   </span>
                 </div>
                 <p className="mt-2 text-sm text-[var(--pcb-muted)]">{item.subtitle}</p>
+                {session ? (
+                  <div className="mt-4 grid gap-3 text-sm text-[var(--pcb-muted)] md:grid-cols-3">
+                    <div>
+                      <span className="font-medium text-[var(--pcb-ink)]">Eventi audit</span>
+                      <p>
+                        {(item.type === 'subject'
+                          ? subjectAuditSummaryMap.get(item.id)?.total
+                          : parcelAuditSummaryMap.get(item.id)?.total) ?? 0}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-[var(--pcb-ink)]">System operator</span>
+                      <p>
+                        {(item.type === 'subject'
+                          ? subjectAuditSummaryMap.get(item.id)?.systemOperatorEvents
+                          : parcelAuditSummaryMap.get(item.id)?.systemOperatorEvents) ?? 0}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-[var(--pcb-ink)]">Ultimo evento</span>
+                      <p>
+                        {(() => {
+                          const latestCreatedAt =
+                            item.type === 'subject'
+                              ? subjectAuditSummaryMap.get(item.id)?.latestCreatedAt
+                              : parcelAuditSummaryMap.get(item.id)?.latestCreatedAt;
+
+                          return latestCreatedAt
+                            ? new Date(latestCreatedAt).toLocaleString('it-IT')
+                            : 'n/d';
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Link
                     href={item.route}

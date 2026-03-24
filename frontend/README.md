@@ -111,6 +111,7 @@ Stato attuale:
 - dashboard, operations e vista `audit` riusano un summary backend dedicato invece di aggregare gli eventi lato frontend
 - anche i dettagli `ingestion` di run e connector mostrano contatori audit contestuali dal summary backend
 - anche i dettagli `subject` e `parcel` mostrano contatori audit contestuali dal summary backend
+- `subjects`, `parcels` e `search` usano summary audit bulk per mostrare contatori contestuali senza query per-card
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

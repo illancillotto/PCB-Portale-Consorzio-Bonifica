@@ -318,6 +318,15 @@ export interface AuditSummary {
   }>;
 }
 
+export interface AuditEntitySummary {
+  entityType: string;
+  entityId: string;
+  total: number;
+  systemEvents: number;
+  systemOperatorEvents: number;
+  latestCreatedAt: string | null;
+}
+
 export interface GisLayer {
   id: string;
   name: string;
@@ -748,6 +757,27 @@ export async function getAuditSummary(
   const suffix = params.toString() ? `?${params.toString()}` : '';
 
   return apiFetch<AuditSummary>(`/audit/summary${suffix}`, {
+    accessToken,
+  });
+}
+
+export async function getAuditEntitySummaries(
+  accessToken: string,
+  input: {
+    entityType: string;
+    entityIds: string[];
+  },
+) {
+  const params = new URLSearchParams();
+  params.set('entityType', input.entityType);
+
+  for (const entityId of input.entityIds) {
+    params.append('entityId', entityId);
+  }
+
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+
+  return apiFetch<PaginatedResponse<AuditEntitySummary>>(`/audit/entity-summaries${suffix}`, {
     accessToken,
   });
 }
