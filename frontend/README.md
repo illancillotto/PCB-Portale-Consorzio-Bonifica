@@ -102,6 +102,7 @@ Stato attuale:
 - la vista `audit` espone anche riepiloghi cliccabili per attore e modulo sorgente
 - la vista `audit` espone anche il contesto dei filtri attivi, utile per ingressi contestuali dalla `search`
 - la vista `operations` espone anche riepiloghi audit per modulo con deep link diretti a `audit`
+- anche la dashboard principale espone ingressi audit per modulo con deep link diretti a `audit`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

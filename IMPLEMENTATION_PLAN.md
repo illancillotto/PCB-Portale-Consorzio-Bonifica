@@ -136,6 +136,7 @@ Stato attuale:
 - completato filtro `entityType/entityId` nella vista `audit`, con ingressi contestuali dalla `search`
 - completato cartiglio frontend dei filtri attivi nella vista `audit`
 - completato riepilogo audit per modulo nella vista `operations`, con deep link verso `audit`
+- completati ingressi audit per modulo anche nella dashboard principale
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:

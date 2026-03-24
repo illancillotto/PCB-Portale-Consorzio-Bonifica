@@ -86,6 +86,20 @@ export default async function HomePage() {
         )
       : Promise.resolve(null),
   ]);
+  const auditBySourceModule = operationalMetrics
+    ? Array.from(
+        new Map(
+          operationalMetrics.auditEvents.items.map((event) => [
+            event.sourceModule,
+            operationalMetrics.auditEvents.items.filter(
+              (candidate) => candidate.sourceModule === event.sourceModule,
+            ).length,
+          ]),
+        ).entries(),
+      )
+        .map(([sourceModule, total]) => ({ sourceModule, total }))
+        .sort((left, right) => right.total - left.total || left.sourceModule.localeCompare(right.sourceModule))
+    : [];
 
   return (
     <PageShell
@@ -227,6 +241,40 @@ export default async function HomePage() {
           <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
             Le metriche di ingestione e audit richiedono sessione operatore attiva. Le viste dettagliate restano
             disponibili nei moduli dedicati.
+          </div>
+        )}
+      </SectionCard>
+
+      <SectionCard title="Ingressi audit per modulo" eyebrow="Audit">
+        {operationalMetrics ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <Link
+              href="/audit"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Tutti i moduli
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {operationalMetrics.auditEvents.total}
+              </p>
+            </Link>
+            {auditBySourceModule.map((item) => (
+              <Link
+                key={item.sourceModule}
+                href={`/audit?sourceModule=${encodeURIComponent(item.sourceModule)}`}
+                className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                  {item.sourceModule}
+                </p>
+                <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{item.total}</p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
+            Gli ingressi audit per modulo richiedono sessione operatore attiva.
           </div>
         )}
       </SectionCard>
