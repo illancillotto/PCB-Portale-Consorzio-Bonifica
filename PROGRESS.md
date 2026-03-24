@@ -242,6 +242,7 @@ Nota:
 - risultati `search` arricchiti con shortcut espliciti a scheda PCB, GIS e ingressi operativi contestuali: completato
 - vista `search` arricchita con riepilogo sintetico e filtro URL-shareable per tipo risultato: completato
 - audit trail esteso con filtro backend/frontend per `sourceModule`: completato
+- vista `audit` arricchita con riepiloghi cliccabili per attore e modulo sorgente: completato
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
 - feed issue connector ordinato backend-side per severita` e connector: completato

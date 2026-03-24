@@ -111,6 +111,10 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
   const uniqueEventTypes = Array.from(new Set(events.items.map((event) => event.eventType))).sort();
   const uniqueActorTypes = Array.from(new Set(events.items.map((event) => event.actorType))).sort();
   const uniqueSourceModules = Array.from(new Set(events.items.map((event) => event.sourceModule))).sort();
+  const sourceModuleCounters = uniqueSourceModules.map((sourceModule) => ({
+    sourceModule,
+    total: events.items.filter((event) => event.sourceModule === sourceModule).length,
+  }));
   const systemEvents = events.items.filter((event) => event.actorType === 'system').length;
   const operatorEvents = events.items.filter((event) => event.actorType === 'system_operator').length;
 
@@ -121,24 +125,71 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
     >
       <SectionCard title="Riepilogo audit" eyebrow="Summary">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+          <Link
+            href={buildAuditFilterHref({
+              actorType: filters.actorType,
+              eventType: filters.eventType,
+              sourceModule: filters.sourceModule,
+            })}
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+          >
             <p className="text-sm text-[var(--pcb-muted)]">Eventi totali</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{events.total}</p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+          </Link>
+          <Link
+            href={buildAuditFilterHref({
+              actorType: 'system',
+              eventType: filters.eventType,
+              sourceModule: filters.sourceModule,
+            })}
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+          >
             <p className="text-sm text-[var(--pcb-muted)]">System</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{systemEvents}</p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+          </Link>
+          <Link
+            href={buildAuditFilterHref({
+              actorType: 'system_operator',
+              eventType: filters.eventType,
+              sourceModule: filters.sourceModule,
+            })}
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+          >
             <p className="text-sm text-[var(--pcb-muted)]">System operator</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{operatorEvents}</p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+          </Link>
+          <Link
+            href={buildAuditFilterHref({
+              actorType: filters.actorType,
+              eventType: filters.eventType,
+              sourceModule: filters.sourceModule,
+            })}
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+          >
             <p className="text-sm text-[var(--pcb-muted)]">Ultimo evento</p>
             <p className="mt-2 text-sm font-semibold text-[var(--pcb-ink)]">
               {events.items[0] ? new Date(events.items[0].createdAt).toLocaleString('it-IT') : 'n/d'}
             </p>
-          </article>
+          </Link>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Moduli sorgente" eyebrow="Source modules">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {sourceModuleCounters.map((item) => (
+            <Link
+              key={item.sourceModule}
+              href={buildAuditFilterHref({
+                eventType: filters.eventType,
+                actorType: filters.actorType,
+                sourceModule: item.sourceModule,
+              })}
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+            >
+              <p className="text-sm text-[var(--pcb-muted)]">{item.sourceModule}</p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{item.total}</p>
+            </Link>
+          ))}
         </div>
       </SectionCard>
 

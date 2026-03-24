@@ -98,6 +98,7 @@ Stato attuale:
 - il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - riepilogo audit e filtri operativi via query string anche su `sourceModule`
+- la vista `audit` espone anche riepiloghi cliccabili per attore e modulo sorgente
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata
