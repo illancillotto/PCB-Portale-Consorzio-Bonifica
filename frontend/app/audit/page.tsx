@@ -75,10 +75,15 @@ interface AuditPageProps {
   searchParams?: Promise<{
     eventType?: string;
     actorType?: string;
+    sourceModule?: string;
   }>;
 }
 
-function buildAuditFilterHref(filters: { eventType?: string; actorType?: string }) {
+function buildAuditFilterHref(filters: {
+  eventType?: string;
+  actorType?: string;
+  sourceModule?: string;
+}) {
   const params = new URLSearchParams();
 
   if (filters.eventType) {
@@ -89,6 +94,10 @@ function buildAuditFilterHref(filters: { eventType?: string; actorType?: string 
     params.set('actorType', filters.actorType);
   }
 
+  if (filters.sourceModule) {
+    params.set('sourceModule', filters.sourceModule);
+  }
+
   const queryString = params.toString();
 
   return queryString ? `/audit?${queryString}` : '/audit';
@@ -97,20 +106,11 @@ function buildAuditFilterHref(filters: { eventType?: string; actorType?: string 
 export default async function AuditPage({ searchParams }: AuditPageProps) {
   const session = await requireOperatorSession();
   const filters = (await searchParams) ?? {};
-  const events = await getAuditEvents(session.accessToken);
-  const filteredEvents = events.items.filter((event) => {
-    if (filters.eventType && event.eventType !== filters.eventType) {
-      return false;
-    }
-
-    if (filters.actorType && event.actorType !== filters.actorType) {
-      return false;
-    }
-
-    return true;
-  });
+  const events = await getAuditEvents(session.accessToken, filters);
+  const filteredEvents = events.items;
   const uniqueEventTypes = Array.from(new Set(events.items.map((event) => event.eventType))).sort();
   const uniqueActorTypes = Array.from(new Set(events.items.map((event) => event.actorType))).sort();
+  const uniqueSourceModules = Array.from(new Set(events.items.map((event) => event.sourceModule))).sort();
   const systemEvents = events.items.filter((event) => event.actorType === 'system').length;
   const operatorEvents = events.items.filter((event) => event.actorType === 'system_operator').length;
 
@@ -145,7 +145,10 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
       <SectionCard title="Eventi recenti" eyebrow="Audit">
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
-            href={buildAuditFilterHref({ actorType: filters.actorType })}
+            href={buildAuditFilterHref({
+              actorType: filters.actorType,
+              sourceModule: filters.sourceModule,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.eventType
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -157,7 +160,11 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
           {uniqueEventTypes.map((eventType) => (
             <Link
               key={eventType}
-              href={buildAuditFilterHref({ eventType, actorType: filters.actorType })}
+              href={buildAuditFilterHref({
+                eventType,
+                actorType: filters.actorType,
+                sourceModule: filters.sourceModule,
+              })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.eventType === eventType
                   ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -170,7 +177,10 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
         </div>
         <div className="mb-6 flex flex-wrap gap-3">
           <Link
-            href={buildAuditFilterHref({ eventType: filters.eventType })}
+            href={buildAuditFilterHref({
+              eventType: filters.eventType,
+              sourceModule: filters.sourceModule,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.actorType
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -182,7 +192,11 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
           {uniqueActorTypes.map((actorType) => (
             <Link
               key={actorType}
-              href={buildAuditFilterHref({ eventType: filters.eventType, actorType })}
+              href={buildAuditFilterHref({
+                eventType: filters.eventType,
+                actorType,
+                sourceModule: filters.sourceModule,
+              })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.actorType === actorType
                   ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -190,6 +204,38 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
               }`}
             >
               {actorType}
+            </Link>
+          ))}
+        </div>
+        <div className="mb-6 flex flex-wrap gap-3">
+          <Link
+            href={buildAuditFilterHref({
+              eventType: filters.eventType,
+              actorType: filters.actorType,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.sourceModule
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti i moduli
+          </Link>
+          {uniqueSourceModules.map((sourceModule) => (
+            <Link
+              key={sourceModule}
+              href={buildAuditFilterHref({
+                eventType: filters.eventType,
+                actorType: filters.actorType,
+                sourceModule,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.sourceModule === sourceModule
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {sourceModule}
             </Link>
           ))}
         </div>

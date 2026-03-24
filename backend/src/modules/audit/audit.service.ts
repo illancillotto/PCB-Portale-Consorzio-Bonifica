@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { DatabaseService } from '../core/database/database.service';
 import { AuditEventResponseDto } from './dto/audit-event-response.dto';
+import { ListAuditEventsQueryDto } from './dto/list-audit-events-query.dto';
 
 interface AuditEventRow {
   id: string;
@@ -23,7 +24,27 @@ export class AuditService {
     return ['auth', 'sensitive_read', 'master_update', 'connector_run', 'matching_review', 'gis_update'];
   }
 
-  async listEvents() {
+  async listEvents(filters: ListAuditEventsQueryDto = {}) {
+    const clauses: string[] = [];
+    const params: string[] = [];
+
+    if (filters.eventType) {
+      params.push(filters.eventType);
+      clauses.push(`event_type = $${params.length}`);
+    }
+
+    if (filters.actorType) {
+      params.push(filters.actorType);
+      clauses.push(`actor_type = $${params.length}`);
+    }
+
+    if (filters.sourceModule) {
+      params.push(filters.sourceModule);
+      clauses.push(`source_module = $${params.length}`);
+    }
+
+    const whereClause = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
+
     const result = await this.databaseService.query<AuditEventRow>(
       `
         SELECT
@@ -37,8 +58,10 @@ export class AuditService {
           payload_jsonb,
           created_at
         FROM audit.audit_event
+        ${whereClause}
         ORDER BY created_at DESC
       `,
+      params,
     );
 
     return {

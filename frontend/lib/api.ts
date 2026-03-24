@@ -659,8 +659,27 @@ export async function getSystemIntegrations(accessToken: string) {
   });
 }
 
-export async function getAuditEvents(accessToken: string) {
-  return apiFetch<PaginatedResponse<AuditEvent>>('/audit/events', {
+export async function getAuditEvents(
+  accessToken: string,
+  filters?: { eventType?: string; actorType?: string; sourceModule?: string },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.eventType) {
+    params.set('eventType', filters.eventType);
+  }
+
+  if (filters?.actorType) {
+    params.set('actorType', filters.actorType);
+  }
+
+  if (filters?.sourceModule) {
+    params.set('sourceModule', filters.sourceModule);
+  }
+
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+
+  return apiFetch<PaginatedResponse<AuditEvent>>(`/audit/events${suffix}`, {
     accessToken,
   });
 }

@@ -131,6 +131,7 @@ Stato attuale:
 - completati source links e documentale base nella scheda soggetto
 - completata estensione della `search` come ingresso operativo verso GIS, ingestion, audit e operations
 - completato filtro URL-shareable per tipo risultato nella `search`, con riepilogo sintetico dei match
+- completato filtro URL-shareable `sourceModule` nella vista `audit`, con supporto backend dedicato
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:
