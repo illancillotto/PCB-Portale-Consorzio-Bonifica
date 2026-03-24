@@ -156,6 +156,7 @@ Stato attuale:
 - completata navigazione globale coerente con la nuova access policy
 - completata formalizzazione backend della stessa policy su `subjects`, `parcels`, `search`
 - completata classificazione dei runtime endpoint tra pubblico tecnico e interno operativo
+- completata uniformazione dei payload errore backend e proxy operativo frontend
 - da completare eventuali notice ancora più specifici per sessioni degradate
 
 Dipendenze:

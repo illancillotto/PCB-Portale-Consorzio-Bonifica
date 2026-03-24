@@ -1225,3 +1225,27 @@ Verifiche eseguite:
 
 - `npm run lint --workspace backend`
 - `npm run build --workspace backend`
+
+### 2026-03-24 – Payload errori backend uniformi
+
+Completato:
+
+- filtro globale backend per tutte le eccezioni Nest/applicative
+- payload uniforme con:
+  - `statusCode`
+  - `error.code`
+  - `error.type`
+  - `error.message`
+  - `error.details`
+  - `error.path`
+  - `error.timestamp`
+  - `error.requestId`
+- riallineamento del proxy frontend operativo per emettere lo stesso schema sui `401/403`
+- riallineamento del consumer frontend delle azioni operative per leggere `error.message`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

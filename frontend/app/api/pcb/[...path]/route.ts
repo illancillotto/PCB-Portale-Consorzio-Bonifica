@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import {
   pcbSessionCookieName,
 } from '../../../../lib/auth';
@@ -96,12 +97,20 @@ function buildProxyAuthResponse(
 
   const response = NextResponse.json(
     {
-      message,
-      reason,
       loginPath: buildLoginRedirectPath(
         reason,
         nextPath ?? `${requestUrl.pathname}${requestUrl.search}`,
       ),
+      statusCode: status,
+      error: {
+        code: reason,
+        type: status === 401 ? 'UnauthorizedException' : 'ForbiddenException',
+        message,
+        details: null,
+        path: nextPath ?? `${requestUrl.pathname}${requestUrl.search}`,
+        timestamp: new Date().toISOString(),
+        requestId: randomUUID(),
+      },
     },
     { status },
   );

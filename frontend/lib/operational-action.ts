@@ -5,6 +5,10 @@ export interface OperationalActionRouter {
 
 interface ProxyAuthErrorPayload {
   message?: string;
+  error?: {
+    message?: string;
+    requestId?: string;
+  };
   loginPath?: string;
 }
 
@@ -23,7 +27,7 @@ export async function resolveOperationalActionFailure(
   }
 
   const payload = (await response.json().catch(() => null)) as ProxyAuthErrorPayload | null;
-  const message = payload?.message ?? `${fallbackMessage} (${response.status})`;
+  const message = payload?.error?.message ?? payload?.message ?? `${fallbackMessage} (${response.status})`;
 
   if ((response.status === 401 || response.status === 403) && payload?.loginPath) {
     router.push(payload.loginPath);

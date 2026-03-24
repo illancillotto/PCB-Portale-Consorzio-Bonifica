@@ -1,6 +1,7 @@
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ApiExceptionFilter } from './modules/core/errors/api-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +19,7 @@ async function bootstrap() {
       forbidUnknownValues: true,
     }),
   );
+  app.useGlobalFilters(new ApiExceptionFilter());
 
   const port = Number(process.env.PCB_API_PORT ?? 3001);
   const host = process.env.PCB_API_HOST ?? '0.0.0.0';

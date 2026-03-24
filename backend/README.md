@@ -127,6 +127,19 @@ Endpoint tecnici pubblici:
 - `GET /api/v1/health`
 - `GET /api/v1/auth/session` richiede token valido ma non ruolo operatore
 
+Schema errori applicativo:
+
+- tutte le eccezioni backend passano da un filtro globale unico
+- payload uniforme:
+  - `statusCode`
+  - `error.code`
+  - `error.type`
+  - `error.message`
+  - `error.details`
+  - `error.path`
+  - `error.timestamp`
+  - `error.requestId`
+
 Il dominio `gis` espone anche lo stato del publication target QGIS Server via `GET /api/v1/gis/publication-status`.
 Il controllo usa `PCB_QGIS_SERVER_URL` e `PCB_QGIS_PROJECT_FILE` per verificare `GetCapabilities` sul route pubblico `/ows/`.
 Il publication target locale espone gia` i layer tematici reali `pcb_parcels`, `pcb_subjects` e `pcb_subject_parcel_links`.
