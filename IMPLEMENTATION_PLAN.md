@@ -137,6 +137,7 @@ Stato attuale:
 - completato cartiglio frontend dei filtri attivi nella vista `audit`
 - completato riepilogo audit per modulo nella vista `operations`, con deep link verso `audit`
 - completati ingressi audit per modulo anche nella dashboard principale
+- completati ingressi audit per attore anche nella dashboard principale
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:

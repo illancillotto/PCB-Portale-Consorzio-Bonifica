@@ -100,6 +100,19 @@ export default async function HomePage() {
         .map(([sourceModule, total]) => ({ sourceModule, total }))
         .sort((left, right) => right.total - left.total || left.sourceModule.localeCompare(right.sourceModule))
     : [];
+  const auditByActorType = operationalMetrics
+    ? Array.from(
+        new Map(
+          operationalMetrics.auditEvents.items.map((event) => [
+            event.actorType,
+            operationalMetrics.auditEvents.items.filter((candidate) => candidate.actorType === event.actorType)
+              .length,
+          ]),
+        ).entries(),
+      )
+        .map(([actorType, total]) => ({ actorType, total }))
+        .sort((left, right) => right.total - left.total || left.actorType.localeCompare(right.actorType))
+    : [];
 
   return (
     <PageShell
@@ -275,6 +288,40 @@ export default async function HomePage() {
         ) : (
           <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
             Gli ingressi audit per modulo richiedono sessione operatore attiva.
+          </div>
+        )}
+      </SectionCard>
+
+      <SectionCard title="Ingressi audit per attore" eyebrow="Actors">
+        {operationalMetrics ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <Link
+              href="/audit"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                Tutti gli attori
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {operationalMetrics.auditEvents.total}
+              </p>
+            </Link>
+            {auditByActorType.map((item) => (
+              <Link
+                key={item.actorType}
+                href={`/audit?actorType=${encodeURIComponent(item.actorType)}`}
+                className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+                  {item.actorType}
+                </p>
+                <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{item.total}</p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
+            Gli ingressi audit per attore richiedono sessione operatore attiva.
           </div>
         )}
       </SectionCard>
