@@ -1083,3 +1083,14 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-24 – Deep link stage dal dettaglio connector
+
+Completato:
+
+- il dettaglio connector collega contatori, issue e storico run ai filtri stage del monitor `ingestion`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

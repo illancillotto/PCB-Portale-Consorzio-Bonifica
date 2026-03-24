@@ -50,6 +50,45 @@ function buildConnectorRunsFilterHref(
     : `/ingestion/connectors/${encodeURIComponent(connectorName)}`;
 }
 
+function buildIngestionStageHref(filters: {
+  connector?: string;
+  status?: string;
+  acquisitionStage?: 'queued' | 'running' | 'completed' | 'failed';
+  postProcessingStage?: 'not_configured' | 'queued' | 'running' | 'completed' | 'failed';
+  normalizationStage?: 'not_started' | 'running' | 'completed' | 'failed';
+  matchingStage?: 'not_started' | 'running' | 'completed' | 'failed';
+}) {
+  const params = new URLSearchParams();
+
+  if (filters.connector) {
+    params.set('connector', filters.connector);
+  }
+
+  if (filters.status) {
+    params.set('status', filters.status);
+  }
+
+  if (filters.acquisitionStage) {
+    params.set('acquisitionStage', filters.acquisitionStage);
+  }
+
+  if (filters.postProcessingStage) {
+    params.set('postProcessingStage', filters.postProcessingStage);
+  }
+
+  if (filters.normalizationStage) {
+    params.set('normalizationStage', filters.normalizationStage);
+  }
+
+  if (filters.matchingStage) {
+    params.set('matchingStage', filters.matchingStage);
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `/ingestion?${queryString}` : '/ingestion';
+}
+
 export default async function ConnectorDetailPage({
   params,
   searchParams,
@@ -153,22 +192,44 @@ export default async function ConnectorDetailPage({
 
       <SectionCard title="Contatori run" eyebrow="Runs">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+          <Link
+            href={buildIngestionStageHref({ connector: connector.connectorName })}
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
             <p className="text-sm text-[var(--pcb-muted)]">Totali</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{connector.runCounters.total}</p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+          </Link>
+          <Link
+            href={buildIngestionStageHref({
+              connector: connector.connectorName,
+              status: 'queued',
+              acquisitionStage: 'queued',
+            })}
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
             <p className="text-sm text-[var(--pcb-muted)]">Queued</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{connector.runCounters.queued}</p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+          </Link>
+          <Link
+            href={buildIngestionStageHref({
+              connector: connector.connectorName,
+              normalizationStage: 'completed',
+            })}
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
             <p className="text-sm text-[var(--pcb-muted)]">Completed</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{connector.runCounters.completed}</p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+          </Link>
+          <Link
+            href={buildIngestionStageHref({
+              connector: connector.connectorName,
+              status: 'failed',
+            })}
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
             <p className="text-sm text-[var(--pcb-muted)]">Failed</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{connector.runCounters.failed}</p>
-          </article>
+          </Link>
         </div>
       </SectionCard>
 
@@ -194,6 +255,15 @@ export default async function ConnectorDetailPage({
                 <p className="mt-2 text-xs text-[var(--pcb-muted)]">
                   {connector.lastCompletedRun.recordsSuccess}/{connector.lastCompletedRun.recordsTotal} successi
                 </p>
+                <Link
+                  href={buildIngestionStageHref({
+                    connector: connector.connectorName,
+                    normalizationStage: 'completed',
+                  })}
+                  className="mt-3 inline-flex text-sm font-semibold text-[var(--pcb-accent)]"
+                >
+                  Apri run completate
+                </Link>
               </>
             ) : (
               <p className="mt-2 text-sm text-[var(--pcb-muted)]">Nessuna run completata.</p>
@@ -209,6 +279,15 @@ export default async function ConnectorDetailPage({
                 <p className="mt-2 text-xs text-[var(--pcb-muted)]">
                   {connector.lastFailedRun.recordsError} errori · {connector.lastFailedRun.logExcerpt || 'senza log'}
                 </p>
+                <Link
+                  href={buildIngestionStageHref({
+                    connector: connector.connectorName,
+                    status: 'failed',
+                  })}
+                  className="mt-3 inline-flex text-sm font-semibold text-[var(--pcb-accent)]"
+                >
+                  Apri run fallite
+                </Link>
               </>
             ) : (
               <p className="mt-2 text-sm text-[var(--pcb-muted)]">Nessun fallimento registrato.</p>
@@ -345,6 +424,41 @@ export default async function ConnectorDetailPage({
                     </Link>
                   </div>
                 ) : null}
+                <div className="mt-4 flex flex-wrap gap-4 text-sm">
+                  {issue.issueType === 'not_runnable' || issue.issueType === 'not_configured' ? (
+                    <Link
+                      href={buildIngestionStageHref({
+                        connector: connector.connectorName,
+                        acquisitionStage: 'failed',
+                      })}
+                      className="font-semibold text-[var(--pcb-accent)]"
+                    >
+                      Vedi run bloccate
+                    </Link>
+                  ) : null}
+                  {issue.issueType === 'dry_run_only' ? (
+                    <Link
+                      href={buildIngestionStageHref({
+                        connector: connector.connectorName,
+                        postProcessingStage: 'not_configured',
+                      })}
+                      className="font-semibold text-[var(--pcb-accent)]"
+                    >
+                      Vedi post-processing assente
+                    </Link>
+                  ) : null}
+                  {issue.issueType === 'latest_run_failed' ? (
+                    <Link
+                      href={buildIngestionStageHref({
+                        connector: connector.connectorName,
+                        status: 'failed',
+                      })}
+                      className="font-semibold text-[var(--pcb-accent)]"
+                    >
+                      Vedi fallimenti
+                    </Link>
+                  ) : null}
+                </div>
               </article>
             ))}
           </div>

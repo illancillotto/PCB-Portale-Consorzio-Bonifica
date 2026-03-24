@@ -91,6 +91,7 @@ Stato attuale:
 - i contatori stage in `operations` sono link operativi al monitor `ingestion` gia` filtrato
 - anche la dashboard principale espone ingressi rapidi verso gli stage operativi di ingestion
 - la vista `audit` espone deep link operativi a run, soggetti e moduli sorgente quando il payload lo consente
+- il dettaglio connector collega contatori, issue e storico run ai filtri stage del monitor `ingestion`
 - il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
