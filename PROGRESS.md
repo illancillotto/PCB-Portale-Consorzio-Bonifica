@@ -240,6 +240,7 @@ Nota:
 - dettaglio connector arricchito con contatori per tipo di issue: completato
 - vista `search` estesa come ingresso operativo verso `operations`, `audit`, `ingestion` e GIS: completato
 - risultati `search` arricchiti con shortcut espliciti a scheda PCB, GIS e ingressi operativi contestuali: completato
+- vista `search` arricchita con riepilogo sintetico e filtro URL-shareable per tipo risultato: completato
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
 - feed issue connector ordinato backend-side per severita` e connector: completato

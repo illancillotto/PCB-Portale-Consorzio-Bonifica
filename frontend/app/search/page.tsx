@@ -7,13 +7,20 @@ import { searchAll } from '../../lib/api';
 interface SearchPageProps {
   searchParams?: Promise<{
     q?: string;
+    type?: 'subject' | 'parcel';
   }>;
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = (await searchParams) ?? {};
   const query = params.q?.trim() ?? '';
+  const requestedType = params.type;
   const results = query ? await searchAll(query) : { items: [], total: 0 };
+  const subjectCount = results.items.filter((item) => item.type === 'subject').length;
+  const parcelCount = results.items.filter((item) => item.type === 'parcel').length;
+  const filteredItems = requestedType
+    ? results.items.filter((item) => item.type === requestedType)
+    : results.items;
 
   return (
     <PageShell
@@ -61,7 +68,55 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <p className="text-sm text-[var(--pcb-muted)]">Nessun risultato trovato.</p>
         ) : (
           <div className="grid gap-4">
-            {results.items.map((item) => (
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  Risultati totali
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">{results.total}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  Soggetti
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">{subjectCount}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  Particelle
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">{parcelCount}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href={`/search?q=${encodeURIComponent(query)}`}
+                className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+              >
+                Tutti
+              </Link>
+              <Link
+                href={`/search?q=${encodeURIComponent(query)}&type=subject`}
+                className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+              >
+                Solo soggetti
+              </Link>
+              <Link
+                href={`/search?q=${encodeURIComponent(query)}&type=parcel`}
+                className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+              >
+                Solo particelle
+              </Link>
+            </div>
+
+            {filteredItems.length === 0 ? (
+              <p className="text-sm text-[var(--pcb-muted)]">
+                Nessun risultato per il filtro selezionato.
+              </p>
+            ) : null}
+
+            {filteredItems.map((item) => (
               <article
                 key={`${item.type}-${item.id}`}
                 className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"

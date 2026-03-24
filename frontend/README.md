@@ -94,6 +94,7 @@ Stato attuale:
 - il dettaglio connector collega contatori, issue e storico run ai filtri stage del monitor `ingestion`
 - la vista `search` espone anche shortcut operativi diretti a `operations`, `audit`, `ingestion` e GIS completo
 - i risultati della `search` offrono azioni esplicite verso scheda PCB, GIS contestuale e ingressi operativi applicativi
+- la vista `search` supporta anche filtro URL-shareable per tipo risultato e riepilogo sintetico `totale/soggetti/particelle`
 - il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
