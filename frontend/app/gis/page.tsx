@@ -24,7 +24,7 @@ interface GisPageProps {
 const validQgisLayers = ['pcb_subject_parcel_links', 'pcb_parcels', 'pcb_subjects'] as const;
 
 export default async function GisPage({ searchParams }: GisPageProps) {
-  const session = await requireOperatorSession();
+  const session = await requireOperatorSession('/gis');
   const filters = searchParams ? await searchParams : {};
   const selectedSubjectId = filters.subjectId;
   const selectedParcelId = filters.parcelId;

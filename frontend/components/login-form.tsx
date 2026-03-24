@@ -12,6 +12,13 @@ export function LoginForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const reason = searchParams.get('reason');
+  const next = searchParams.get('next');
+  const reasonMessage =
+    reason === 'unauthorized'
+      ? 'L’accesso alla vista richiesta richiede un ruolo operativo PCB valido.'
+      : reason === 'authentication_required'
+        ? 'Per aprire la vista richiesta devi autenticarti con una sessione operatore.'
+        : null;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,15 +45,20 @@ export function LoginForm() {
       return;
     }
 
-    router.push('/ingestion');
+    router.push(next || '/ingestion');
     router.refresh();
   }
 
   return (
     <form onSubmit={onSubmit} className="grid gap-4">
-      {reason === 'unauthorized' ? (
+      {reasonMessage ? (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          L&apos;accesso alla vista richiesta richiede un ruolo operativo valido.
+          {reasonMessage}
+        </div>
+      ) : null}
+      {next ? (
+        <div className="rounded-2xl border border-[var(--pcb-line)] bg-white px-4 py-3 text-sm text-[var(--pcb-muted)]">
+          Dopo il login verrai reindirizzato a <strong className="text-[var(--pcb-ink)]">{next}</strong>.
         </div>
       ) : null}
       {errorMessage ? (

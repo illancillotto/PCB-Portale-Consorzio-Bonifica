@@ -38,6 +38,18 @@ async function fetchBackendSession(accessToken: string, path: string) {
   }>;
 }
 
+function buildLoginRedirectPath(reason: 'authentication_required' | 'unauthorized', nextPath?: string) {
+  const params = new URLSearchParams({
+    reason,
+  });
+
+  if (nextPath) {
+    params.set('next', nextPath);
+  }
+
+  return `/login?${params.toString()}`;
+}
+
 export async function getOptionalSession(): Promise<FrontendSession | null> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(pcbSessionCookieName)?.value;
@@ -58,18 +70,18 @@ export async function getOptionalSession(): Promise<FrontendSession | null> {
   };
 }
 
-export async function requireOperatorSession() {
+export async function requireOperatorSession(nextPath?: string) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(pcbSessionCookieName)?.value;
 
   if (!accessToken) {
-    redirect('/login');
+    redirect(buildLoginRedirectPath('authentication_required', nextPath));
   }
 
   const authorization = await fetchBackendSession(accessToken, '/auth/operator-access');
 
   if (!authorization?.authorized || !authorization.principal) {
-    redirect('/login?reason=unauthorized');
+    redirect(buildLoginRedirectPath('unauthorized', nextPath));
   }
 
   return {

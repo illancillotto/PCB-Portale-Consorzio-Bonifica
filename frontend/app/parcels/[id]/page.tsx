@@ -12,8 +12,8 @@ interface ParcelDetailPageProps {
 }
 
 export default async function ParcelDetailPage({ params }: ParcelDetailPageProps) {
-  const session = await requireOperatorSession();
   const { id } = await params;
+  const session = await requireOperatorSession(`/parcels/${id}`);
 
   let parcel;
   let auditSummary;

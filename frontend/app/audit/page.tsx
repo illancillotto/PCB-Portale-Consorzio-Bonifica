@@ -117,7 +117,7 @@ function buildAuditFilterHref(filters: {
 }
 
 export default async function AuditPage({ searchParams }: AuditPageProps) {
-  const session = await requireOperatorSession();
+  const session = await requireOperatorSession('/audit');
   const filters = (await searchParams) ?? {};
   const [events, summary] = await Promise.all([
     getAuditEvents(session.accessToken, filters),

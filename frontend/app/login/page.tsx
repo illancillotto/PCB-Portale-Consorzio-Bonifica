@@ -2,9 +2,19 @@ import { LoginForm } from '../../components/login-form';
 import { PageShell } from '../../components/page-shell';
 import { SectionCard } from '../../components/section-card';
 import { getOptionalSession } from '../../lib/auth';
+import Link from 'next/link';
 
-export default async function LoginPage() {
+interface LoginPageProps {
+  searchParams?: Promise<{
+    reason?: string;
+    next?: string;
+  }>;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   const session = await getOptionalSession();
+  const params = (await searchParams) ?? {};
+  const next = params.next;
 
   return (
     <PageShell
@@ -18,6 +28,14 @@ export default async function LoginPage() {
               <p>
                 Sessione attiva come <strong className="text-[var(--pcb-ink)]">{session.principal.preferredUsername}</strong>.
               </p>
+              {next ? (
+                <Link
+                  href={next}
+                  className="inline-flex rounded-full border border-[var(--pcb-line)] px-5 py-3 font-semibold text-[var(--pcb-ink)]"
+                >
+                  Continua verso la vista richiesta
+                </Link>
+              ) : null}
               <form action="/api/auth/logout" method="post">
                 <button
                   type="submit"
@@ -45,7 +63,7 @@ export default async function LoginPage() {
             <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4">
               <dt className="font-semibold text-[var(--pcb-ink)]">Uso previsto</dt>
               <dd className="mt-1">
-                In questa fase la protezione riguarda le viste operative `ingestion` e `gis`.
+                In questa fase la protezione riguarda tutte le viste operative protette: `ingestion`, `gis`, `audit`, `operations` e dettagli sensibili.
               </dd>
             </div>
           </dl>

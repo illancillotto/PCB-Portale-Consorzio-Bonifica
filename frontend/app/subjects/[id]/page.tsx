@@ -13,8 +13,8 @@ interface SubjectDetailPageProps {
 }
 
 export default async function SubjectDetailPage({ params }: SubjectDetailPageProps) {
-  const session = await requireOperatorSession();
   const { id } = await params;
+  const session = await requireOperatorSession(`/subjects/${id}`);
 
   let subject;
   let parcels;

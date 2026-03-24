@@ -65,8 +65,8 @@ export default async function IngestionRunDetailPage({
   params,
   searchParams,
 }: IngestionRunDetailPageProps) {
-  const session = await requireOperatorSession();
   const { id } = await params;
+  const session = await requireOperatorSession(`/ingestion/${id}`);
   const filters = (await searchParams) ?? {};
 
   let run;

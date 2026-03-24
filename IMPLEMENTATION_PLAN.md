@@ -148,7 +148,9 @@ Stato attuale:
 - completato endpoint bulk `audit/entity-summaries` e suo riuso negli entry point `subjects`, `parcels`, `search`
 - completati loading/error states condivisi nel frontend App Router
 - completati empty states condivisi sui principali entry point frontend
-- da completare loading/error/empty states più raffinati
+- completato redirect contestuale verso `login` con `reason` e `next` sulle principali route protette
+- completato resume post-login verso la vista richiesta
+- da completare eventuali fallback/notice ancora più specifici per sessioni degradate
 
 Dipendenze:
 
@@ -349,7 +351,8 @@ Stato attuale:
 - completata protezione selettiva iniziale delle viste operative `ingestion` e `gis`
 - completata protezione delle API operative `ingestion` e `gis`
 - completata protezione e prima vista operativa `audit`
-- da completare protezione selettiva delle altre API non pubbliche del portale
+- completato redirect frontend contestuale per le principali route protette con ripresa della vista richiesta
+- da completare eventuale estensione della protezione selettiva ad altre viste non ancora classificate come operative
 
 Dipendenze:
 

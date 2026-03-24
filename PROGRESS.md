@@ -258,6 +258,31 @@ Nota:
 - endpoint backend bulk `audit/entity-summaries` introdotto e riusato da `subjects`, `parcels`, `search`: completato
 - loading/error states condivisi introdotti nel frontend Next.js a livello App Router root: completato
 - empty states condivisi introdotti e applicati ai principali entry point frontend: completato
+- redirect auth frontend contestuali con `reason` e `next` sulle route protette: completato
+- login frontend con resume automatico verso la vista richiesta: completato
+
+### 2026-03-24 – Route protette con redirect contestuale
+
+Completato:
+
+- `requireOperatorSession` esteso con redirect contestuale verso `login`
+- preservazione di `reason=authentication_required|unauthorized`
+- preservazione del path richiesto tramite query `next`
+- resume post-login verso la vista originariamente richiesta
+- estensione del pattern a:
+  - `audit`
+  - `operations`
+  - `gis`
+  - `ingestion`
+  - dettaglio run `ingestion`
+  - dettaglio connector `ingestion`
+  - dettaglio `subject`
+  - dettaglio `parcel`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
 - feed issue connector ordinato backend-side per severita` e connector: completato

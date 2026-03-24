@@ -113,7 +113,7 @@ function buildIssueFilterHref(filters: {
 }
 
 export default async function IngestionPage({ searchParams }: IngestionPageProps) {
-  const session = await requireOperatorSession();
+  const session = await requireOperatorSession('/ingestion');
   const filters = (await searchParams) ?? {};
   const [runs, connectors, connectorIssues, orchestrationSummary] = await Promise.all([
     getIngestionRuns(session.accessToken),

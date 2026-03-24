@@ -59,7 +59,7 @@ function buildOperationsHref(filters: {
 }
 
 export default async function OperationsPage({ searchParams }: OperationsPageProps) {
-  const session = await requireOperatorSession();
+  const session = await requireOperatorSession('/operations');
   const filters = (await searchParams) ?? {};
   const [
     integrations,

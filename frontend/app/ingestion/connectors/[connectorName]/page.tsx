@@ -94,8 +94,8 @@ export default async function ConnectorDetailPage({
   params,
   searchParams,
 }: ConnectorDetailPageProps) {
-  const session = await requireOperatorSession();
   const { connectorName } = await params;
+  const session = await requireOperatorSession(`/ingestion/connectors/${connectorName}`);
   const filters = (await searchParams) ?? {};
 
   let connector;
