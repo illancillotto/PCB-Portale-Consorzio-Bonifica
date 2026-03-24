@@ -244,6 +244,7 @@ Nota:
 - audit trail esteso con filtro backend/frontend per `sourceModule`: completato
 - vista `audit` arricchita con riepiloghi cliccabili per attore e modulo sorgente: completato
 - audit trail esteso con filtro backend/frontend per entita` (`entityType`, `entityId`) e collegato alla `search`: completato
+- vista `audit` arricchita con cartiglio dei filtri attivi e reset rapido del contesto: completato
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
 - feed issue connector ordinato backend-side per severita` e connector: completato

@@ -129,12 +129,40 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
   }));
   const systemEvents = events.items.filter((event) => event.actorType === 'system').length;
   const operatorEvents = events.items.filter((event) => event.actorType === 'system_operator').length;
+  const activeFilters = [
+    filters.eventType ? `evento: ${filters.eventType}` : null,
+    filters.actorType ? `attore: ${filters.actorType}` : null,
+    filters.sourceModule ? `modulo: ${filters.sourceModule}` : null,
+    filters.entityType ? `entita': ${filters.entityType}` : null,
+    filters.entityId ? `id: ${filters.entityId}` : null,
+  ].filter(Boolean);
 
   return (
     <PageShell
       title="Audit trail"
       description="Eventi operativi e decisioni manuali tracciati dal backend PCB. Vista riservata a operatori autenticati."
     >
+      {activeFilters.length > 0 ? (
+        <SectionCard title="Contesto attivo" eyebrow="Filters">
+          <div className="flex flex-wrap gap-3">
+            {activeFilters.map((filter) => (
+              <span
+                key={filter}
+                className="rounded-full border border-[var(--pcb-line)] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+              >
+                {filter}
+              </span>
+            ))}
+            <Link
+              href="/audit"
+              className="rounded-full border border-[var(--pcb-accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]"
+            >
+              Azzera filtri
+            </Link>
+          </div>
+        </SectionCard>
+      ) : null}
+
       <SectionCard title="Riepilogo audit" eyebrow="Summary">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <Link

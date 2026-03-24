@@ -134,6 +134,7 @@ Stato attuale:
 - completato filtro URL-shareable `sourceModule` nella vista `audit`, con supporto backend dedicato
 - completati riepiloghi cliccabili per attore e modulo sorgente nella vista `audit`
 - completato filtro `entityType/entityId` nella vista `audit`, con ingressi contestuali dalla `search`
+- completato cartiglio frontend dei filtri attivi nella vista `audit`
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:

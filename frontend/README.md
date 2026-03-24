@@ -100,6 +100,7 @@ Stato attuale:
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - riepilogo audit e filtri operativi via query string anche su `sourceModule`
 - la vista `audit` espone anche riepiloghi cliccabili per attore e modulo sorgente
+- la vista `audit` espone anche il contesto dei filtri attivi, utile per ingressi contestuali dalla `search`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata
