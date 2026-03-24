@@ -256,6 +256,7 @@ Nota:
 - dettagli `ingestion` di run e connector arricchiti con contatori audit contestuali: completato
 - dettagli `subject` e `parcel` arricchiti con contatori audit contestuali: completato
 - endpoint backend bulk `audit/entity-summaries` introdotto e riusato da `subjects`, `parcels`, `search`: completato
+- loading/error states condivisi introdotti nel frontend Next.js a livello App Router root: completato
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
 - feed issue connector ordinato backend-side per severita` e connector: completato
