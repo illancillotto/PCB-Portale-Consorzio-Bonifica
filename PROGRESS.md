@@ -251,6 +251,7 @@ Nota:
 - schede soggetto e particella arricchite con ingressi audit contestuali per entita`: completato
 - liste soggetti e particelle arricchite con shortcut operativi verso scheda, GIS e audit contestuale: completato
 - lista run e dettaglio run `ingestion` arricchiti con shortcut diretti a `audit` contestuale: completato
+- dettaglio connector `ingestion` arricchito con shortcut diretti a `audit` del modulo e delle ultime run: completato
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
 - feed issue connector ordinato backend-side per severita` e connector: completato

@@ -107,6 +107,7 @@ Stato attuale:
 - anche le schede soggetto e particella espongono ingressi audit contestuali per entita`
 - anche le liste soggetti e particelle espongono shortcut operativi verso scheda, GIS e audit contestuale
 - lista run e dettaglio run di `ingestion` espongono shortcut diretti al trail `audit` della run e del modulo ingest
+- anche il dettaglio connector `ingestion` espone shortcut diretti al trail `audit` del modulo e delle ultime run
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

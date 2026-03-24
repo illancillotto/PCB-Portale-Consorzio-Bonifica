@@ -187,6 +187,20 @@ export default async function ConnectorDetailPage({
             <strong className="text-[var(--pcb-ink)]">Issue aperte:</strong> {connector.issueCounters.total}
             {' · '}critiche {connector.issueCounters.critical} · warning {connector.issueCounters.warning}
           </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/audit?sourceModule=ingest"
+              className="text-sm font-semibold text-[var(--pcb-accent)]"
+            >
+              Audit ingestion
+            </Link>
+            <Link
+              href="/operations"
+              className="text-sm font-semibold text-[var(--pcb-accent)]"
+            >
+              Operations
+            </Link>
+          </div>
         </div>
       </SectionCard>
 
@@ -264,6 +278,12 @@ export default async function ConnectorDetailPage({
                 >
                   Apri run completate
                 </Link>
+                <Link
+                  href={`/audit?entityType=ingestion_run&entityId=${connector.lastCompletedRun.id}`}
+                  className="mt-3 inline-flex text-sm font-semibold text-[var(--pcb-accent)]"
+                >
+                  Audit ultima run completata
+                </Link>
               </>
             ) : (
               <p className="mt-2 text-sm text-[var(--pcb-muted)]">Nessuna run completata.</p>
@@ -287,6 +307,12 @@ export default async function ConnectorDetailPage({
                   className="mt-3 inline-flex text-sm font-semibold text-[var(--pcb-accent)]"
                 >
                   Apri run fallite
+                </Link>
+                <Link
+                  href={`/audit?entityType=ingestion_run&entityId=${connector.lastFailedRun.id}`}
+                  className="mt-3 inline-flex text-sm font-semibold text-[var(--pcb-accent)]"
+                >
+                  Audit ultima run fallita
                 </Link>
               </>
             ) : (
