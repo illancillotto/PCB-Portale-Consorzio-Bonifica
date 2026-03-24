@@ -262,6 +262,8 @@ Nota:
 - login frontend con resume automatico verso la vista richiesta: completato
 - proxy frontend operativo con fallback auth uniforme su `401/403`: completato
 - azioni operative client-side con redirect contestuale al login su sessione scaduta: completato
+- dashboard, ricerca e liste business classificate come viste protette: completato
+- navigazione globale riallineata alla stessa access policy operativa: completato
 
 ### 2026-03-24 – Route protette con redirect contestuale
 
@@ -280,6 +282,26 @@ Completato:
   - dettaglio connector `ingestion`
   - dettaglio `subject`
   - dettaglio `parcel`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
+
+### 2026-03-24 – Access policy esplicita per le viste business
+
+Completato:
+
+- protezione server-side estesa a:
+  - dashboard `/`
+  - ricerca `/search`
+  - lista soggetti `/subjects`
+  - lista particelle `/parcels`
+- preservazione del contesto query nei redirect a `login` per:
+  - `/search?q=...&type=...`
+  - `/subjects?q=...`
+- navigazione globale riallineata: i link protetti aprono `login` con `next` contestuale quando non esiste sessione
+- rimozione dei fallback anonimi residuali dalle viste ormai classificate come operative
 
 Verifiche eseguite:
 

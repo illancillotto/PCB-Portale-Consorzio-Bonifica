@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getOptionalSession } from '../lib/auth';
+import { buildLoginRedirectPath } from '../lib/auth-redirect';
 
 interface PageShellProps {
   title: string;
@@ -9,13 +10,13 @@ interface PageShellProps {
 }
 
 const navigationItems = [
-  { href: '/', label: 'Dashboard' },
-  { href: '/subjects', label: 'Soggetti' },
-  { href: '/parcels', label: 'Particelle' },
-  { href: '/gis', label: 'GIS' },
-  { href: '/ingestion', label: 'Ingestion' },
-  { href: '/audit', label: 'Audit' },
-  { href: '/operations', label: 'Operations' },
+  { href: '/', label: 'Dashboard', protected: true },
+  { href: '/subjects', label: 'Soggetti', protected: true },
+  { href: '/parcels', label: 'Particelle', protected: true },
+  { href: '/gis', label: 'GIS', protected: true },
+  { href: '/ingestion', label: 'Ingestion', protected: true },
+  { href: '/audit', label: 'Audit', protected: true },
+  { href: '/operations', label: 'Operations', protected: true },
 ];
 
 export async function PageShell({ title, description, children, actions }: PageShellProps) {
@@ -30,7 +31,11 @@ export async function PageShell({ title, description, children, actions }: PageS
               {navigationItems.map((item) => (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={
+                    session || !item.protected
+                      ? item.href
+                      : buildLoginRedirectPath('authentication_required', item.href)
+                  }
                   className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]"
                 >
                   {item.label}

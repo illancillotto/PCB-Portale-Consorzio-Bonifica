@@ -4,17 +4,15 @@ import { PageShell } from '../../components/page-shell';
 import { SearchForm } from '../../components/search-form';
 import { SectionCard } from '../../components/section-card';
 import { getAuditEntitySummaries, getParcels } from '../../lib/api';
-import { getOptionalSession } from '../../lib/auth';
+import { requireOperatorSession } from '../../lib/auth';
 
 export default async function ParcelsPage() {
-  const session = await getOptionalSession();
+  const session = await requireOperatorSession('/parcels');
   const response = await getParcels();
-  const auditSummaries = session
-    ? await getAuditEntitySummaries(session.accessToken, {
-        entityType: 'parcel',
-        entityIds: response.items.map((parcel) => parcel.id),
-      })
-    : { items: [], total: 0 };
+  const auditSummaries = await getAuditEntitySummaries(session.accessToken, {
+    entityType: 'parcel',
+    entityIds: response.items.map((parcel) => parcel.id),
+  });
   const auditSummaryMap = new Map(auditSummaries.items.map((item) => [item.entityId, item]));
 
   return (
@@ -48,26 +46,24 @@ export default async function ParcelsPage() {
                     {parcel.subjects.length} relazioni
                   </span>
                 </div>
-                {session ? (
-                  <div className="mt-4 grid gap-3 text-sm text-[var(--pcb-muted)] md:grid-cols-3">
-                    <div>
-                      <span className="font-medium text-[var(--pcb-ink)]">Eventi audit</span>
-                      <p>{auditSummaryMap.get(parcel.id)?.total ?? 0}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-[var(--pcb-ink)]">System operator</span>
-                      <p>{auditSummaryMap.get(parcel.id)?.systemOperatorEvents ?? 0}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-[var(--pcb-ink)]">Ultimo evento</span>
-                      <p>
-                        {auditSummaryMap.get(parcel.id)?.latestCreatedAt
-                          ? new Date(auditSummaryMap.get(parcel.id)!.latestCreatedAt!).toLocaleString('it-IT')
-                          : 'n/d'}
-                      </p>
-                    </div>
+                <div className="mt-4 grid gap-3 text-sm text-[var(--pcb-muted)] md:grid-cols-3">
+                  <div>
+                    <span className="font-medium text-[var(--pcb-ink)]">Eventi audit</span>
+                    <p>{auditSummaryMap.get(parcel.id)?.total ?? 0}</p>
                   </div>
-                ) : null}
+                  <div>
+                    <span className="font-medium text-[var(--pcb-ink)]">System operator</span>
+                    <p>{auditSummaryMap.get(parcel.id)?.systemOperatorEvents ?? 0}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-[var(--pcb-ink)]">Ultimo evento</span>
+                    <p>
+                      {auditSummaryMap.get(parcel.id)?.latestCreatedAt
+                        ? new Date(auditSummaryMap.get(parcel.id)!.latestCreatedAt!).toLocaleString('it-IT')
+                        : 'n/d'}
+                    </p>
+                  </div>
+                </div>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Link
                     href={`/parcels/${parcel.id}`}

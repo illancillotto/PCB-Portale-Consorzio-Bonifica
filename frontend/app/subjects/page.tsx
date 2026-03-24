@@ -5,7 +5,7 @@ import { SearchForm } from '../../components/search-form';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { getAuditEntitySummaries, getSubjects } from '../../lib/api';
-import { getOptionalSession } from '../../lib/auth';
+import { requireOperatorSession } from '../../lib/auth';
 
 interface SubjectsPageProps {
   searchParams?: Promise<{
@@ -14,16 +14,16 @@ interface SubjectsPageProps {
 }
 
 export default async function SubjectsPage({ searchParams }: SubjectsPageProps) {
-  const session = await getOptionalSession();
   const params = (await searchParams) ?? {};
   const query = params.q?.trim() ?? '';
+  const session = await requireOperatorSession(
+    query ? `/subjects?${new URLSearchParams({ q: query }).toString()}` : '/subjects',
+  );
   const response = await getSubjects(query || undefined);
-  const auditSummaries = session
-    ? await getAuditEntitySummaries(session.accessToken, {
-        entityType: 'subject',
-        entityIds: response.items.map((subject) => subject.id),
-      })
-    : { items: [], total: 0 };
+  const auditSummaries = await getAuditEntitySummaries(session.accessToken, {
+    entityType: 'subject',
+    entityIds: response.items.map((subject) => subject.id),
+  });
   const auditSummaryMap = new Map(auditSummaries.items.map((item) => [item.entityId, item]));
 
   return (
@@ -66,26 +66,24 @@ export default async function SubjectsPage({ searchParams }: SubjectsPageProps) 
                     <p>{subject.identifiers.map((item) => item.value).join(' · ')}</p>
                   </div>
                 </div>
-                {session ? (
-                  <div className="mt-4 grid gap-3 text-sm text-[var(--pcb-muted)] md:grid-cols-3">
-                    <div>
-                      <span className="font-medium text-[var(--pcb-ink)]">Eventi audit</span>
-                      <p>{auditSummaryMap.get(subject.id)?.total ?? 0}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-[var(--pcb-ink)]">System operator</span>
-                      <p>{auditSummaryMap.get(subject.id)?.systemOperatorEvents ?? 0}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-[var(--pcb-ink)]">Ultimo evento</span>
-                      <p>
-                        {auditSummaryMap.get(subject.id)?.latestCreatedAt
-                          ? new Date(auditSummaryMap.get(subject.id)!.latestCreatedAt!).toLocaleString('it-IT')
-                          : 'n/d'}
-                      </p>
-                    </div>
+                <div className="mt-4 grid gap-3 text-sm text-[var(--pcb-muted)] md:grid-cols-3">
+                  <div>
+                    <span className="font-medium text-[var(--pcb-ink)]">Eventi audit</span>
+                    <p>{auditSummaryMap.get(subject.id)?.total ?? 0}</p>
                   </div>
-                ) : null}
+                  <div>
+                    <span className="font-medium text-[var(--pcb-ink)]">System operator</span>
+                    <p>{auditSummaryMap.get(subject.id)?.systemOperatorEvents ?? 0}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-[var(--pcb-ink)]">Ultimo evento</span>
+                    <p>
+                      {auditSummaryMap.get(subject.id)?.latestCreatedAt
+                        ? new Date(auditSummaryMap.get(subject.id)!.latestCreatedAt!).toLocaleString('it-IT')
+                        : 'n/d'}
+                    </p>
+                  </div>
+                </div>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Link
                     href={`/subjects/${subject.id}`}

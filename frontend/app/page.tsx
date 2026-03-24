@@ -12,7 +12,7 @@ import {
   getParcels,
   getSubjects,
 } from '../lib/api';
-import { getOptionalSession } from '../lib/auth';
+import { requireOperatorSession } from '../lib/auth';
 
 const moduleCards = [
   {
@@ -58,36 +58,31 @@ const moduleCards = [
 ];
 
 export default async function HomePage() {
-  const session = await getOptionalSession();
+  const session = await requireOperatorSession('/');
   const [subjects, parcels, gisMetrics, operationalMetrics] = await Promise.all([
     getSubjects(),
     getParcels(),
-    session
-      ? Promise.all([
-          getGisLayers(session.accessToken),
-          getGisPublicationStatus(session.accessToken),
-          getGisSubjectParcelLinks(session.accessToken),
-        ]).then(([layers, publicationStatus, subjectParcelLinks]) => ({
-          layers,
-          publicationStatus,
-          subjectParcelLinks,
-        }))
-      : Promise.resolve(null),
-    session
-      ? Promise.all([
-          getIngestionRuns(session.accessToken),
-          getIngestionOrchestrationSummary(session.accessToken),
-          getAuditSummary(session.accessToken),
-        ]).then(([ingestionRuns, orchestrationSummary, auditSummary]) => ({
-            ingestionRuns,
-            orchestrationSummary,
-            auditSummary,
-          }),
-        )
-      : Promise.resolve(null),
+    Promise.all([
+      getGisLayers(session.accessToken),
+      getGisPublicationStatus(session.accessToken),
+      getGisSubjectParcelLinks(session.accessToken),
+    ]).then(([layers, publicationStatus, subjectParcelLinks]) => ({
+      layers,
+      publicationStatus,
+      subjectParcelLinks,
+    })),
+    Promise.all([
+      getIngestionRuns(session.accessToken),
+      getIngestionOrchestrationSummary(session.accessToken),
+      getAuditSummary(session.accessToken),
+    ]).then(([ingestionRuns, orchestrationSummary, auditSummary]) => ({
+      ingestionRuns,
+      orchestrationSummary,
+      auditSummary,
+    })),
   ]);
-  const auditBySourceModule = operationalMetrics ? operationalMetrics.auditSummary.bySourceModule : [];
-  const auditByActorType = operationalMetrics ? operationalMetrics.auditSummary.byActorType : [];
+  const auditBySourceModule = operationalMetrics.auditSummary.bySourceModule;
+  const auditByActorType = operationalMetrics.auditSummary.byActorType;
 
   return (
     <PageShell
@@ -132,50 +127,42 @@ export default async function HomePage() {
       </section>
 
       <SectionCard title="Metriche GIS" eyebrow="Map Ops">
-        {gisMetrics ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
-                Layer pubblicati
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-                {gisMetrics.layers.total}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
-                Relazioni GIS
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-                {gisMetrics.subjectParcelLinks.total}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
-                Publication target
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-                {gisMetrics.publicationStatus.statusLabel}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
-                Preset operativi
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">4</p>
-            </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+              Layer pubblicati
+            </p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {gisMetrics.layers.total}
+            </p>
           </div>
-        ) : (
-          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
-            Le metriche GIS operative sono visibili con sessione operatore attiva. Il viewer e gli shortcut restano
-            disponibili dai moduli GIS e Operations.
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+              Relazioni GIS
+            </p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {gisMetrics.subjectParcelLinks.total}
+            </p>
           </div>
-        )}
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+              Publication target
+            </p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {gisMetrics.publicationStatus.statusLabel}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+              Preset operativi
+            </p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">4</p>
+          </div>
+        </div>
       </SectionCard>
 
       <SectionCard title="Metriche ingestion e audit" eyebrow="Ops">
-        {operationalMetrics ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Link
               href="/ingestion"
               className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
@@ -225,17 +212,10 @@ export default async function HomePage() {
               </p>
             </Link>
           </div>
-        ) : (
-          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
-            Le metriche di ingestione e audit richiedono sessione operatore attiva. Le viste dettagliate restano
-            disponibili nei moduli dedicati.
-          </div>
-        )}
       </SectionCard>
 
       <SectionCard title="Ingressi audit per modulo" eyebrow="Audit">
-        {operationalMetrics ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Link
               href="/audit"
               className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
@@ -260,16 +240,10 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
-        ) : (
-          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
-            Gli ingressi audit per modulo richiedono sessione operatore attiva.
-          </div>
-        )}
       </SectionCard>
 
       <SectionCard title="Ingressi audit per attore" eyebrow="Actors">
-        {operationalMetrics ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Link
               href="/audit"
               className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
@@ -294,16 +268,10 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
-        ) : (
-          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
-            Gli ingressi audit per attore richiedono sessione operatore attiva.
-          </div>
-        )}
       </SectionCard>
 
       <SectionCard title="Ingressi operativi ingestion" eyebrow="Pipeline">
-        {operationalMetrics ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Link
               href="/ingestion?status=running&acquisitionStage=running"
               className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
@@ -349,11 +317,6 @@ export default async function HomePage() {
               </p>
             </Link>
           </div>
-        ) : (
-          <div className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]">
-            Gli ingressi operativi della pipeline ingestion richiedono sessione operatore attiva.
-          </div>
-        )}
       </SectionCard>
 
       <SectionCard title="Preset GIS rapidi" eyebrow="Map">

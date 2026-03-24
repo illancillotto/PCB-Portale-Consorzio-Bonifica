@@ -152,6 +152,8 @@ Stato attuale:
 - completato resume post-login verso la vista richiesta
 - completato fallback auth uniforme anche sul proxy operativo frontend per `401/403`
 - completato redirect contestuale al login anche durante le azioni operative client-side
+- completata classificazione operativa anche di dashboard, search e liste business
+- completata navigazione globale coerente con la nuova access policy
 - da completare eventuali notice ancora più specifici per sessioni degradate
 
 Dipendenze:
@@ -355,7 +357,8 @@ Stato attuale:
 - completata protezione e prima vista operativa `audit`
 - completato redirect frontend contestuale per le principali route protette con ripresa della vista richiesta
 - completato fallback uniforme del proxy frontend operativo con pulizia sessione scaduta
-- da completare eventuale estensione della protezione selettiva ad altre viste non ancora classificate come operative
+- completata estensione della protezione selettiva alle principali viste di business del portale
+- da completare eventuale formalizzazione backend della stessa policy su endpoint oggi ancora pubblici
 
 Dipendenze:
 
