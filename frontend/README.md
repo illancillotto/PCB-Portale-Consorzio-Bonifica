@@ -92,6 +92,8 @@ Stato attuale:
 - anche la dashboard principale espone ingressi rapidi verso gli stage operativi di ingestion
 - la vista `audit` espone deep link operativi a run, soggetti e moduli sorgente quando il payload lo consente
 - il dettaglio connector collega contatori, issue e storico run ai filtri stage del monitor `ingestion`
+- la vista `search` espone anche shortcut operativi diretti a `operations`, `audit`, `ingestion` e GIS completo
+- i risultati della `search` offrono azioni esplicite verso scheda PCB, GIS contestuale e ingressi operativi applicativi
 - il feed issue connector arriva gia` ordinato backend-side per severita`
 - riepilogo audit e filtri operativi via query string su `eventType` e `actorType`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS

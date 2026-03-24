@@ -12,7 +12,7 @@ Regole operative:
 
 ## Stato corrente
 
-- Data ultimo aggiornamento: 2026-03-23
+- Data ultimo aggiornamento: 2026-03-24
 - Stato progetto: fondazioni completate, backend core collegato a PostgreSQL/PostGIS, frontend integrato alle API reali per soggetti, particelle, ricerca, ingestion monitor e base GIS, primo connector NAS read-only persistente su `ingest`, normalizzazione iniziale `raw -> normalized` disponibile nel backend
 - Ambiente locale verificato:
   - `docker compose up -d pcb-postgres`
@@ -238,6 +238,8 @@ Nota:
 - endpoint dettaglio connector esteso con elenco issue aperte, eliminando il fetch frontend separato: completato
 - dettaglio connector esteso con filtro `issueType` sulle issue aperte: completato
 - dettaglio connector arricchito con contatori per tipo di issue: completato
+- vista `search` estesa come ingresso operativo verso `operations`, `audit`, `ingestion` e GIS: completato
+- risultati `search` arricchiti con shortcut espliciti a scheda PCB, GIS e ingressi operativi contestuali: completato
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
 - feed issue connector ordinato backend-side per severita` e connector: completato

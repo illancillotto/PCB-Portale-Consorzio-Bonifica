@@ -129,6 +129,7 @@ Stato attuale:
 
 - completati client API, ricerca reale, lista soggetti, scheda soggetto base, lista/vista particella base
 - completati source links e documentale base nella scheda soggetto
+- completata estensione della `search` come ingresso operativo verso GIS, ingestion, audit e operations
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:
