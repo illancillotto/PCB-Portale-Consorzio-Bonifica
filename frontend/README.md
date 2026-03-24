@@ -116,6 +116,8 @@ Stato attuale:
 - gli empty states principali del frontend usano ora un componente condiviso per viste lista e monitor operative
 - le route protette preservano ora `reason` e `next` nel redirect a `login`
 - il login resume reindirizza l'operatore alla vista richiesta dopo autenticazione o sessione non autorizzata
+- il proxy frontend operativo intercetta ora `401/403`, normalizza il ritorno a `login` e pulisce la sessione scaduta
+- i trigger client-side operativi reindirizzano al login contestuale quando la sessione scade durante un'azione
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

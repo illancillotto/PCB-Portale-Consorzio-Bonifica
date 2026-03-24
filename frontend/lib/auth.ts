@@ -1,5 +1,8 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import {
+  buildLoginRedirectPath,
+} from './auth-redirect';
 
 const backendBaseUrl = process.env.PCB_API_BASE_URL ?? 'http://127.0.0.1:3001/api/v1';
 
@@ -36,18 +39,6 @@ async function fetchBackendSession(accessToken: string, path: string) {
     authorized?: boolean;
     principal?: AuthenticatedPrincipal;
   }>;
-}
-
-function buildLoginRedirectPath(reason: 'authentication_required' | 'unauthorized', nextPath?: string) {
-  const params = new URLSearchParams({
-    reason,
-  });
-
-  if (nextPath) {
-    params.set('next', nextPath);
-  }
-
-  return `/login?${params.toString()}`;
 }
 
 export async function getOptionalSession(): Promise<FrontendSession | null> {

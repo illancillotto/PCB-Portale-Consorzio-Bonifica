@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { resolveOperationalActionFailure } from '../lib/operational-action';
 
 interface IngestionRunTriggerProps {
   connectorName: string;
@@ -47,15 +48,24 @@ export function IngestionRunTrigger({
         },
       );
 
-      if (!response.ok) {
-        throw new Error(`Run request failed with status ${response.status}`);
+      const failure = await resolveOperationalActionFailure(
+        response,
+        router,
+        'Avvio run non riuscito',
+      );
+
+      if (failure) {
+        if (!failure.redirected) {
+          setError(failure.message);
+        }
+        return;
       }
 
       const run = (await response.json()) as StartIngestionRunResponse;
       router.push(`/ingestion/${run.id}`);
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : 'Run request failed');
+      setError(caughtError instanceof Error ? caughtError.message : 'Avvio run non riuscito');
     } finally {
       setIsSubmitting(false);
     }

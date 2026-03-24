@@ -260,6 +260,8 @@ Nota:
 - empty states condivisi introdotti e applicati ai principali entry point frontend: completato
 - redirect auth frontend contestuali con `reason` e `next` sulle route protette: completato
 - login frontend con resume automatico verso la vista richiesta: completato
+- proxy frontend operativo con fallback auth uniforme su `401/403`: completato
+- azioni operative client-side con redirect contestuale al login su sessione scaduta: completato
 
 ### 2026-03-24 – Route protette con redirect contestuale
 
@@ -278,6 +280,26 @@ Completato:
   - dettaglio connector `ingestion`
   - dettaglio `subject`
   - dettaglio `parcel`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
+
+### 2026-03-24 – Proxy operativo e fallback auth uniformi
+
+Completato:
+
+- validazione sicura del parametro `next` nel frontend auth
+- proxy `frontend/app/api/pcb/[...path]/route.ts` esteso con payload uniforme per:
+  - `authentication_required`
+  - `unauthorized`
+- pulizia del cookie `pcb_session` quando il backend restituisce `401`
+- redirect al login contestuale anche per azioni operative client-side:
+  - trigger run ingestion
+  - trigger normalize/match
+  - decisioni manuali matching
+  - assegnazione manuale soggetto
 
 Verifiche eseguite:
 

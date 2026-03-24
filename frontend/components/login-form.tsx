@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useState } from 'react';
+import { normalizeNextPath } from '../lib/auth-redirect';
 
 export function LoginForm() {
   const router = useRouter();
@@ -12,7 +13,7 @@ export function LoginForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const reason = searchParams.get('reason');
-  const next = searchParams.get('next');
+  const next = normalizeNextPath(searchParams.get('next'));
   const reasonMessage =
     reason === 'unauthorized'
       ? 'L’accesso alla vista richiesta richiede un ruolo operativo PCB valido.'

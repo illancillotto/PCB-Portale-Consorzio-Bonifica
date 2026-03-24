@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { resolveOperationalActionFailure } from '../lib/operational-action';
 
 interface MatchingSubjectOption {
   id: string;
@@ -41,14 +42,25 @@ export function MatchingSubjectAssignment({
         },
       );
 
-      if (!response.ok) {
-        throw new Error(`assign-subject failed with status ${response.status}`);
+      const failure = await resolveOperationalActionFailure(
+        response,
+        router,
+        'Assegnazione soggetto non riuscita',
+      );
+
+      if (failure) {
+        if (!failure.redirected) {
+          setError(failure.message);
+        }
+        return;
       }
 
       router.refresh();
     } catch (caughtError) {
       setError(
-        caughtError instanceof Error ? caughtError.message : 'assign-subject failed',
+        caughtError instanceof Error
+          ? caughtError.message
+          : 'Assegnazione soggetto non riuscita',
       );
     } finally {
       setIsSubmitting(false);

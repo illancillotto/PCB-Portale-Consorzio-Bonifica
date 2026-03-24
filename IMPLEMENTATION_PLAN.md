@@ -150,7 +150,9 @@ Stato attuale:
 - completati empty states condivisi sui principali entry point frontend
 - completato redirect contestuale verso `login` con `reason` e `next` sulle principali route protette
 - completato resume post-login verso la vista richiesta
-- da completare eventuali fallback/notice ancora più specifici per sessioni degradate
+- completato fallback auth uniforme anche sul proxy operativo frontend per `401/403`
+- completato redirect contestuale al login anche durante le azioni operative client-side
+- da completare eventuali notice ancora più specifici per sessioni degradate
 
 Dipendenze:
 
@@ -352,6 +354,7 @@ Stato attuale:
 - completata protezione delle API operative `ingestion` e `gis`
 - completata protezione e prima vista operativa `audit`
 - completato redirect frontend contestuale per le principali route protette con ripresa della vista richiesta
+- completato fallback uniforme del proxy frontend operativo con pulizia sessione scaduta
 - da completare eventuale estensione della protezione selettiva ad altre viste non ancora classificate come operative
 
 Dipendenze:

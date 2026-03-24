@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { resolveOperationalActionFailure } from '../lib/operational-action';
 
 interface IngestionStageTriggerProps {
   runId: string;
@@ -28,13 +29,26 @@ export function IngestionStageTrigger({ runId, stage }: IngestionStageTriggerPro
         },
       );
 
-      if (!response.ok) {
-        throw new Error(`${stage} failed with status ${response.status}`);
+      const failure = await resolveOperationalActionFailure(
+        response,
+        router,
+        `Operazione ${stage} non riuscita`,
+      );
+
+      if (failure) {
+        if (!failure.redirected) {
+          setError(failure.message);
+        }
+        return;
       }
 
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : `${stage} failed`);
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : `Operazione ${stage} non riuscita`,
+      );
     } finally {
       setIsSubmitting(false);
     }

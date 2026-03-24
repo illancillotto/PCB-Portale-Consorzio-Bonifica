@@ -2,6 +2,7 @@ import { LoginForm } from '../../components/login-form';
 import { PageShell } from '../../components/page-shell';
 import { SectionCard } from '../../components/section-card';
 import { getOptionalSession } from '../../lib/auth';
+import { normalizeNextPath } from '../../lib/auth-redirect';
 import Link from 'next/link';
 
 interface LoginPageProps {
@@ -14,7 +15,7 @@ interface LoginPageProps {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const session = await getOptionalSession();
   const params = (await searchParams) ?? {};
-  const next = params.next;
+  const next = normalizeNextPath(params.next);
 
   return (
     <PageShell

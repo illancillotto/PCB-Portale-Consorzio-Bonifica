@@ -1,6 +1,9 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { pcbSessionCookieName } from '../../../../lib/auth';
+import {
+  pcbSessionCookieName,
+} from '../../../../lib/auth';
+import { buildLoginRedirectPath } from '../../../../lib/auth-redirect';
 
 const backendBaseUrl = process.env.PCB_API_BASE_URL ?? 'http://127.0.0.1:3001/api/v1';
 
@@ -13,7 +16,13 @@ async function proxyRequest(
   const accessToken = cookieStore.get(pcbSessionCookieName)?.value;
 
   if (!accessToken) {
-    return NextResponse.json({ message: 'Missing frontend session.' }, { status: 401 });
+    return buildProxyAuthResponse(
+      request,
+      'authentication_required',
+      'Sessione frontend assente. Effettua di nuovo il login.',
+      401,
+      true,
+    );
   }
 
   const { path } = await context.params;
@@ -34,6 +43,26 @@ async function proxyRequest(
     cache: 'no-store',
   });
 
+  if (response.status === 401) {
+    return buildProxyAuthResponse(
+      request,
+      'authentication_required',
+      'La sessione operatore non e` piu` valida. Effettua di nuovo il login.',
+      401,
+      true,
+    );
+  }
+
+  if (response.status === 403) {
+    return buildProxyAuthResponse(
+      request,
+      'unauthorized',
+      'La sessione corrente non ha i permessi richiesti per questa operazione.',
+      403,
+      false,
+    );
+  }
+
   const responseText = await response.text();
 
   return new NextResponse(responseText, {
@@ -42,6 +71,51 @@ async function proxyRequest(
       'Content-Type': response.headers.get('content-type') ?? 'application/json',
     },
   });
+}
+
+function buildProxyAuthResponse(
+  request: Request,
+  reason: 'authentication_required' | 'unauthorized',
+  message: string,
+  status: 401 | 403,
+  clearSession: boolean,
+) {
+  const requestUrl = new URL(request.url);
+  const referer = request.headers.get('referer');
+
+  let nextPath: string | undefined;
+
+  if (referer) {
+    try {
+      const refererUrl = new URL(referer);
+      nextPath = `${refererUrl.pathname}${refererUrl.search}${refererUrl.hash}`;
+    } catch {
+      nextPath = undefined;
+    }
+  }
+
+  const response = NextResponse.json(
+    {
+      message,
+      reason,
+      loginPath: buildLoginRedirectPath(
+        reason,
+        nextPath ?? `${requestUrl.pathname}${requestUrl.search}`,
+      ),
+    },
+    { status },
+  );
+
+  if (clearSession) {
+    response.cookies.set(pcbSessionCookieName, '', {
+      httpOnly: true,
+      maxAge: 0,
+      path: '/',
+      sameSite: 'lax',
+    });
+  }
+
+  return response;
 }
 
 export async function GET(

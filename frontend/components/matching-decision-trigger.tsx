@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { resolveOperationalActionFailure } from '../lib/operational-action';
 
 interface MatchingDecisionTriggerProps {
   runId: string;
@@ -32,13 +33,26 @@ export function MatchingDecisionTrigger({
         },
       );
 
-      if (!response.ok) {
-        throw new Error(`${action} failed with status ${response.status}`);
+      const failure = await resolveOperationalActionFailure(
+        response,
+        router,
+        `Operazione ${action} non riuscita`,
+      );
+
+      if (failure) {
+        if (!failure.redirected) {
+          setError(failure.message);
+        }
+        return;
       }
 
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : `${action} failed`);
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : `Operazione ${action} non riuscita`,
+      );
     } finally {
       setIsSubmitting(false);
     }
