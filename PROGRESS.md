@@ -253,6 +253,7 @@ Nota:
 - lista run e dettaglio run `ingestion` arricchiti con shortcut diretti a `audit` contestuale: completato
 - dettaglio connector `ingestion` arricchito con shortcut diretti a `audit` del modulo e delle ultime run: completato
 - summary backend dedicato per il dominio `audit`, riusato da dashboard, operations e vista audit: completato
+- dettagli `ingestion` di run e connector arricchiti con contatori audit contestuali: completato
 - catalogo e dettaglio connector arricchiti con `operationalStatus` sintetico: completato
 - catalogo connector ordinato backend-side per priorita` operativa: completato
 - feed issue connector ordinato backend-side per severita` e connector: completato

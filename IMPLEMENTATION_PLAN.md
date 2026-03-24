@@ -143,6 +143,7 @@ Stato attuale:
 - completati shortcut `audit` contestuali anche nella lista run e nel dettaglio run di `ingestion`
 - completati shortcut `audit` anche nel dettaglio connector del dominio `ingestion`
 - completato summary backend dedicato per `audit`, usato dalle principali viste operative
+- completati contatori audit contestuali nei dettagli `ingestion` di run e connector
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:

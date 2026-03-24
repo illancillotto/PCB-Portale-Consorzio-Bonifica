@@ -9,6 +9,7 @@ import { SectionCard } from '../../../components/section-card';
 import { StatusChip } from '../../../components/status-chip';
 import { requireOperatorSession } from '../../../lib/auth';
 import {
+  getAuditSummary,
   getSubjects,
   getIngestionRun,
   getMatchingResults,
@@ -76,10 +77,17 @@ export default async function IngestionRunDetailPage({
     notFound();
   }
 
-  const [normalizedRecords, matchingResults, subjects] = await Promise.all([
+  const [normalizedRecords, matchingResults, subjects, runAuditSummary, ingestAuditSummary] = await Promise.all([
     getNormalizedRecords(id, session.accessToken),
     getMatchingResults(id, session.accessToken),
     getSubjects(),
+    getAuditSummary(session.accessToken, {
+      entityType: 'ingestion_run',
+      entityId: run.id,
+    }),
+    getAuditSummary(session.accessToken, {
+      sourceModule: 'ingest',
+    }),
   ]);
 
   const matchedCount = matchingResults.items.filter(
@@ -215,6 +223,33 @@ export default async function IngestionRunDetailPage({
             </div>
             <p className="mt-3 text-xs text-[var(--pcb-muted)]">
               risultati scritti {run.stages.matching.resultsWritten}
+            </p>
+          </article>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Contesto audit" eyebrow="Audit">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Eventi run</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{runAuditSummary.total}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Ultimo evento run</p>
+            <p className="mt-2 text-sm font-semibold text-[var(--pcb-ink)]">
+              {runAuditSummary.latestCreatedAt
+                ? new Date(runAuditSummary.latestCreatedAt).toLocaleString('it-IT')
+                : 'n/d'}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Eventi modulo ingest</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{ingestAuditSummary.total}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">System operator modulo</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {ingestAuditSummary.systemOperatorEvents}
             </p>
           </article>
         </div>

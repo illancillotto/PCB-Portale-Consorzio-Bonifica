@@ -6,6 +6,7 @@ import { SectionCard } from '../../../../components/section-card';
 import { StatusChip } from '../../../../components/status-chip';
 import { requireOperatorSession } from '../../../../lib/auth';
 import {
+  getAuditSummary,
   getIngestionConnectorDetail,
   getIngestionConnectorRuns,
 } from '../../../../lib/api';
@@ -105,9 +106,26 @@ export default async function ConnectorDetailPage({
     notFound();
   }
 
-  const runs = await getIngestionConnectorRuns(connector.connectorName, session.accessToken, {
-    status: filters.status,
-  });
+  const [runs, ingestAuditSummary, lastCompletedRunAuditSummary, lastFailedRunAuditSummary] = await Promise.all([
+    getIngestionConnectorRuns(connector.connectorName, session.accessToken, {
+      status: filters.status,
+    }),
+    getAuditSummary(session.accessToken, {
+      sourceModule: 'ingest',
+    }),
+    connector.lastCompletedRun
+      ? getAuditSummary(session.accessToken, {
+          entityType: 'ingestion_run',
+          entityId: connector.lastCompletedRun.id,
+        })
+      : Promise.resolve(null),
+    connector.lastFailedRun
+      ? getAuditSummary(session.accessToken, {
+          entityType: 'ingestion_run',
+          entityId: connector.lastFailedRun.id,
+        })
+      : Promise.resolve(null),
+  ]);
   const connectorIssues = connector.issues.filter((issue) => {
     if (filters.issueSeverity && issue.severity !== filters.issueSeverity) {
       return false;
@@ -244,6 +262,33 @@ export default async function ConnectorDetailPage({
             <p className="text-sm text-[var(--pcb-muted)]">Failed</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{connector.runCounters.failed}</p>
           </Link>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Contesto audit" eyebrow="Audit">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Eventi modulo ingest</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{ingestAuditSummary.total}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">System operator modulo</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {ingestAuditSummary.systemOperatorEvents}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Audit ultima completata</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {lastCompletedRunAuditSummary?.total ?? 0}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Audit ultima fallita</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {lastFailedRunAuditSummary?.total ?? 0}
+            </p>
+          </article>
         </div>
       </SectionCard>
 
