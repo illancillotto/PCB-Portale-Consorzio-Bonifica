@@ -92,6 +92,16 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
   const systemOperatorAuditEvents = auditEvents.items.filter(
     (event) => event.actorType === 'system_operator',
   ).length;
+  const auditBySourceModule = Array.from(
+    new Map(
+      auditEvents.items.map((event) => [
+        event.sourceModule,
+        auditEvents.items.filter((candidate) => candidate.sourceModule === event.sourceModule).length,
+      ]),
+    ).entries(),
+  )
+    .map(([sourceModule, total]) => ({ sourceModule, total }))
+    .sort((left, right) => right.total - left.total || left.sourceModule.localeCompare(right.sourceModule));
 
   return (
     <PageShell
@@ -197,6 +207,28 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         <p className="mt-4 text-xs text-[var(--pcb-muted)]">
           Ultimo controllo {new Date(integrations.checkedAt).toLocaleString('it-IT')}
         </p>
+      </SectionCard>
+
+      <SectionCard title="Audit per modulo" eyebrow="Audit">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Link
+            href="/audit"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
+            <p className="text-sm text-[var(--pcb-muted)]">Tutti gli eventi</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{auditEvents.total}</p>
+          </Link>
+          {auditBySourceModule.map((item) => (
+            <Link
+              key={item.sourceModule}
+              href={`/audit?sourceModule=${encodeURIComponent(item.sourceModule)}`}
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+            >
+              <p className="text-sm text-[var(--pcb-muted)]">{item.sourceModule}</p>
+              <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{item.total}</p>
+            </Link>
+          ))}
+        </div>
       </SectionCard>
 
       <SectionCard title="Connector attention" eyebrow="Ingestion">

@@ -135,6 +135,7 @@ Stato attuale:
 - completati riepiloghi cliccabili per attore e modulo sorgente nella vista `audit`
 - completato filtro `entityType/entityId` nella vista `audit`, con ingressi contestuali dalla `search`
 - completato cartiglio frontend dei filtri attivi nella vista `audit`
+- completato riepilogo audit per modulo nella vista `operations`, con deep link verso `audit`
 - da completare loading/error/empty states più raffinati
 
 Dipendenze:
