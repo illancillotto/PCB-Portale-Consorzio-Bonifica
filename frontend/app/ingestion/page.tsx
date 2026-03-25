@@ -34,6 +34,12 @@ interface IngestionPageProps {
   }>;
 }
 
+interface ActiveRunFilter {
+  key: string;
+  label: string;
+  clearHref: string;
+}
+
 function resolveRawOutcomeCounterKey(outcomeCode?: string) {
   if (outcomeCode === 'raw.directory_subject_bucket') {
     return 'directorySubjectBucket';
@@ -114,6 +120,10 @@ function buildRunsFilterHref(filters: {
   const queryString = params.toString();
 
   return queryString ? `/ingestion?${queryString}` : '/ingestion';
+}
+
+function buildRunFilterLabel(label: string, value: string) {
+  return `${label}: ${value}`;
 }
 
 function buildIssueFilterHref(filters: {
@@ -201,6 +211,17 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
     throw error;
   }
   const availableConnectors = Array.from(new Set(runs.items.map((run) => run.connectorName))).sort();
+  const runFilterState = {
+    status: filters.status,
+    connector: filters.connector,
+    rawOutcomeCode: filters.rawOutcomeCode,
+    normalizedOutcomeCode: filters.normalizedOutcomeCode,
+    matchingOutcomeCode: filters.matchingOutcomeCode,
+    acquisitionStage: filters.acquisitionStage,
+    postProcessingStage: filters.postProcessingStage,
+    normalizationStage: filters.normalizationStage,
+    matchingStage: filters.matchingStage,
+  } satisfies Parameters<typeof buildRunsFilterHref>[0];
   const filteredRuns = runs.items.filter((run) => {
     if (filters.status && run.status !== filters.status) {
       return false;
@@ -271,6 +292,72 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
     0,
   );
   const manualConnectors = connectors.items.filter((connector) => connector.triggerMode === 'manual');
+  const activeRunFilters: ActiveRunFilter[] = [
+    filters.status
+      ? {
+          key: 'status',
+          label: buildRunFilterLabel('stato run', filters.status),
+          clearHref: buildRunsFilterHref({ ...runFilterState, status: undefined }),
+        }
+      : null,
+    filters.connector
+      ? {
+          key: 'connector',
+          label: buildRunFilterLabel('connector', filters.connector),
+          clearHref: buildRunsFilterHref({ ...runFilterState, connector: undefined }),
+        }
+      : null,
+    filters.rawOutcomeCode
+      ? {
+          key: 'rawOutcomeCode',
+          label: buildRunFilterLabel('raw outcome', filters.rawOutcomeCode),
+          clearHref: buildRunsFilterHref({ ...runFilterState, rawOutcomeCode: undefined }),
+        }
+      : null,
+    filters.normalizedOutcomeCode
+      ? {
+          key: 'normalizedOutcomeCode',
+          label: buildRunFilterLabel('normalized outcome', filters.normalizedOutcomeCode),
+          clearHref: buildRunsFilterHref({ ...runFilterState, normalizedOutcomeCode: undefined }),
+        }
+      : null,
+    filters.matchingOutcomeCode
+      ? {
+          key: 'matchingOutcomeCode',
+          label: buildRunFilterLabel('matching outcome', filters.matchingOutcomeCode),
+          clearHref: buildRunsFilterHref({ ...runFilterState, matchingOutcomeCode: undefined }),
+        }
+      : null,
+    filters.acquisitionStage
+      ? {
+          key: 'acquisitionStage',
+          label: buildRunFilterLabel('acquisition', filters.acquisitionStage),
+          clearHref: buildRunsFilterHref({ ...runFilterState, acquisitionStage: undefined }),
+        }
+      : null,
+    filters.postProcessingStage
+      ? {
+          key: 'postProcessingStage',
+          label: buildRunFilterLabel('post-processing', filters.postProcessingStage),
+          clearHref: buildRunsFilterHref({ ...runFilterState, postProcessingStage: undefined }),
+        }
+      : null,
+    filters.normalizationStage
+      ? {
+          key: 'normalizationStage',
+          label: buildRunFilterLabel('normalization', filters.normalizationStage),
+          clearHref: buildRunsFilterHref({ ...runFilterState, normalizationStage: undefined }),
+        }
+      : null,
+    filters.matchingStage
+      ? {
+          key: 'matchingStage',
+          label: buildRunFilterLabel('matching', filters.matchingStage),
+          clearHref: buildRunsFilterHref({ ...runFilterState, matchingStage: undefined }),
+        }
+      : null,
+  ].filter((item): item is ActiveRunFilter => item !== null);
+  const hasRunFilters = activeRunFilters.length > 0;
 
   return (
     <PageShell
@@ -743,6 +830,43 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
       </SectionCard>
 
       <SectionCard title="Run disponibili" eyebrow="Ingestion">
+        {hasRunFilters ? (
+          <div className="mb-6 rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div>
+                <p className="text-sm text-[var(--pcb-muted)]">Contesto filtri attivi</p>
+                <p className="mt-2 text-lg font-semibold text-[var(--pcb-ink)]">
+                  {filteredRuns.length} run visibili su {runs.total}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/ingestion"
+                  className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                >
+                  Azzera filtri run
+                </Link>
+                <Link
+                  href="/operations"
+                  className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                >
+                  Torna a operations
+                </Link>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {activeRunFilters.map((filter) => (
+                <Link
+                  key={filter.key}
+                  href={filter.clearHref}
+                  className="rounded-full border border-[var(--pcb-line)] bg-[var(--pcb-surface-2)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                >
+                  {filter.label} ×
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
             href={buildRunsFilterHref({

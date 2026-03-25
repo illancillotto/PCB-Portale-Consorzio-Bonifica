@@ -1597,3 +1597,16 @@ Verifiche eseguite:
 
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-25 – Contesto filtri run nel monitor Ingestion
+
+Completato:
+
+- il monitor `ingestion` mostra ora il contesto dei filtri run attivi
+- i filtri outcome-aware e stage-aware sono removibili singolarmente
+- aggiunti reset completo dei filtri run e ritorno rapido a `operations`
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

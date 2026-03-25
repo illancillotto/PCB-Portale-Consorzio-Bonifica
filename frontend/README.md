@@ -144,6 +144,7 @@ Stato attuale:
 - `operations` espone ora anche ingressi rapidi alle run piu` rilevanti: fallite, queued e da verificare
 - i contatori outcome in `operations` aprono ora il monitor `ingestion` gia` filtrato per outcome e stage
 - `operations` espone ora anche una sezione `Pipeline attention` con shortcut diretti ai casi raw/normalized/matching che richiedono verifica
+- il monitor `ingestion` espone ora il contesto dei filtri run attivi con reset puntuale e ritorno rapido a `operations`
 - il dettaglio run distingue anche `resolutionMode` e `requiresManualReview` sui risultati di matching
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata
