@@ -15,6 +15,7 @@ import { MatchingResultResponseDto } from './dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from './dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from './dto/normalized-record-response.dto';
 import { IngestionOrchestrationSummaryResponseDto } from './dto/orchestration-summary-response.dto';
+import { RawRecordResponseDto } from './dto/raw-record-response.dto';
 import { RunMatchingResponseDto } from './dto/run-matching-response.dto';
 import { StartIngestionRunResponseDto } from './dto/start-ingestion-run-response.dto';
 
@@ -32,8 +33,11 @@ interface IngestionRunRow {
 }
 
 interface RawIngestionRecordRow {
+  id: string;
+  ingestion_run_id: string;
   source_record_id: string;
   payload_jsonb: Record<string, unknown>;
+  captured_at: Date | string;
 }
 
 interface NormalizedIngestionRecordRow {
@@ -960,6 +964,34 @@ export class IngestService {
 
     return {
       items: result.rows.map((row) => this.mapNormalizedRecord(row)),
+      total: result.rows.length,
+    };
+  }
+
+  async listRawRecordsByRunId(id: string) {
+    const run = await this.getRunRowById(id);
+
+    if (!run) {
+      return null;
+    }
+
+    const result = await this.databaseService.query<RawIngestionRecordRow>(
+      `
+        SELECT
+          id,
+          ingestion_run_id,
+          source_record_id,
+          payload_jsonb,
+          captured_at
+        FROM ingest.ingestion_record_raw
+        WHERE ingestion_run_id = $1
+        ORDER BY captured_at ASC, source_record_id ASC
+      `,
+      [id],
+    );
+
+    return {
+      items: result.rows.map((row) => this.mapRawRecord(row)),
       total: result.rows.length,
     };
   }
@@ -1946,6 +1978,17 @@ export class IngestService {
     };
   }
 
+  private mapRawRecord(row: RawIngestionRecordRow): RawRecordResponseDto {
+    return {
+      id: row.id,
+      ingestionRunId: row.ingestion_run_id,
+      sourceRecordId: row.source_record_id,
+      outcomeCode: this.resolveRawOutcomeCode(row.payload_jsonb),
+      payload: row.payload_jsonb,
+      capturedAt: new Date(row.captured_at).toISOString(),
+    };
+  }
+
   private mapMatchingResult(row: MatchingResultRow): MatchingResultResponseDto {
     const outcomeCode = this.resolveMatchingOutcomeCode(row.decision_status, row.decision_type);
 
@@ -2001,6 +2044,34 @@ export class IngestService {
     }
 
     return 'normalize.record_normalized';
+  }
+
+  private resolveRawOutcomeCode(payload: Record<string, unknown>) {
+    const kind = this.readString(payload.kind);
+    const potentialSubjectKey = this.readString(payload.potentialSubjectKey);
+    const bucketLetter = this.readString(payload.bucketLetter);
+
+    if (kind === 'directory' && potentialSubjectKey) {
+      return 'raw.directory_subject_bucket';
+    }
+
+    if (kind === 'directory' && bucketLetter) {
+      return 'raw.directory_bucket_only';
+    }
+
+    if (kind === 'directory') {
+      return 'raw.directory_structure_only';
+    }
+
+    if (kind === 'file' && potentialSubjectKey) {
+      return 'raw.file_subject_hint';
+    }
+
+    if (kind === 'file') {
+      return 'raw.file_without_subject_hint';
+    }
+
+    return 'raw.record_captured';
   }
 
   private resolveMatchingOutcomeCode(decisionStatus: string, decisionType: string) {

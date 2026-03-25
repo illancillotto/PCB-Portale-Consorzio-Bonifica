@@ -1458,3 +1458,19 @@ Verifiche eseguite:
 Nota:
 
 - come nei blocchi precedenti, il primo `lint` frontend e` fallito se lanciato mentre `.next/types` era ancora in rigenerazione; rilanciato a build completata, poi OK
+
+### 2026-03-25 – Outcome metadata strutturati anche sul raw ingest
+
+Completato:
+
+- nuovo endpoint `GET /api/v1/ingestion/runs/{id}/raw-records`
+- i record `raw ingest` espongono ora `outcomeCode` strutturato
+- il dettaglio run mostra ora una sezione dedicata ai record raw con kind, depth, bucket, subject hint e path
+- la visibilità della pipeline ora copre in modo esplicito `raw -> normalized -> matching`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

@@ -21,6 +21,7 @@ import { MatchingResultResponseDto } from '../dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from '../dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from '../dto/normalized-record-response.dto';
 import { IngestionOrchestrationSummaryResponseDto } from '../dto/orchestration-summary-response.dto';
+import { RawRecordResponseDto } from '../dto/raw-record-response.dto';
 import { ListConnectorsQueryDto } from '../dto/list-connectors-query.dto';
 import { ListConnectorIssuesQueryDto } from '../dto/list-connector-issues-query.dto';
 import { ListConnectorRunsQueryDto } from '../dto/list-connector-runs-query.dto';
@@ -112,6 +113,19 @@ export class IngestionController {
   @Post('runs/:id/normalize')
   async normalizeRun(@Param('id') id: string): Promise<NormalizeRunResponseDto> {
     const result = await this.ingestService.normalizeRun(id);
+
+    if (!result) {
+      throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });
+    }
+
+    return result;
+  }
+
+  @Get('runs/:id/raw-records')
+  async listRawRecords(
+    @Param('id') id: string,
+  ): Promise<{ items: RawRecordResponseDto[]; total: number }> {
+    const result = await this.ingestService.listRawRecordsByRunId(id);
 
     if (!result) {
       throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });

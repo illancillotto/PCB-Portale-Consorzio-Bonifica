@@ -132,6 +132,25 @@ export interface IngestionRun {
   };
 }
 
+export interface RawRecord {
+  id: string;
+  ingestionRunId: string;
+  sourceRecordId: string;
+  outcomeCode: string;
+  payload: {
+    path?: string;
+    relativePath?: string;
+    kind?: 'directory' | 'file';
+    depth?: number;
+    sizeBytes?: number | null;
+    modifiedAt?: string | null;
+    fileHash?: string | null;
+    bucketLetter?: string | null;
+    potentialSubjectKey?: string | null;
+  };
+  capturedAt: string;
+}
+
 export interface IngestionConnectorCatalogItem {
   connectorName: string;
   sourceSystem: string;
@@ -653,6 +672,12 @@ export async function getIngestionOrchestrationSummary(accessToken: string) {
 
 export async function getIngestionRun(id: string, accessToken: string) {
   return apiFetch<IngestionRun>(`/ingestion/runs/${id}`, {
+    accessToken,
+  });
+}
+
+export async function getRawRecords(id: string, accessToken: string) {
+  return apiFetch<PaginatedResponse<RawRecord>>(`/ingestion/runs/${id}/raw-records`, {
     accessToken,
   });
 }

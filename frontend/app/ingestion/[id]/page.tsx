@@ -13,6 +13,7 @@ import {
   getIngestionRun,
   getMatchingResults,
   getNormalizedRecords,
+  getRawRecords,
   getSubjects,
   isApiError,
 } from '../../../lib/api';
@@ -94,13 +95,15 @@ export default async function IngestionRunDetailPage({
   }
 
   let normalizedRecords;
+  let rawRecords;
   let matchingResults;
   let subjects;
   let runAuditSummary;
   let ingestAuditSummary;
 
   try {
-    [normalizedRecords, matchingResults, subjects, runAuditSummary, ingestAuditSummary] = await Promise.all([
+    [rawRecords, normalizedRecords, matchingResults, subjects, runAuditSummary, ingestAuditSummary] = await Promise.all([
+      getRawRecords(id, session.accessToken),
       getNormalizedRecords(id, session.accessToken),
       getMatchingResults(id, session.accessToken),
       getSubjects(session.accessToken),
@@ -305,6 +308,10 @@ export default async function IngestionRunDetailPage({
       <SectionCard title="Esiti pipeline" eyebrow="Workflow">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Record raw</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{rawRecords.total}</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Record normalizzati</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
               {normalizedRecords.total}
@@ -327,6 +334,64 @@ export default async function IngestionRunDetailPage({
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{rejectedCount}</p>
           </article>
         </div>
+      </SectionCard>
+
+      <SectionCard title="Raw ingest records" eyebrow="Raw">
+        {rawRecords.items.length === 0 ? (
+          <p className="text-sm text-[var(--pcb-muted)]">
+            Nessun record raw disponibile per questa run.
+          </p>
+        ) : (
+          <div className="grid gap-4">
+            {rawRecords.items.map((item) => (
+              <article
+                key={item.id}
+                className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+              >
+                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <h3 className="text-base font-semibold text-[var(--pcb-ink)]">
+                      {item.sourceRecordId}
+                    </h3>
+                    <p className="mt-1 text-sm text-[var(--pcb-muted)]">
+                      {item.payload.relativePath ?? 'Percorso non disponibile'}
+                    </p>
+                  </div>
+                  <StatusChip label={item.payload.kind ?? 'raw'} />
+                </div>
+                <dl className="mt-4 grid gap-3 text-sm text-[var(--pcb-muted)] md:grid-cols-2 xl:grid-cols-4">
+                  <div>
+                    <dt className="font-medium text-[var(--pcb-ink)]">Kind</dt>
+                    <dd>{item.payload.kind ?? 'n/d'}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--pcb-ink)]">Depth</dt>
+                    <dd>{item.payload.depth ?? 'n/d'}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--pcb-ink)]">Bucket</dt>
+                    <dd>{item.payload.bucketLetter ?? 'n/d'}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--pcb-ink)]">Subject hint</dt>
+                    <dd>{item.payload.potentialSubjectKey ?? 'n/d'}</dd>
+                  </div>
+                  <div className="md:col-span-2 xl:col-span-3">
+                    <dt className="font-medium text-[var(--pcb-ink)]">Path</dt>
+                    <dd className="break-all">{item.payload.path ?? item.payload.relativePath ?? 'n/d'}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--pcb-ink)]">Captured</dt>
+                    <dd>{new Date(item.capturedAt).toLocaleString('it-IT')}</dd>
+                  </div>
+                </dl>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
+                  {item.outcomeCode}
+                </p>
+              </article>
+            ))}
+          </div>
+        )}
       </SectionCard>
 
       <SectionCard title="Normalized records" eyebrow="Normalized">
