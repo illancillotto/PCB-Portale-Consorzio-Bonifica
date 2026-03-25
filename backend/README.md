@@ -139,6 +139,7 @@ Schema errori applicativo:
   - `error.path`
   - `error.timestamp`
   - `error.requestId`
+- ogni request backend riceve e restituisce anche header `x-request-id`
 - il dominio `ingest` espone anche codici errore applicativi stabili, ad esempio:
   - `ingest.connector_unsupported`
   - `ingest.connector_not_runnable`

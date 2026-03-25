@@ -1346,3 +1346,22 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-25 – Correlazione end-to-end dei request ID
+
+Completato:
+
+- middleware backend che assegna e restituisce `x-request-id` per ogni request
+- filtro globale backend riallineato a `request.requestId`
+- proxy frontend `/api/pcb` riallineato per:
+  - inoltrare `x-request-id` al backend
+  - restituire `x-request-id` al client
+  - preservare lo stesso `requestId` anche nei `401/403` locali del proxy
+- `ApiError` frontend riallineato per leggere `requestId` anche dagli header di risposta
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

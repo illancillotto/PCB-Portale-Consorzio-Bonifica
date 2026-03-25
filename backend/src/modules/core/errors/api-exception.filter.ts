@@ -13,6 +13,7 @@ interface HttpRequestLike {
   method: string;
   url: string;
   headers?: unknown;
+  requestId?: string;
 }
 
 interface HttpResponseLike {
@@ -163,6 +164,10 @@ export class ApiExceptionFilter implements ExceptionFilter {
   }
 
   private resolveRequestId(request: HttpRequestLike) {
+    if (request.requestId && request.requestId.trim().length > 0) {
+      return request.requestId;
+    }
+
     const headerValue = this.readHeader(request.headers, 'x-request-id');
 
     if (typeof headerValue === 'string' && headerValue.trim().length > 0) {

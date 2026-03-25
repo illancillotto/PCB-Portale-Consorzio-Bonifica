@@ -1,7 +1,17 @@
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { randomUUID } from 'crypto';
 import { AppModule } from './app.module';
 import { ApiExceptionFilter } from './modules/core/errors/api-exception.filter';
+
+interface RequestLike {
+  headers: Record<string, string | string[] | undefined>;
+  requestId?: string;
+}
+
+interface ResponseLike {
+  setHeader(name: string, value: string): void;
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +30,19 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new ApiExceptionFilter());
+  app.use((request: RequestLike, response: ResponseLike, next: () => void) => {
+    const headerValue = request.headers['x-request-id'];
+    const requestId =
+      typeof headerValue === 'string'
+        ? headerValue
+        : Array.isArray(headerValue) && headerValue[0]
+          ? headerValue[0]
+          : randomUUID();
+
+    request.requestId = requestId;
+    response.setHeader('x-request-id', requestId);
+    next();
+  });
 
   const port = Number(process.env.PCB_API_PORT ?? 3001);
   const host = process.env.PCB_API_HOST ?? '0.0.0.0';

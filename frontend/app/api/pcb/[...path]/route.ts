@@ -13,12 +13,14 @@ async function proxyRequest(
   context: { params: Promise<{ path: string[] }> },
   method: 'GET' | 'POST',
 ) {
+  const proxyRequestId = request.headers.get('x-request-id') ?? randomUUID();
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(pcbSessionCookieName)?.value;
 
   if (!accessToken) {
     return buildProxyAuthResponse(
       request,
+      proxyRequestId,
       'authentication_required',
       'Sessione frontend assente. Effettua di nuovo il login.',
       401,
@@ -38,6 +40,7 @@ async function proxyRequest(
     method,
     headers: {
       Authorization: `Bearer ${accessToken}`,
+      'x-request-id': proxyRequestId,
       ...(method === 'POST' ? { 'Content-Type': 'application/json' } : {}),
     },
     body: method === 'POST' ? await request.text() : undefined,
@@ -47,6 +50,7 @@ async function proxyRequest(
   if (response.status === 401) {
     return buildProxyAuthResponse(
       request,
+      response.headers.get('x-request-id') ?? proxyRequestId,
       'authentication_required',
       'La sessione operatore non e` piu` valida. Effettua di nuovo il login.',
       401,
@@ -57,6 +61,7 @@ async function proxyRequest(
   if (response.status === 403) {
     return buildProxyAuthResponse(
       request,
+      response.headers.get('x-request-id') ?? proxyRequestId,
       'unauthorized',
       'La sessione corrente non ha i permessi richiesti per questa operazione.',
       403,
@@ -70,12 +75,14 @@ async function proxyRequest(
     status: response.status,
     headers: {
       'Content-Type': response.headers.get('content-type') ?? 'application/json',
+      'x-request-id': response.headers.get('x-request-id') ?? proxyRequestId,
     },
   });
 }
 
 function buildProxyAuthResponse(
   request: Request,
+  requestId: string,
   reason: 'authentication_required' | 'unauthorized',
   message: string,
   status: 401 | 403,
@@ -109,11 +116,13 @@ function buildProxyAuthResponse(
         details: null,
         path: nextPath ?? `${requestUrl.pathname}${requestUrl.search}`,
         timestamp: new Date().toISOString(),
-        requestId: randomUUID(),
+        requestId,
       },
     },
     { status },
   );
+
+  response.headers.set('x-request-id', requestId);
 
   if (clearSession) {
     response.cookies.set(pcbSessionCookieName, '', {

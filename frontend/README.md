@@ -125,6 +125,7 @@ Stato attuale:
 - le azioni operative `ingestion` e `matching` classificano ora gli errori in `authentication`, `authorization`, `domain`, `runtime`
 - i pannelli errore operativi mostrano anche `error.code` e `requestId` quando disponibili
 - le viste server-side principali intercettano ora `ApiError` e mostrano pannelli SSR con classificazione `domain/runtime/auth`
+- il proxy `/api/pcb` propaga `x-request-id` verso il backend e lo rende disponibile anche ai pannelli errore frontend
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

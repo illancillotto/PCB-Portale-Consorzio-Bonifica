@@ -486,7 +486,7 @@ async function apiFetch<T>(path: string, options?: ApiFetchOptions): Promise<T> 
         `PCB API request failed: ${response.status} ${response.statusText}`,
       statusCode: payload?.statusCode ?? response.status,
       code: payload?.error?.code ?? null,
-      requestId: payload?.error?.requestId ?? null,
+      requestId: payload?.error?.requestId ?? response.headers.get('x-request-id'),
       details: payload?.error?.details ?? null,
     });
   }
