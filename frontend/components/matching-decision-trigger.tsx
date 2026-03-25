@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { resolveOperationalActionFailure } from '../lib/operational-action';
+import { OperationalErrorNotice } from './operational-error-notice';
+import { OperationalActionFailure, resolveOperationalActionFailure } from '../lib/operational-action';
 
 interface MatchingDecisionTriggerProps {
   runId: string;
@@ -17,13 +18,13 @@ export function MatchingDecisionTrigger({
 }: MatchingDecisionTriggerProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<OperationalActionFailure | null>(null);
 
   const label = action === 'confirm-match' ? 'Conferma match' : 'Conferma no match';
 
   async function handleAction() {
     setIsSubmitting(true);
-    setError(null);
+    setFailure(null);
 
     try {
       const response = await fetch(
@@ -41,18 +42,23 @@ export function MatchingDecisionTrigger({
 
       if (failure) {
         if (!failure.redirected) {
-          setError(failure.message);
+          setFailure(failure);
         }
         return;
       }
 
       router.refresh();
     } catch (caughtError) {
-      setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : `Operazione ${action} non riuscita`,
-      );
+      setFailure({
+        redirected: false,
+        kind: 'runtime',
+        code: null,
+        message:
+          caughtError instanceof Error
+            ? caughtError.message
+            : `Operazione ${action} non riuscita`,
+        requestId: null,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -68,7 +74,7 @@ export function MatchingDecisionTrigger({
       >
         {isSubmitting ? 'Aggiornamento...' : label}
       </button>
-      {error ? <p className="text-sm text-[#9b3d2e]">{error}</p> : null}
+      <OperationalErrorNotice failure={failure} />
     </div>
   );
 }

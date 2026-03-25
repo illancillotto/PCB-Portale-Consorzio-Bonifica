@@ -122,6 +122,8 @@ Stato attuale:
 - la navigazione globale instrada gli utenti non autenticati verso `login` con ritorno contestuale alla vista richiesta
 - le API di business `subjects`, `parcels` e `search` passano ora sempre da bearer token esplicito
 - il proxy operativo frontend riallinea i `401/403` allo stesso schema errore del backend
+- le azioni operative `ingestion` e `matching` classificano ora gli errori in `authentication`, `authorization`, `domain`, `runtime`
+- i pannelli errore operativi mostrano anche `error.code` e `requestId` quando disponibili
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

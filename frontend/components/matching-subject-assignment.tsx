@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { resolveOperationalActionFailure } from '../lib/operational-action';
+import { OperationalErrorNotice } from './operational-error-notice';
+import { OperationalActionFailure, resolveOperationalActionFailure } from '../lib/operational-action';
 
 interface MatchingSubjectOption {
   id: string;
@@ -23,16 +24,22 @@ export function MatchingSubjectAssignment({
   const router = useRouter();
   const [selectedSubjectId, setSelectedSubjectId] = useState(options[0]?.id ?? '');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<OperationalActionFailure | null>(null);
 
   async function handleAssign() {
     if (!selectedSubjectId) {
-      setError('Seleziona un soggetto');
+      setFailure({
+        redirected: false,
+        kind: 'domain',
+        code: 'ingest.subject_selection_required',
+        message: 'Seleziona un soggetto',
+        requestId: null,
+      });
       return;
     }
 
     setIsSubmitting(true);
-    setError(null);
+    setFailure(null);
 
     try {
       const response = await fetch(
@@ -50,18 +57,23 @@ export function MatchingSubjectAssignment({
 
       if (failure) {
         if (!failure.redirected) {
-          setError(failure.message);
+          setFailure(failure);
         }
         return;
       }
 
       router.refresh();
     } catch (caughtError) {
-      setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : 'Assegnazione soggetto non riuscita',
-      );
+      setFailure({
+        redirected: false,
+        kind: 'runtime',
+        code: null,
+        message:
+          caughtError instanceof Error
+            ? caughtError.message
+            : 'Assegnazione soggetto non riuscita',
+        requestId: null,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -88,7 +100,7 @@ export function MatchingSubjectAssignment({
       >
         {isSubmitting ? 'Assegnazione...' : 'Assegna soggetto'}
       </button>
-      {error ? <p className="text-sm text-[#9b3d2e]">{error}</p> : null}
+      <OperationalErrorNotice failure={failure} />
     </div>
   );
 }

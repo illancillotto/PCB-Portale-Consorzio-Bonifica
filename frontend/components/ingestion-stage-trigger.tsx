@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { resolveOperationalActionFailure } from '../lib/operational-action';
+import { OperationalErrorNotice } from './operational-error-notice';
+import { OperationalActionFailure, resolveOperationalActionFailure } from '../lib/operational-action';
 
 interface IngestionStageTriggerProps {
   runId: string;
@@ -12,14 +13,14 @@ interface IngestionStageTriggerProps {
 export function IngestionStageTrigger({ runId, stage }: IngestionStageTriggerProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<OperationalActionFailure | null>(null);
 
   const label =
     stage === 'normalize' ? 'Esegui normalizzazione' : 'Esegui matching';
 
   async function handleAction() {
     setIsSubmitting(true);
-    setError(null);
+    setFailure(null);
 
     try {
       const response = await fetch(
@@ -37,18 +38,23 @@ export function IngestionStageTrigger({ runId, stage }: IngestionStageTriggerPro
 
       if (failure) {
         if (!failure.redirected) {
-          setError(failure.message);
+          setFailure(failure);
         }
         return;
       }
 
       router.refresh();
     } catch (caughtError) {
-      setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : `Operazione ${stage} non riuscita`,
-      );
+      setFailure({
+        redirected: false,
+        kind: 'runtime',
+        code: null,
+        message:
+          caughtError instanceof Error
+            ? caughtError.message
+            : `Operazione ${stage} non riuscita`,
+        requestId: null,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -64,7 +70,7 @@ export function IngestionStageTrigger({ runId, stage }: IngestionStageTriggerPro
       >
         {isSubmitting ? 'Operazione in corso...' : label}
       </button>
-      {error ? <p className="text-sm text-[#9b3d2e]">{error}</p> : null}
+      <OperationalErrorNotice failure={failure} />
     </div>
   );
 }

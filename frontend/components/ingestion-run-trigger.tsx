@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { resolveOperationalActionFailure } from '../lib/operational-action';
+import { OperationalErrorNotice } from './operational-error-notice';
+import { OperationalActionFailure, resolveOperationalActionFailure } from '../lib/operational-action';
 
 interface IngestionRunTriggerProps {
   connectorName: string;
@@ -30,7 +31,7 @@ export function IngestionRunTrigger({
 }: IngestionRunTriggerProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<OperationalActionFailure | null>(null);
 
   async function handleRun() {
     if (disabled) {
@@ -38,7 +39,7 @@ export function IngestionRunTrigger({
     }
 
     setIsSubmitting(true);
-    setError(null);
+    setFailure(null);
 
     try {
       const response = await fetch(
@@ -56,7 +57,7 @@ export function IngestionRunTrigger({
 
       if (failure) {
         if (!failure.redirected) {
-          setError(failure.message);
+          setFailure(failure);
         }
         return;
       }
@@ -65,7 +66,13 @@ export function IngestionRunTrigger({
       router.push(`/ingestion/${run.id}`);
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : 'Avvio run non riuscito');
+      setFailure({
+        redirected: false,
+        kind: 'runtime',
+        code: null,
+        message: caughtError instanceof Error ? caughtError.message : 'Avvio run non riuscito',
+        requestId: null,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -82,7 +89,7 @@ export function IngestionRunTrigger({
         {isSubmitting ? 'Avvio in corso...' : disabled ? `Bloccato ${connectorName}` : `Esegui ${connectorName}`}
       </button>
       {disabled && disabledReason ? <p className="text-sm text-[var(--pcb-muted)]">{disabledReason}</p> : null}
-      {error ? <p className="text-sm text-[#9b3d2e]">{error}</p> : null}
+      <OperationalErrorNotice failure={failure} />
     </div>
   );
 }

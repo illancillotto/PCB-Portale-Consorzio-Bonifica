@@ -1295,3 +1295,28 @@ Verifiche eseguite:
 
 - `npm run lint --workspace backend`
 - `npm run build --workspace backend`
+
+### 2026-03-25 – Classificazione errori operativi nel frontend
+
+Completato:
+
+- classificazione frontend dei fallimenti operativi in:
+  - `authentication`
+  - `authorization`
+  - `domain`
+  - `runtime`
+- pannello riusabile per errori operativi con:
+  - titolo coerente per tipo errore
+  - `error.code`
+  - `requestId`
+- adozione sui trigger:
+  - avvio run ingestion
+  - normalizzazione
+  - matching
+  - decisioni manuali
+  - assegnazione soggetto
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`
