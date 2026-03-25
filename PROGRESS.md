@@ -1474,3 +1474,19 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-25 – Summary raw ingest strutturati nel monitor operativo
+
+Completato:
+
+- le run `ingestion` espongono ora `rawSummary` derivato dal layer `ingestion_record_raw`
+- il catalogo e il dettaglio connector riportano il summary raw dell’ultima run disponibile
+- il monitor `ingestion` mostra i volumi raw catturati e i subject hint rilevati
+- il dettaglio connector mostra raw summary su ultima run, ultimo completamento e ultimo fallimento
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

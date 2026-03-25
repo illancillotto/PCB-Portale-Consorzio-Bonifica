@@ -19,6 +19,13 @@ export interface IngestionConnectorCatalogResponseDto {
     status: string;
     startedAt: string;
     endedAt: string | null;
+    rawSummary: {
+      totalRecords: number;
+      directoryRecords: number;
+      fileRecords: number;
+      subjectHintRecords: number;
+      bucketRecords: number;
+    };
     failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
     failureCode: string | null;
   } | null;

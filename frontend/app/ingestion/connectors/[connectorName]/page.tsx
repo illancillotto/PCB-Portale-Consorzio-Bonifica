@@ -251,6 +251,14 @@ export default async function ConnectorDetailPage({
             <strong className="text-[var(--pcb-ink)]">Issue aperte:</strong> {connector.issueCounters.total}
             {' · '}critiche {connector.issueCounters.critical} · warning {connector.issueCounters.warning}
           </p>
+          {connector.latestRun ? (
+            <p className="mt-2">
+              <strong className="text-[var(--pcb-ink)]">Ultimo raw ingest:</strong>{' '}
+              {connector.latestRun.rawSummary.totalRecords} record
+              {' · '}hint {connector.latestRun.rawSummary.subjectHintRecords}
+              {' · '}bucket {connector.latestRun.rawSummary.bucketRecords}
+            </p>
+          ) : null}
           {connector.latestRun?.failureCode ? (
             <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
               {connector.latestRun.failureCode}
@@ -366,6 +374,10 @@ export default async function ConnectorDetailPage({
                 <p className="mt-2 text-xs text-[var(--pcb-muted)]">
                   {connector.lastCompletedRun.recordsSuccess}/{connector.lastCompletedRun.recordsTotal} successi
                 </p>
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  raw {connector.lastCompletedRun.rawSummary.totalRecords} · hint{' '}
+                  {connector.lastCompletedRun.rawSummary.subjectHintRecords}
+                </p>
                 <Link
                   href={buildIngestionStageHref({
                     connector: connector.connectorName,
@@ -395,6 +407,10 @@ export default async function ConnectorDetailPage({
                 </p>
                 <p className="mt-2 text-xs text-[var(--pcb-muted)]">
                   {connector.lastFailedRun.recordsError} errori · {connector.lastFailedRun.logExcerpt || 'senza log'}
+                </p>
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  raw {connector.lastFailedRun.rawSummary.totalRecords} · hint{' '}
+                  {connector.lastFailedRun.rawSummary.subjectHintRecords}
                 </p>
                 {connector.lastFailedRun.failureCode ? (
                   <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">

@@ -196,6 +196,11 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
     (run) => run.stages.postProcessing.status === 'running',
   ).length;
   const totalRecords = runs.items.reduce((total, run) => total + run.recordsTotal, 0);
+  const totalRawRecords = runs.items.reduce((total, run) => total + run.rawSummary.totalRecords, 0);
+  const totalRawSubjectHints = runs.items.reduce(
+    (total, run) => total + run.rawSummary.subjectHintRecords,
+    0,
+  );
   const manualConnectors = connectors.items.filter((connector) => connector.triggerMode === 'manual');
 
   return (
@@ -218,7 +223,7 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
       <IngestionAutoRefresh enabled={queuedRuns > 0 || runningRuns > 0} />
 
       <SectionCard title="Riepilogo operativo" eyebrow="Summary">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Run totali</p>
             <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{runs.total}</p>
@@ -249,6 +254,13 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                 {failedRuns} run con errori
               </p>
             ) : null}
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Raw ingest</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{totalRawRecords}</p>
+            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+              {totalRawSubjectHints} con subject hint
+            </p>
           </article>
         </div>
       </SectionCard>
@@ -943,6 +955,10 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                     {run.failureStage ? ` · ${run.failureStage}` : ''}
                   </p>
                 ) : null}
+                <p className="mt-2 text-sm text-[var(--pcb-muted)]">
+                  raw {run.rawSummary.totalRecords} · dir {run.rawSummary.directoryRecords} · file{' '}
+                  {run.rawSummary.fileRecords} · hint {run.rawSummary.subjectHintRecords}
+                </p>
                 <p className="mt-2 text-sm text-[var(--pcb-muted)]">
                   normalizzati {run.stages.normalization.recordsWritten} · matching{' '}
                   {run.stages.matching.resultsWritten}

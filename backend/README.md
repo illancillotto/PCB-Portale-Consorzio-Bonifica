@@ -154,6 +154,7 @@ Schema errori applicativo:
 - i record `normalized` espongono anche `outcomeCode` strutturato
 - i risultati `matching` espongono anche `outcomeCode`, `requiresManualReview` e `resolutionMode`
 - i record `raw ingest` espongono anche `outcomeCode` strutturato via `GET /api/v1/ingestion/runs/{id}/raw-records`
+- le run `ingestion` e il dettaglio connector espongono anche `rawSummary` strutturato derivato da `ingestion_record_raw`
 - anche i domini `auth`, `anagrafiche` e `catasto` espongono codici errore stabili, ad esempio:
   - `auth.authorization_header_missing`
   - `auth.invalid_authorization_header`

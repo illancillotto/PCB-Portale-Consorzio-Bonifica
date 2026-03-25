@@ -95,6 +95,14 @@ interface NumericCountRow {
   total: string | number;
 }
 
+interface RawSummaryRow {
+  total_records: string | number;
+  directory_records: string | number;
+  file_records: string | number;
+  subject_hint_records: string | number;
+  bucket_records: string | number;
+}
+
 interface TimestampRow {
   latest_run_at: Date | string | null;
 }
@@ -289,9 +297,10 @@ export class IngestService {
                 status: latestRun.status,
                 startedAt: latestRun.startedAt,
                 endedAt: latestRun.endedAt,
+                rawSummary: latestRun.rawSummary,
                 failureStage: latestRun.failureStage,
                 failureCode: latestRun.failureCode,
-          }
+              }
             : null,
           issueCounters,
         };
@@ -537,6 +546,7 @@ export class IngestService {
     const lastCompletedRun = runsResult.rows.find((row) => row.status === 'completed') ?? null;
     const lastFailedRun = runsResult.rows.find((row) => row.status === 'failed') ?? null;
     const latestRunMapped = latestRun ? await this.mapRun(latestRun) : null;
+    const lastCompletedRunMapped = lastCompletedRun ? await this.mapRun(lastCompletedRun) : null;
     const lastFailedRunMapped = lastFailedRun ? await this.mapRun(lastFailedRun) : null;
     const executionReadiness = this.getConnectorExecutionReadiness(connectorName);
     const issueCounters = connectorIssues.items.reduce(
@@ -597,6 +607,7 @@ export class IngestService {
             status: latestRun.status,
             startedAt: new Date(latestRun.started_at).toISOString(),
             endedAt: latestRun.ended_at ? new Date(latestRun.ended_at).toISOString() : null,
+            rawSummary: latestRunMapped?.rawSummary ?? this.emptyRawSummary(),
             failureStage: latestRunMapped?.failureStage ?? null,
             failureCode: latestRunMapped?.failureCode ?? null,
           }
@@ -612,6 +623,7 @@ export class IngestService {
             recordsTotal: lastCompletedRun.records_total,
             recordsSuccess: lastCompletedRun.records_success,
             recordsError: lastCompletedRun.records_error,
+            rawSummary: lastCompletedRunMapped?.rawSummary ?? this.emptyRawSummary(),
           }
         : null,
       lastFailedRun: lastFailedRun
@@ -624,6 +636,7 @@ export class IngestService {
             recordsSuccess: lastFailedRun.records_success,
             recordsError: lastFailedRun.records_error,
             logExcerpt: lastFailedRun.log_excerpt ?? '',
+            rawSummary: lastFailedRunMapped?.rawSummary ?? this.emptyRawSummary(),
             failureStage: lastFailedRunMapped?.failureStage ?? null,
             failureCode: lastFailedRunMapped?.failureCode ?? null,
           }
@@ -1731,7 +1744,7 @@ export class IngestService {
 
   private async mapRun(row: IngestionRunRow): Promise<IngestionRunResponseDto> {
     const postProcessingConfig = this.getPostProcessingConfig();
-    const [postProcessingState, normalizationState, matchingState, normalizedCount, matchingCount] =
+    const [postProcessingState, normalizationState, matchingState, rawSummary, normalizedCount, matchingCount] =
       await Promise.all([
         this.redisService.getJson<PostProcessingRuntimeState>(
           `pcb:ingest:runs:${row.id}:post-processing`,
@@ -1740,6 +1753,7 @@ export class IngestService {
           `pcb:ingest:runs:${row.id}:normalization`,
         ),
         this.redisService.getJson<MatchingRuntimeState>(`pcb:ingest:runs:${row.id}:matching`),
+        this.getRawSummaryByRunId(row.id),
         this.countNormalizedRecords(row.id),
         this.countMatchingResults(row.id),
       ]);
@@ -1786,6 +1800,7 @@ export class IngestService {
       recordsSuccess: row.records_success,
       recordsError: row.records_error,
       logExcerpt: row.log_excerpt ?? '',
+      rawSummary,
       failureStage: failure?.stage ?? null,
       failureCode: failure?.code ?? null,
       stages: {
@@ -1860,6 +1875,52 @@ export class IngestService {
     }
 
     return 'ingest.acquisition_failed';
+  }
+
+  private async getRawSummaryByRunId(runId: string) {
+    const result = await this.databaseService.query<RawSummaryRow>(
+      `
+        SELECT
+          COUNT(*)::text AS total_records,
+          COUNT(*) FILTER (WHERE payload_jsonb ->> 'kind' = 'directory')::text AS directory_records,
+          COUNT(*) FILTER (WHERE payload_jsonb ->> 'kind' = 'file')::text AS file_records,
+          COUNT(*) FILTER (
+            WHERE COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') <> ''
+          )::text AS subject_hint_records,
+          COUNT(*) FILTER (
+            WHERE COALESCE(NULLIF(payload_jsonb ->> 'bucketLetter', ''), '') <> ''
+          )::text AS bucket_records
+        FROM ingest.ingestion_record_raw
+        WHERE ingestion_run_id = $1
+      `,
+      [runId],
+    );
+
+    return this.mapRawSummary(result.rows[0]);
+  }
+
+  private mapRawSummary(row?: RawSummaryRow) {
+    if (!row) {
+      return this.emptyRawSummary();
+    }
+
+    return {
+      totalRecords: Number(row.total_records ?? 0),
+      directoryRecords: Number(row.directory_records ?? 0),
+      fileRecords: Number(row.file_records ?? 0),
+      subjectHintRecords: Number(row.subject_hint_records ?? 0),
+      bucketRecords: Number(row.bucket_records ?? 0),
+    };
+  }
+
+  private emptyRawSummary() {
+    return {
+      totalRecords: 0,
+      directoryRecords: 0,
+      fileRecords: 0,
+      subjectHintRecords: 0,
+      bucketRecords: 0,
+    };
   }
 
   private resolveConnectorIssueFailureCode(

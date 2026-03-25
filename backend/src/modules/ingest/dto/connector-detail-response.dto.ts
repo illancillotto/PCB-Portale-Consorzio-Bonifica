@@ -19,6 +19,13 @@ export interface IngestionConnectorDetailResponseDto {
     status: string;
     startedAt: string;
     endedAt: string | null;
+    rawSummary: {
+      totalRecords: number;
+      directoryRecords: number;
+      fileRecords: number;
+      subjectHintRecords: number;
+      bucketRecords: number;
+    };
     failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
     failureCode: string | null;
   } | null;
@@ -30,6 +37,13 @@ export interface IngestionConnectorDetailResponseDto {
     recordsTotal: number;
     recordsSuccess: number;
     recordsError: number;
+    rawSummary: {
+      totalRecords: number;
+      directoryRecords: number;
+      fileRecords: number;
+      subjectHintRecords: number;
+      bucketRecords: number;
+    };
   } | null;
   lastFailedRun: {
     id: string;
@@ -40,6 +54,13 @@ export interface IngestionConnectorDetailResponseDto {
     recordsSuccess: number;
     recordsError: number;
     logExcerpt: string;
+    rawSummary: {
+      totalRecords: number;
+      directoryRecords: number;
+      fileRecords: number;
+      subjectHintRecords: number;
+      bucketRecords: number;
+    };
     failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
     failureCode: string | null;
   } | null;

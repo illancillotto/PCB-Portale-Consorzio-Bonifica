@@ -539,3 +539,4 @@ Estensioni completate:
 - il dominio `ingestion` espone ora failure metadata strutturati (`failureCode`, `failureStage`) su run e connector issue
 - la pipeline `normalized -> matching` espone ora anche outcome metadata strutturati a livello record
 - la pipeline `raw -> normalized -> matching` espone ora outcome metadata strutturati su tutti i livelli record
+- il monitor operativo e il dettaglio connector espongono ora anche `rawSummary` strutturato per run e ultima esecuzione

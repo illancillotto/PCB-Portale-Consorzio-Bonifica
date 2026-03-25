@@ -110,6 +110,13 @@ export interface IngestionRun {
   recordsSuccess: number;
   recordsError: number;
   logExcerpt: string;
+  rawSummary: {
+    totalRecords: number;
+    directoryRecords: number;
+    fileRecords: number;
+    subjectHintRecords: number;
+    bucketRecords: number;
+  };
   failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
   failureCode: string | null;
   stages: {
@@ -172,6 +179,13 @@ export interface IngestionConnectorCatalogItem {
     status: string;
     startedAt: string;
     endedAt: string | null;
+    rawSummary: {
+      totalRecords: number;
+      directoryRecords: number;
+      fileRecords: number;
+      subjectHintRecords: number;
+      bucketRecords: number;
+    };
     failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
     failureCode: string | null;
   } | null;
@@ -203,6 +217,13 @@ export interface IngestionConnectorDetail {
     status: string;
     startedAt: string;
     endedAt: string | null;
+    rawSummary: {
+      totalRecords: number;
+      directoryRecords: number;
+      fileRecords: number;
+      subjectHintRecords: number;
+      bucketRecords: number;
+    };
     failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
     failureCode: string | null;
   } | null;
@@ -214,6 +235,13 @@ export interface IngestionConnectorDetail {
     recordsTotal: number;
     recordsSuccess: number;
     recordsError: number;
+    rawSummary: {
+      totalRecords: number;
+      directoryRecords: number;
+      fileRecords: number;
+      subjectHintRecords: number;
+      bucketRecords: number;
+    };
   } | null;
   lastFailedRun: {
     id: string;
@@ -224,6 +252,13 @@ export interface IngestionConnectorDetail {
     recordsSuccess: number;
     recordsError: number;
     logExcerpt: string;
+    rawSummary: {
+      totalRecords: number;
+      directoryRecords: number;
+      fileRecords: number;
+      subjectHintRecords: number;
+      bucketRecords: number;
+    };
     failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
     failureCode: string | null;
   } | null;

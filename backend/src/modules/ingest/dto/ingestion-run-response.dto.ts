@@ -9,6 +9,13 @@ export interface IngestionRunResponseDto {
   recordsSuccess: number;
   recordsError: number;
   logExcerpt: string;
+  rawSummary: {
+    totalRecords: number;
+    directoryRecords: number;
+    fileRecords: number;
+    subjectHintRecords: number;
+    bucketRecords: number;
+  };
   failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
   failureCode: string | null;
   stages: {
