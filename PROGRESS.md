@@ -1408,3 +1408,18 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-25 – Observability runtime delle integrazioni in Operations
+
+Completato:
+
+- `GET /api/v1/system/integrations` espone ora `statusCode`, `failureCode` e `target` per integrazione
+- `operations` mostra contesto strutturato per PostgreSQL, Redis, Keycloak e QGIS invece del solo testo libero
+- i target URL di Keycloak e QGIS sono ora apribili direttamente dalla vista operativa
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

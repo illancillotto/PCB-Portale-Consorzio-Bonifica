@@ -215,9 +215,36 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
               <p className="mt-4 text-sm text-[var(--pcb-muted)]">
                 {item.configured ? 'Configurazione presente' : 'Configurazione assente'}
               </p>
+              <div className="mt-3 grid gap-2 text-xs text-[var(--pcb-muted)]">
+                {item.statusCode !== null ? <p>HTTP/status {item.statusCode}</p> : null}
+                {item.failureCode ? <p>Failure code {item.failureCode}</p> : null}
+                {item.target ? <p className="break-all">Target {item.target}</p> : null}
+              </div>
               {item.detail ? (
                 <p className="mt-2 break-all text-xs text-[var(--pcb-muted)]">{item.detail}</p>
               ) : null}
+              <div className="mt-4 flex flex-wrap gap-3">
+                {item.key === 'qgis' && item.target ? (
+                  <a
+                    href={item.target}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                  >
+                    Apri target
+                  </a>
+                ) : null}
+                {item.key === 'keycloak' && item.target ? (
+                  <a
+                    href={item.target}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                  >
+                    Apri discovery
+                  </a>
+                ) : null}
+              </div>
             </article>
           ))}
         </div>

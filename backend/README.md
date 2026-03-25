@@ -34,6 +34,7 @@ npm run dev
 - `GET /api/v1/health`
 - `GET /api/v1/system/modules`
 - `GET /api/v1/system/integrations`
+  espone anche `statusCode`, `failureCode` e `target` per ogni integrazione runtime
 - `GET /api/v1/auth/keycloak`
 - `GET /api/v1/auth/keycloak/discovery`
 - `GET /api/v1/auth/session`
@@ -163,6 +164,14 @@ Schema errori applicativo:
   - `audit.entity_type_required`
   - `audit.entity_ids_required`
   - `audit.invalid_entity_id_filter`
+- il runtime `system/integrations` espone anche failure code strutturati per integrazione, ad esempio:
+  - `system.postgres_unavailable`
+  - `system.redis_unavailable`
+  - `system.keycloak_not_configured`
+  - `system.keycloak_unavailable`
+  - `system.qgis_not_configured`
+  - `system.qgis_unavailable`
+  - `system.qgis_unreachable`
 
 Il dominio `gis` espone anche lo stato del publication target QGIS Server via `GET /api/v1/gis/publication-status`.
 Il controllo usa `PCB_QGIS_SERVER_URL` e `PCB_QGIS_PROJECT_FILE` per verificare `GetCapabilities` sul route pubblico `/ows/`.

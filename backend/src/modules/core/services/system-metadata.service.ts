@@ -59,6 +59,9 @@ export class SystemMetadataService {
         configured: true,
         available: true,
         statusLabel: 'ok',
+        statusCode: 200,
+        failureCode: null,
+        target: 'postgresql:SELECT 1',
         detail: 'Connessione SQL verificata',
       };
     } catch (error) {
@@ -68,6 +71,9 @@ export class SystemMetadataService {
         configured: true,
         available: false,
         statusLabel: 'unavailable',
+        statusCode: null,
+        failureCode: 'system.postgres_unavailable',
+        target: 'postgresql:SELECT 1',
         detail: error instanceof Error ? error.message : 'Connessione SQL non disponibile',
       };
     }
@@ -82,6 +88,11 @@ export class SystemMetadataService {
       configured: true,
       available: redis.available,
       statusLabel: redis.available ? 'ok' : 'unavailable',
+      statusCode: redis.available ? 200 : null,
+      failureCode: redis.available ? null : 'system.redis_unavailable',
+      target:
+        process.env.PCB_REDIS_URL ??
+        `redis://${process.env.PCB_REDIS_HOST ?? 'localhost'}:${process.env.PCB_REDIS_PORT ?? '6379'}`,
       detail: redis.status,
     };
   }
@@ -96,6 +107,15 @@ export class SystemMetadataService {
       label: 'Keycloak',
       configured,
       available,
+      statusCode: available ? 200 : null,
+      failureCode: !configured
+        ? 'system.keycloak_not_configured'
+        : available
+          ? null
+          : 'system.keycloak_unavailable',
+      target:
+        discovery.discoveryUrl ??
+        ('issuer' in discovery && typeof discovery.issuer === 'string' ? discovery.issuer : null),
       statusLabel: !configured ? 'not_configured' : available ? 'ok' : 'unavailable',
       detail:
         discovery.discoveryUrl ??
@@ -113,6 +133,9 @@ export class SystemMetadataService {
         label: 'QGIS Server',
         configured: false,
         available: false,
+        statusCode: null,
+        failureCode: 'system.qgis_not_configured',
+        target: serviceUrl || null,
         statusLabel: 'not_configured',
         detail: !serviceUrl ? 'PCB_QGIS_SERVER_URL non configurato' : 'PCB_QGIS_PROJECT_FILE non configurato',
       };
@@ -135,6 +158,9 @@ export class SystemMetadataService {
         label: 'QGIS Server',
         configured: true,
         available: response.ok,
+        statusCode: response.status,
+        failureCode: response.ok ? null : 'system.qgis_unavailable',
+        target: requestUrl.toString(),
         statusLabel: response.ok ? 'ok' : 'unavailable',
         detail: requestUrl.toString(),
       };
@@ -144,6 +170,9 @@ export class SystemMetadataService {
         label: 'QGIS Server',
         configured: true,
         available: false,
+        statusCode: null,
+        failureCode: 'system.qgis_unreachable',
+        target: requestUrl.toString(),
         statusLabel: 'unavailable',
         detail: error instanceof Error ? error.message : 'QGIS Server non disponibile',
       };
