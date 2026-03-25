@@ -383,6 +383,9 @@ export interface IngestionOrchestrationSummary {
   matchingCompletedRuns: number;
   normalizedRecords: number;
   reviewQueue: number;
+  rawOutcomeCounters: Record<string, number>;
+  normalizedOutcomeCounters: Record<string, number>;
+  matchingOutcomeCounters: Record<string, number>;
   latestRunAt: string | null;
 }
 

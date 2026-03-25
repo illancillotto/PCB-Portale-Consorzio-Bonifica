@@ -114,6 +114,31 @@ interface TimestampRow {
   latest_run_at: Date | string | null;
 }
 
+interface OutcomeCountersRow {
+  directory_subject_bucket: string | number;
+  directory_bucket_only: string | number;
+  directory_structure_only: string | number;
+  file_subject_hint: string | number;
+  file_without_subject_hint: string | number;
+  record_captured: string | number;
+  normalize_directory_subject_bucket: string | number;
+  normalize_directory_bucket_only: string | number;
+  normalize_directory_structure_only: string | number;
+  normalize_document_subject_hint: string | number;
+  normalize_document_without_subject_hint: string | number;
+  normalize_record_normalized: string | number;
+  match_manually_accepted: string | number;
+  match_manually_rejected: string | number;
+  match_review_required: string | number;
+  match_ignored: string | number;
+  match_unmatched_no_candidate: string | number;
+  match_unmatched: string | number;
+  match_identifier_exact: string | number;
+  match_source_link_exact: string | number;
+  match_canonical_display_name_exact: string | number;
+  match_unknown: string | number;
+}
+
 interface ConnectorExecutionResult {
   status: string;
   startedAt?: string;
@@ -690,7 +715,7 @@ export class IngestService {
     const healthyConnectors =
       connectorCatalog.length -
       new Set(connectorIssues.items.map((item) => item.connectorName)).size;
-    const [queuedRunsResult, runningRunsResult, failedRunsResult, normalizedRecordsResult, reviewQueueResult, latestRunResult] =
+    const [queuedRunsResult, runningRunsResult, failedRunsResult, normalizedRecordsResult, reviewQueueResult, latestRunResult, outcomeCountersResult] =
       await Promise.all([
         this.databaseService.query<NumericCountRow>(
           `SELECT COUNT(*)::text AS total FROM ingest.ingestion_run WHERE status = 'queued'`,
@@ -710,7 +735,130 @@ export class IngestService {
         this.databaseService.query<TimestampRow>(
           `SELECT MAX(started_at) AS latest_run_at FROM ingest.ingestion_run`,
         ),
+        this.databaseService.query<OutcomeCountersRow>(
+          `
+            SELECT
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_raw
+                WHERE payload_jsonb ->> 'kind' = 'directory'
+                  AND COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') <> ''
+              ) AS directory_subject_bucket,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_raw
+                WHERE payload_jsonb ->> 'kind' = 'directory'
+                  AND COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') = ''
+                  AND COALESCE(NULLIF(payload_jsonb ->> 'bucketLetter', ''), '') <> ''
+              ) AS directory_bucket_only,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_raw
+                WHERE payload_jsonb ->> 'kind' = 'directory'
+                  AND COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') = ''
+                  AND COALESCE(NULLIF(payload_jsonb ->> 'bucketLetter', ''), '') = ''
+              ) AS directory_structure_only,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_raw
+                WHERE payload_jsonb ->> 'kind' = 'file'
+                  AND COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') <> ''
+              ) AS file_subject_hint,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_raw
+                WHERE payload_jsonb ->> 'kind' = 'file'
+                  AND COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') = ''
+              ) AS file_without_subject_hint,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_raw
+                WHERE COALESCE(NULLIF(payload_jsonb ->> 'kind', ''), '') NOT IN ('directory', 'file')
+              ) AS record_captured,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_normalized
+                WHERE normalized_jsonb ->> 'recordType' = 'directory'
+                  AND COALESCE(NULLIF(normalized_jsonb #>> '{subjectHints,normalizedSubjectKey}', ''), '') <> ''
+              ) AS normalize_directory_subject_bucket,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_normalized
+                WHERE normalized_jsonb ->> 'recordType' = 'directory'
+                  AND COALESCE(NULLIF(normalized_jsonb #>> '{subjectHints,normalizedSubjectKey}', ''), '') = ''
+                  AND COALESCE(NULLIF(normalized_jsonb #>> '{filesystem,bucketLetter}', ''), '') <> ''
+              ) AS normalize_directory_bucket_only,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_normalized
+                WHERE normalized_jsonb ->> 'recordType' = 'directory'
+                  AND COALESCE(NULLIF(normalized_jsonb #>> '{subjectHints,normalizedSubjectKey}', ''), '') = ''
+                  AND COALESCE(NULLIF(normalized_jsonb #>> '{filesystem,bucketLetter}', ''), '') = ''
+              ) AS normalize_directory_structure_only,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_normalized
+                WHERE normalized_jsonb ->> 'recordType' = 'file'
+                  AND COALESCE(NULLIF(normalized_jsonb #>> '{subjectHints,normalizedSubjectKey}', ''), '') <> ''
+              ) AS normalize_document_subject_hint,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_normalized
+                WHERE normalized_jsonb ->> 'recordType' = 'file'
+                  AND COALESCE(NULLIF(normalized_jsonb #>> '{subjectHints,normalizedSubjectKey}', ''), '') = ''
+              ) AS normalize_document_without_subject_hint,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.ingestion_record_normalized
+                WHERE COALESCE(NULLIF(normalized_jsonb ->> 'recordType', ''), '') NOT IN ('directory', 'file')
+              ) AS normalize_record_normalized,
+              (
+                SELECT COUNT(*)::text FROM ingest.matching_result WHERE decision_status = 'accepted'
+              ) AS match_manually_accepted,
+              (
+                SELECT COUNT(*)::text FROM ingest.matching_result WHERE decision_status = 'rejected'
+              ) AS match_manually_rejected,
+              (
+                SELECT COUNT(*)::text FROM ingest.matching_result WHERE decision_status = 'review'
+              ) AS match_review_required,
+              (
+                SELECT COUNT(*)::text FROM ingest.matching_result WHERE decision_status = 'ignored'
+              ) AS match_ignored,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.matching_result
+                WHERE decision_status = 'unmatched' AND decision_type = 'no_candidate'
+              ) AS match_unmatched_no_candidate,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.matching_result
+                WHERE decision_status = 'unmatched' AND decision_type <> 'no_candidate'
+              ) AS match_unmatched,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.matching_result
+                WHERE decision_status = 'matched' AND decision_type = 'identifier_exact'
+              ) AS match_identifier_exact,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.matching_result
+                WHERE decision_status = 'matched' AND decision_type = 'source_link_exact'
+              ) AS match_source_link_exact,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.matching_result
+                WHERE decision_status = 'matched' AND decision_type = 'canonical_display_name_exact'
+              ) AS match_canonical_display_name_exact,
+              (
+                SELECT COUNT(*)::text
+                FROM ingest.matching_result
+                WHERE decision_status NOT IN ('accepted', 'rejected', 'review', 'ignored', 'unmatched', 'matched')
+              ) AS match_unknown
+          `,
+        ),
       ]);
+
+    const outcomeCounters = outcomeCountersResult.rows[0];
 
     return {
       registeredConnectors: connectorCatalog.length,
@@ -744,6 +892,34 @@ export class IngestService {
       ).length,
       normalizedRecords: Number(normalizedRecordsResult.rows[0]?.total ?? 0),
       reviewQueue: Number(reviewQueueResult.rows[0]?.total ?? 0),
+      rawOutcomeCounters: {
+        'raw.directory_subject_bucket': Number(outcomeCounters?.directory_subject_bucket ?? 0),
+        'raw.directory_bucket_only': Number(outcomeCounters?.directory_bucket_only ?? 0),
+        'raw.directory_structure_only': Number(outcomeCounters?.directory_structure_only ?? 0),
+        'raw.file_subject_hint': Number(outcomeCounters?.file_subject_hint ?? 0),
+        'raw.file_without_subject_hint': Number(outcomeCounters?.file_without_subject_hint ?? 0),
+        'raw.record_captured': Number(outcomeCounters?.record_captured ?? 0),
+      },
+      normalizedOutcomeCounters: {
+        'normalize.directory_subject_bucket': Number(outcomeCounters?.normalize_directory_subject_bucket ?? 0),
+        'normalize.directory_bucket_only': Number(outcomeCounters?.normalize_directory_bucket_only ?? 0),
+        'normalize.directory_structure_only': Number(outcomeCounters?.normalize_directory_structure_only ?? 0),
+        'normalize.document_subject_hint': Number(outcomeCounters?.normalize_document_subject_hint ?? 0),
+        'normalize.document_without_subject_hint': Number(outcomeCounters?.normalize_document_without_subject_hint ?? 0),
+        'normalize.record_normalized': Number(outcomeCounters?.normalize_record_normalized ?? 0),
+      },
+      matchingOutcomeCounters: {
+        'match.manually_accepted': Number(outcomeCounters?.match_manually_accepted ?? 0),
+        'match.manually_rejected': Number(outcomeCounters?.match_manually_rejected ?? 0),
+        'match.review_required': Number(outcomeCounters?.match_review_required ?? 0),
+        'match.ignored': Number(outcomeCounters?.match_ignored ?? 0),
+        'match.unmatched_no_candidate': Number(outcomeCounters?.match_unmatched_no_candidate ?? 0),
+        'match.unmatched': Number(outcomeCounters?.match_unmatched ?? 0),
+        'match.identifier_exact': Number(outcomeCounters?.match_identifier_exact ?? 0),
+        'match.source_link_exact': Number(outcomeCounters?.match_source_link_exact ?? 0),
+        'match.canonical_display_name_exact': Number(outcomeCounters?.match_canonical_display_name_exact ?? 0),
+        'match.unknown': Number(outcomeCounters?.match_unknown ?? 0),
+      },
       latestRunAt: latestRunResult.rows[0]?.latest_run_at
         ? new Date(latestRunResult.rows[0].latest_run_at).toISOString()
         : null,

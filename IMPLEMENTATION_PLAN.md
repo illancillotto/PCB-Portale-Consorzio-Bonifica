@@ -543,3 +543,4 @@ Estensioni completate:
 - `rawSummary` espone ora anche il breakdown per outcome del layer NAS, visibile in monitor e dettaglio connector
 - il dettaglio run supporta ora filtri raw per `outcomeCode` con query string condivisibile
 - il dettaglio run espone ora riconciliazione pipeline con deep link outcome-aware tra raw, normalized e matching
+- `operations` espone ora anche gli outcome aggregati cross-run della pipeline ingestion

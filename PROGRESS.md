@@ -1538,3 +1538,18 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-25 – Outcome pipeline cross-run in Operations
+
+Completato:
+
+- `orchestration-summary` espone ora gli outcome aggregati cross-run per `raw`, `normalized` e `matching`
+- `operations` mostra una sezione dedicata agli outcome della pipeline ingestion
+- il monitor cross-domain legge ora non solo run e issue, ma anche la distribuzione concreta degli esiti pipeline
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

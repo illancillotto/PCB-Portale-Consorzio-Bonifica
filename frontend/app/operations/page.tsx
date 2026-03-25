@@ -170,6 +170,53 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         </div>
       </SectionCard>
 
+      <SectionCard title="Pipeline outcomes" eyebrow="Ingestion">
+        <div className="grid gap-4 xl:grid-cols-3">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Raw outcomes</p>
+            <div className="mt-4 grid gap-3">
+              {Object.entries(orchestrationSummary.rawOutcomeCounters).map(([key, total]) => (
+                <div
+                  key={key}
+                  className="flex items-center justify-between rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]"
+                >
+                  <span className="break-all">{key}</span>
+                  <strong className="text-[var(--pcb-ink)]">{total}</strong>
+                </div>
+              ))}
+            </div>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Normalized outcomes</p>
+            <div className="mt-4 grid gap-3">
+              {Object.entries(orchestrationSummary.normalizedOutcomeCounters).map(([key, total]) => (
+                <div
+                  key={key}
+                  className="flex items-center justify-between rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]"
+                >
+                  <span className="break-all">{key}</span>
+                  <strong className="text-[var(--pcb-ink)]">{total}</strong>
+                </div>
+              ))}
+            </div>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Matching outcomes</p>
+            <div className="mt-4 grid gap-3">
+              {Object.entries(orchestrationSummary.matchingOutcomeCounters).map(([key, total]) => (
+                <div
+                  key={key}
+                  className="flex items-center justify-between rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]"
+                >
+                  <span className="break-all">{key}</span>
+                  <strong className="text-[var(--pcb-ink)]">{total}</strong>
+                </div>
+              ))}
+            </div>
+          </article>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Preset GIS" eyebrow="Shortcuts">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <Link
