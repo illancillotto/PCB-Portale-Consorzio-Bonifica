@@ -541,3 +541,4 @@ Estensioni completate:
 - la pipeline `raw -> normalized -> matching` espone ora outcome metadata strutturati su tutti i livelli record
 - il monitor operativo e il dettaglio connector espongono ora anche `rawSummary` strutturato per run e ultima esecuzione
 - `rawSummary` espone ora anche il breakdown per outcome del layer NAS, visibile in monitor e dettaglio connector
+- il dettaglio run supporta ora filtri raw per `outcomeCode` con query string condivisibile

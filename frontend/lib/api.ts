@@ -751,10 +751,27 @@ export async function getIngestionRun(id: string, accessToken: string) {
   });
 }
 
-export async function getRawRecords(id: string, accessToken: string) {
-  return apiFetch<PaginatedResponse<RawRecord>>(`/ingestion/runs/${id}/raw-records`, {
-    accessToken,
-  });
+export async function getRawRecords(
+  id: string,
+  accessToken: string,
+  filters?: {
+    outcomeCode?: string;
+  },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.outcomeCode) {
+    params.set('outcomeCode', filters.outcomeCode);
+  }
+
+  const queryString = params.toString();
+
+  return apiFetch<PaginatedResponse<RawRecord>>(
+    `/ingestion/runs/${id}/raw-records${queryString ? `?${queryString}` : ''}`,
+    {
+      accessToken,
+    },
+  );
 }
 
 export async function getNormalizedRecords(id: string, accessToken: string) {

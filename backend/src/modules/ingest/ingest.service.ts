@@ -987,7 +987,7 @@ export class IngestService {
     };
   }
 
-  async listRawRecordsByRunId(id: string) {
+  async listRawRecordsByRunId(id: string, outcomeCode?: string) {
     const run = await this.getRunRowById(id);
 
     if (!run) {
@@ -1009,9 +1009,13 @@ export class IngestService {
       [id],
     );
 
+    const items = result.rows
+      .map((row) => this.mapRawRecord(row))
+      .filter((item) => !outcomeCode || item.outcomeCode === outcomeCode);
+
     return {
-      items: result.rows.map((row) => this.mapRawRecord(row)),
-      total: result.rows.length,
+      items,
+      total: items.length,
     };
   }
 

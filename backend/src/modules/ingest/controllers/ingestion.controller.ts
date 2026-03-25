@@ -25,6 +25,7 @@ import { RawRecordResponseDto } from '../dto/raw-record-response.dto';
 import { ListConnectorsQueryDto } from '../dto/list-connectors-query.dto';
 import { ListConnectorIssuesQueryDto } from '../dto/list-connector-issues-query.dto';
 import { ListConnectorRunsQueryDto } from '../dto/list-connector-runs-query.dto';
+import { ListRawRecordsQueryDto } from '../dto/list-raw-records-query.dto';
 import { RunMatchingResponseDto } from '../dto/run-matching-response.dto';
 import { StartIngestionRunResponseDto } from '../dto/start-ingestion-run-response.dto';
 
@@ -124,8 +125,9 @@ export class IngestionController {
   @Get('runs/:id/raw-records')
   async listRawRecords(
     @Param('id') id: string,
+    @Query() query: ListRawRecordsQueryDto,
   ): Promise<{ items: RawRecordResponseDto[]; total: number }> {
-    const result = await this.ingestService.listRawRecordsByRunId(id);
+    const result = await this.ingestService.listRawRecordsByRunId(id, query.outcomeCode);
 
     if (!result) {
       throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });

@@ -1506,3 +1506,19 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-25 – Filtri raw outcome nel dettaglio run
+
+Completato:
+
+- `GET /api/v1/ingestion/runs/{id}/raw-records` supporta ora il filtro `outcomeCode`
+- il dettaglio run espone filtri URL-shareable sul layer raw
+- i filtri raw, normalized e matching convivono sulla stessa query string della run
+- la lettura operativa della pipeline nella singola run e` ora piu` rapida e focalizzata
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

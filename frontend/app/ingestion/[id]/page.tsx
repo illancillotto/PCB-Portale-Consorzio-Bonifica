@@ -23,6 +23,7 @@ interface IngestionRunDetailPageProps {
     id: string;
   }>;
   searchParams?: Promise<{
+    rawOutcomeCode?: string;
     normalizedStatus?: string;
     matchingStatus?: string;
   }>;
@@ -30,9 +31,13 @@ interface IngestionRunDetailPageProps {
 
 function buildRunDetailFilterHref(
   runId: string,
-  filters: { normalizedStatus?: string; matchingStatus?: string },
+  filters: { rawOutcomeCode?: string; normalizedStatus?: string; matchingStatus?: string },
 ) {
   const params = new URLSearchParams();
+
+  if (filters.rawOutcomeCode) {
+    params.set('rawOutcomeCode', filters.rawOutcomeCode);
+  }
 
   if (filters.normalizedStatus) {
     params.set('normalizedStatus', filters.normalizedStatus);
@@ -103,7 +108,9 @@ export default async function IngestionRunDetailPage({
 
   try {
     [rawRecords, normalizedRecords, matchingResults, subjects, runAuditSummary, ingestAuditSummary] = await Promise.all([
-      getRawRecords(id, session.accessToken),
+      getRawRecords(id, session.accessToken, {
+        outcomeCode: filters.rawOutcomeCode,
+      }),
       getNormalizedRecords(id, session.accessToken),
       getMatchingResults(id, session.accessToken),
       getSubjects(session.accessToken),
@@ -337,9 +344,55 @@ export default async function IngestionRunDetailPage({
       </SectionCard>
 
       <SectionCard title="Raw ingest records" eyebrow="Raw">
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildRunDetailFilterHref(run.id, {
+              normalizedStatus: filters.normalizedStatus,
+              matchingStatus: filters.matchingStatus,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.rawOutcomeCode
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Tutti
+          </Link>
+          {Object.entries(run.rawSummary.outcomeCounters)
+            .filter(([, total]) => total > 0)
+            .map(([key]) => {
+              const outcomeCodeByKey: Record<string, string> = {
+                directorySubjectBucket: 'raw.directory_subject_bucket',
+                directoryBucketOnly: 'raw.directory_bucket_only',
+                directoryStructureOnly: 'raw.directory_structure_only',
+                fileSubjectHint: 'raw.file_subject_hint',
+                fileWithoutSubjectHint: 'raw.file_without_subject_hint',
+                recordCaptured: 'raw.record_captured',
+              };
+              const outcomeCode = outcomeCodeByKey[key];
+
+              return (
+                <Link
+                  key={outcomeCode}
+                  href={buildRunDetailFilterHref(run.id, {
+                    rawOutcomeCode: outcomeCode,
+                    normalizedStatus: filters.normalizedStatus,
+                    matchingStatus: filters.matchingStatus,
+                  })}
+                  className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                    filters.rawOutcomeCode === outcomeCode
+                      ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                      : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+                  }`}
+                >
+                  {outcomeCode}
+                </Link>
+              );
+            })}
+        </div>
         {rawRecords.items.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">
-            Nessun record raw disponibile per questa run.
+            Nessun record raw disponibile per i filtri correnti.
           </p>
         ) : (
           <div className="grid gap-4">
@@ -397,7 +450,10 @@ export default async function IngestionRunDetailPage({
       <SectionCard title="Normalized records" eyebrow="Normalized">
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
-            href={buildRunDetailFilterHref(run.id, { matchingStatus: filters.matchingStatus })}
+            href={buildRunDetailFilterHref(run.id, {
+              rawOutcomeCode: filters.rawOutcomeCode,
+              matchingStatus: filters.matchingStatus,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.normalizedStatus
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -410,6 +466,7 @@ export default async function IngestionRunDetailPage({
             <Link
               key={status}
               href={buildRunDetailFilterHref(run.id, {
+                rawOutcomeCode: filters.rawOutcomeCode,
                 normalizedStatus: status,
                 matchingStatus: filters.matchingStatus,
               })}
@@ -478,7 +535,10 @@ export default async function IngestionRunDetailPage({
       <SectionCard title="Matching results" eyebrow="Matching">
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
-            href={buildRunDetailFilterHref(run.id, { normalizedStatus: filters.normalizedStatus })}
+            href={buildRunDetailFilterHref(run.id, {
+              rawOutcomeCode: filters.rawOutcomeCode,
+              normalizedStatus: filters.normalizedStatus,
+            })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.matchingStatus
                 ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
@@ -491,6 +551,7 @@ export default async function IngestionRunDetailPage({
             <Link
               key={status}
               href={buildRunDetailFilterHref(run.id, {
+                rawOutcomeCode: filters.rawOutcomeCode,
                 normalizedStatus: filters.normalizedStatus,
                 matchingStatus: status,
               })}
