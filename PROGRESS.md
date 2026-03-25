@@ -1553,3 +1553,19 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-25 – Ingressi operativi run da Operations
+
+Completato:
+
+- `operations` espone ora link diretti alle run piu` rilevanti
+- aggiunti ingressi per:
+  - ultima run fallita
+  - ultima run queued
+  - ultima run da verificare
+- il monitor cross-domain e` ora anche punto di ingresso operativo, non solo osservativo
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

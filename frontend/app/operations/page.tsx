@@ -119,6 +119,14 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
   }
   const queuedRuns = ingestionRuns.items.filter((run) => run.status === 'queued').length;
   const failedRuns = ingestionRuns.items.filter((run) => run.status === 'failed').length;
+  const latestFailedRun = ingestionRuns.items.find((run) => run.status === 'failed') ?? null;
+  const latestQueuedRun = ingestionRuns.items.find((run) => run.status === 'queued') ?? null;
+  const latestReviewRun =
+    ingestionRuns.items.find(
+      (run) =>
+        run.status !== 'failed' &&
+        (run.stages.matching.status === 'completed' || run.stages.postProcessing.status === 'completed'),
+    ) ?? null;
 
   return (
     <PageShell
@@ -213,6 +221,93 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
                 </div>
               ))}
             </div>
+          </article>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Ingressi operativi pipeline" eyebrow="Runs">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Ultima run fallita</p>
+            {latestFailedRun ? (
+              <>
+                <p className="mt-2 text-lg font-semibold text-[var(--pcb-ink)]">
+                  {latestFailedRun.connectorName}
+                </p>
+                <p className="mt-1 text-sm text-[var(--pcb-muted)]">
+                  {new Date(latestFailedRun.startedAt).toLocaleString('it-IT')}
+                </p>
+                {latestFailedRun.failureCode ? (
+                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
+                    {latestFailedRun.failureCode}
+                    {latestFailedRun.failureStage ? ` · ${latestFailedRun.failureStage}` : ''}
+                  </p>
+                ) : null}
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link href={`/ingestion/${latestFailedRun.id}`} className="text-sm font-semibold text-[var(--pcb-accent)]">
+                    Apri run
+                  </Link>
+                  <Link href="/ingestion?status=failed" className="text-sm font-semibold text-[var(--pcb-accent)]">
+                    Tutte le fallite
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-[var(--pcb-muted)]">Nessuna run fallita disponibile.</p>
+            )}
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Ultima run in coda</p>
+            {latestQueuedRun ? (
+              <>
+                <p className="mt-2 text-lg font-semibold text-[var(--pcb-ink)]">
+                  {latestQueuedRun.connectorName}
+                </p>
+                <p className="mt-1 text-sm text-[var(--pcb-muted)]">
+                  {new Date(latestQueuedRun.startedAt).toLocaleString('it-IT')}
+                </p>
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  raw {latestQueuedRun.rawSummary.totalRecords} · norm {latestQueuedRun.stages.normalization.recordsWritten} · match{' '}
+                  {latestQueuedRun.stages.matching.resultsWritten}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link href={`/ingestion/${latestQueuedRun.id}`} className="text-sm font-semibold text-[var(--pcb-accent)]">
+                    Apri run
+                  </Link>
+                  <Link href="/ingestion?status=queued" className="text-sm font-semibold text-[var(--pcb-accent)]">
+                    Tutte le queued
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-[var(--pcb-muted)]">Nessuna run in coda disponibile.</p>
+            )}
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Ultima run da verificare</p>
+            {latestReviewRun ? (
+              <>
+                <p className="mt-2 text-lg font-semibold text-[var(--pcb-ink)]">
+                  {latestReviewRun.connectorName}
+                </p>
+                <p className="mt-1 text-sm text-[var(--pcb-muted)]">
+                  {new Date(latestReviewRun.startedAt).toLocaleString('it-IT')}
+                </p>
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  matching {latestReviewRun.stages.matching.status} · post {latestReviewRun.stages.postProcessing.status}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link href={`/ingestion/${latestReviewRun.id}`} className="text-sm font-semibold text-[var(--pcb-accent)]">
+                    Apri run
+                  </Link>
+                  <Link href="/ingestion?matchingStage=completed" className="text-sm font-semibold text-[var(--pcb-accent)]">
+                    Apri pipeline completate
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-[var(--pcb-muted)]">Nessuna run recente disponibile.</p>
+            )}
           </article>
         </div>
       </SectionCard>
