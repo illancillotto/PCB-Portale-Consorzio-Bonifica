@@ -1320,3 +1320,29 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-25 – Gestione SSR degli errori applicativi principali
+
+Completato:
+
+- `ApiError` tipizzato nel client API frontend con:
+  - `statusCode`
+  - `code`
+  - `kind`
+  - `requestId`
+  - `details`
+- pannello SSR riusabile per errori applicativi server-side
+- adozione nelle viste principali:
+  - dashboard
+  - search
+  - subjects
+  - parcels
+  - ingestion
+  - audit
+  - operations
+  - gis
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

@@ -1,4 +1,5 @@
 import { PageShell } from '../../components/page-shell';
+import { ServerApiErrorState } from '../../components/server-api-error-state';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
@@ -10,6 +11,7 @@ import {
   getIngestionConnectorIssues,
   getIngestionOrchestrationSummary,
   getIngestionRuns,
+  isApiError,
   getSystemIntegrations,
 } from '../../lib/api';
 import Link from 'next/link';
@@ -61,32 +63,56 @@ function buildOperationsHref(filters: {
 export default async function OperationsPage({ searchParams }: OperationsPageProps) {
   const session = await requireOperatorSession('/operations');
   const filters = (await searchParams) ?? {};
-  const [
-    integrations,
-    ingestionRuns,
-    connectors,
-    connectorIssues,
-    orchestrationSummary,
-    auditSummary,
-    publicationStatus,
-    subjectParcelLinks,
-  ] = await Promise.all([
-      getSystemIntegrations(session.accessToken),
-      getIngestionRuns(session.accessToken),
-      getIngestionConnectors(session.accessToken, {
-        operationalStatus: filters.connectorOperationalStatus,
-        triggerMode: filters.connectorTriggerMode,
-      }),
-      getIngestionConnectorIssues(session.accessToken, {
-        connectorName: filters.issueConnector,
-        severity: filters.issueSeverity,
-        issueType: filters.issueType,
-      }),
-      getIngestionOrchestrationSummary(session.accessToken),
-      getAuditSummary(session.accessToken),
-      getGisPublicationStatus(session.accessToken),
-      getGisSubjectParcelLinks(session.accessToken),
-    ]);
+  let integrations;
+  let ingestionRuns;
+  let connectors;
+  let connectorIssues;
+  let orchestrationSummary;
+  let auditSummary;
+  let publicationStatus;
+  let subjectParcelLinks;
+
+  try {
+    [
+      integrations,
+      ingestionRuns,
+      connectors,
+      connectorIssues,
+      orchestrationSummary,
+      auditSummary,
+      publicationStatus,
+      subjectParcelLinks,
+    ] = await Promise.all([
+        getSystemIntegrations(session.accessToken),
+        getIngestionRuns(session.accessToken),
+        getIngestionConnectors(session.accessToken, {
+          operationalStatus: filters.connectorOperationalStatus,
+          triggerMode: filters.connectorTriggerMode,
+        }),
+        getIngestionConnectorIssues(session.accessToken, {
+          connectorName: filters.issueConnector,
+          severity: filters.issueSeverity,
+          issueType: filters.issueType,
+        }),
+        getIngestionOrchestrationSummary(session.accessToken),
+        getAuditSummary(session.accessToken),
+        getGisPublicationStatus(session.accessToken),
+        getGisSubjectParcelLinks(session.accessToken),
+      ]);
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Operations"
+          description="Stato operativo centralizzato delle integrazioni core del Portale Consorzio Bonifica."
+        >
+          <ServerApiErrorState error={error} />
+        </PageShell>
+      );
+    }
+
+    throw error;
+  }
   const queuedRuns = ingestionRuns.items.filter((run) => run.status === 'queued').length;
   const failedRuns = ingestionRuns.items.filter((run) => run.status === 'failed').length;
 

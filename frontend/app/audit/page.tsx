@@ -1,8 +1,9 @@
 import { PageShell } from '../../components/page-shell';
 import { EmptyState } from '../../components/empty-state';
+import { ServerApiErrorState } from '../../components/server-api-error-state';
 import { SectionCard } from '../../components/section-card';
 import { requireOperatorSession } from '../../lib/auth';
-import { getAuditEvents, getAuditSummary } from '../../lib/api';
+import { getAuditEvents, getAuditSummary, isApiError } from '../../lib/api';
 import Link from 'next/link';
 
 function readPayloadString(payload: Record<string, unknown>, key: string) {
@@ -119,10 +120,28 @@ function buildAuditFilterHref(filters: {
 export default async function AuditPage({ searchParams }: AuditPageProps) {
   const session = await requireOperatorSession('/audit');
   const filters = (await searchParams) ?? {};
-  const [events, summary] = await Promise.all([
-    getAuditEvents(session.accessToken, filters),
-    getAuditSummary(session.accessToken, filters),
-  ]);
+  let events;
+  let summary;
+
+  try {
+    [events, summary] = await Promise.all([
+      getAuditEvents(session.accessToken, filters),
+      getAuditSummary(session.accessToken, filters),
+    ]);
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Audit trail"
+          description="Eventi operativi e decisioni manuali tracciati dal backend PCB. Vista riservata a operatori autenticati."
+        >
+          <ServerApiErrorState error={error} />
+        </PageShell>
+      );
+    }
+
+    throw error;
+  }
   const filteredEvents = events.items;
   const uniqueEventTypes = Array.from(new Set(events.items.map((event) => event.eventType))).sort();
   const uniqueActorTypes = Array.from(new Set(events.items.map((event) => event.actorType))).sort();

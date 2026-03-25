@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { EmptyState } from '../../components/empty-state';
 import { PageShell } from '../../components/page-shell';
+import { ServerApiErrorState } from '../../components/server-api-error-state';
 import { SearchForm } from '../../components/search-form';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
-import { getAuditEntitySummaries, getSubjects } from '../../lib/api';
+import { getAuditEntitySummaries, getSubjects, isApiError } from '../../lib/api';
 import { requireOperatorSession } from '../../lib/auth';
 
 interface SubjectsPageProps {
@@ -19,11 +20,30 @@ export default async function SubjectsPage({ searchParams }: SubjectsPageProps) 
   const session = await requireOperatorSession(
     query ? `/subjects?${new URLSearchParams({ q: query }).toString()}` : '/subjects',
   );
-  const response = await getSubjects(session.accessToken, query || undefined);
-  const auditSummaries = await getAuditEntitySummaries(session.accessToken, {
-    entityType: 'subject',
-    entityIds: response.items.map((subject) => subject.id),
-  });
+  let response;
+  let auditSummaries;
+
+  try {
+    response = await getSubjects(session.accessToken, query || undefined);
+    auditSummaries = await getAuditEntitySummaries(session.accessToken, {
+      entityType: 'subject',
+      entityIds: response.items.map((subject) => subject.id),
+    });
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Soggetti master"
+          description="Anagrafe unica centrata sul CUUA. La lista usa dati reali e consente accesso diretto alla scheda soggetto."
+          actions={<SearchForm defaultValue={query} />}
+        >
+          <ServerApiErrorState error={error} />
+        </PageShell>
+      );
+    }
+
+    throw error;
+  }
   const auditSummaryMap = new Map(auditSummaries.items.map((item) => [item.entityId, item]));
 
   return (

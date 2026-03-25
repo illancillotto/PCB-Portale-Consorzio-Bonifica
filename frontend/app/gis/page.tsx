@@ -1,6 +1,7 @@
 import { PageShell } from '../../components/page-shell';
 import { GisMap } from '../../components/gis-map';
 import { GisPublicationLinks } from '../../components/gis-publication-links';
+import { ServerApiErrorState } from '../../components/server-api-error-state';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
@@ -10,6 +11,7 @@ import {
   getGisLayers,
   getGisMapFeatures,
   getGisPublicationStatus,
+  isApiError,
 } from '../../lib/api';
 
 interface GisPageProps {
@@ -38,22 +40,43 @@ export default async function GisPage({ searchParams }: GisPageProps) {
           )
       : [...validQgisLayers]
   ) as Array<(typeof validQgisLayers)[number]>;
-  const [layers, featureLinks, mapFeatures, publicationStatus, subjectParcelLinks] = await Promise.all([
-    getGisLayers(session.accessToken),
-    getGisFeatureLinks(session.accessToken, {
-      subjectId: selectedSubjectId,
-      parcelId: selectedParcelId,
-    }),
-    getGisMapFeatures(session.accessToken, {
-      subjectId: selectedSubjectId,
-      parcelId: selectedParcelId,
-    }),
-    getGisPublicationStatus(session.accessToken),
-    getFilteredGisSubjectParcelLinks(session.accessToken, {
-      subjectId: selectedSubjectId,
-      parcelId: selectedParcelId,
-    }),
-  ]);
+  let layers;
+  let featureLinks;
+  let mapFeatures;
+  let publicationStatus;
+  let subjectParcelLinks;
+
+  try {
+    [layers, featureLinks, mapFeatures, publicationStatus, subjectParcelLinks] = await Promise.all([
+      getGisLayers(session.accessToken),
+      getGisFeatureLinks(session.accessToken, {
+        subjectId: selectedSubjectId,
+        parcelId: selectedParcelId,
+      }),
+      getGisMapFeatures(session.accessToken, {
+        subjectId: selectedSubjectId,
+        parcelId: selectedParcelId,
+      }),
+      getGisPublicationStatus(session.accessToken),
+      getFilteredGisSubjectParcelLinks(session.accessToken, {
+        subjectId: selectedSubjectId,
+        parcelId: selectedParcelId,
+      }),
+    ]);
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="GIS operativo"
+          description="Viewer cartografico iniziale basato su PostGIS reale, catalogo layer PCB e feature georiferite esposte dal backend protetto."
+        >
+          <ServerApiErrorState error={error} />
+        </PageShell>
+      );
+    }
+
+    throw error;
+  }
   const displayedFeatures = mapFeatures.items;
 
   return (

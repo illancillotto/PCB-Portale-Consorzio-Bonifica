@@ -160,6 +160,7 @@ Stato attuale:
 - completata introduzione dei codici errore di dominio iniziali su `ingest`
 - completata estensione dei codici errore di dominio a `auth`, `anagrafiche` e `catasto`
 - completata classificazione dei fallimenti operativi anche nel frontend `ingestion/matching`
+- completata la gestione SSR degli `ApiError` nelle viste operative principali
 - da completare eventuali notice ancora più specifici per sessioni degradate
 
 Dipendenze:

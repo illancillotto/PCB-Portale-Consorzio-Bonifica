@@ -4,6 +4,19 @@ interface ApiFetchOptions {
   accessToken?: string;
 }
 
+interface ApiErrorPayload {
+  statusCode?: number;
+  error?: {
+    code?: string;
+    type?: string;
+    message?: string;
+    details?: unknown;
+    path?: string;
+    timestamp?: string;
+    requestId?: string;
+  };
+}
+
 export interface SubjectIdentifier {
   type: string;
   value: string;
@@ -419,11 +432,39 @@ interface PaginatedResponse<T> {
   pageSize?: number;
 }
 
-class ApiError extends Error {
-  constructor(message: string) {
-    super(message);
+export class ApiError extends Error {
+  readonly statusCode: number | null;
+  readonly code: string | null;
+  readonly kind: 'authentication' | 'authorization' | 'domain' | 'runtime';
+  readonly requestId: string | null;
+  readonly details: unknown;
+
+  constructor(options: {
+    message: string;
+    statusCode: number | null;
+    code: string | null;
+    requestId: string | null;
+    details?: unknown;
+  }) {
+    super(options.message);
     this.name = 'ApiError';
+    this.statusCode = options.statusCode;
+    this.code = options.code;
+    this.requestId = options.requestId;
+    this.details = options.details ?? null;
+    this.kind =
+      options.statusCode === 401
+        ? 'authentication'
+        : options.statusCode === 403
+          ? 'authorization'
+          : options.statusCode !== null && options.statusCode >= 500
+            ? 'runtime'
+            : 'domain';
   }
+}
+
+export function isApiError(error: unknown): error is ApiError {
+  return error instanceof ApiError;
 }
 
 async function apiFetch<T>(path: string, options?: ApiFetchOptions): Promise<T> {
@@ -437,7 +478,17 @@ async function apiFetch<T>(path: string, options?: ApiFetchOptions): Promise<T> 
   });
 
   if (!response.ok) {
-    throw new ApiError(`PCB API request failed: ${response.status} ${response.statusText}`);
+    const payload = (await response.json().catch(() => null)) as ApiErrorPayload | null;
+
+    throw new ApiError({
+      message:
+        payload?.error?.message ??
+        `PCB API request failed: ${response.status} ${response.statusText}`,
+      statusCode: payload?.statusCode ?? response.status,
+      code: payload?.error?.code ?? null,
+      requestId: payload?.error?.requestId ?? null,
+      details: payload?.error?.details ?? null,
+    });
   }
 
   return response.json() as Promise<T>;

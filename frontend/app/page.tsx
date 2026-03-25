@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { PageShell } from '../components/page-shell';
+import { ServerApiErrorState } from '../components/server-api-error-state';
 import { SearchForm } from '../components/search-form';
 import { SectionCard } from '../components/section-card';
 import {
+  isApiError,
   getAuditSummary,
   getGisLayers,
   getGisPublicationStatus,
@@ -59,28 +61,50 @@ const moduleCards = [
 
 export default async function HomePage() {
   const session = await requireOperatorSession('/');
-  const [subjects, parcels, gisMetrics, operationalMetrics] = await Promise.all([
-    getSubjects(session.accessToken),
-    getParcels(session.accessToken),
-    Promise.all([
-      getGisLayers(session.accessToken),
-      getGisPublicationStatus(session.accessToken),
-      getGisSubjectParcelLinks(session.accessToken),
-    ]).then(([layers, publicationStatus, subjectParcelLinks]) => ({
-      layers,
-      publicationStatus,
-      subjectParcelLinks,
-    })),
-    Promise.all([
-      getIngestionRuns(session.accessToken),
-      getIngestionOrchestrationSummary(session.accessToken),
-      getAuditSummary(session.accessToken),
-    ]).then(([ingestionRuns, orchestrationSummary, auditSummary]) => ({
-      ingestionRuns,
-      orchestrationSummary,
-      auditSummary,
-    })),
-  ]);
+  let subjects;
+  let parcels;
+  let gisMetrics;
+  let operationalMetrics;
+
+  try {
+    [subjects, parcels, gisMetrics, operationalMetrics] = await Promise.all([
+      getSubjects(session.accessToken),
+      getParcels(session.accessToken),
+      Promise.all([
+        getGisLayers(session.accessToken),
+        getGisPublicationStatus(session.accessToken),
+        getGisSubjectParcelLinks(session.accessToken),
+      ]).then(([layers, publicationStatus, subjectParcelLinks]) => ({
+        layers,
+        publicationStatus,
+        subjectParcelLinks,
+      })),
+      Promise.all([
+        getIngestionRuns(session.accessToken),
+        getIngestionOrchestrationSummary(session.accessToken),
+        getAuditSummary(session.accessToken),
+      ]).then(([ingestionRuns, orchestrationSummary, auditSummary]) => ({
+        ingestionRuns,
+        orchestrationSummary,
+        auditSummary,
+      })),
+    ]);
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Portale interno PCB"
+          description="La dashboard iniziale usa dati reali del backend NestJS e del database PostgreSQL/PostGIS per anagrafiche, catasto e ricerca."
+          actions={<SearchForm />}
+        >
+          <ServerApiErrorState error={error} />
+        </PageShell>
+      );
+    }
+
+    throw error;
+  }
+
   const auditBySourceModule = operationalMetrics.auditSummary.bySourceModule;
   const auditByActorType = operationalMetrics.auditSummary.byActorType;
 

@@ -3,6 +3,7 @@ import { EmptyState } from '../../components/empty-state';
 import { IngestionAutoRefresh } from '../../components/ingestion-auto-refresh';
 import { IngestionRunTrigger } from '../../components/ingestion-run-trigger';
 import { PageShell } from '../../components/page-shell';
+import { ServerApiErrorState } from '../../components/server-api-error-state';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
@@ -11,6 +12,7 @@ import {
   getIngestionConnectorIssues,
   getIngestionOrchestrationSummary,
   getIngestionRuns,
+  isApiError,
 } from '../../lib/api';
 
 interface IngestionPageProps {
@@ -115,19 +117,39 @@ function buildIssueFilterHref(filters: {
 export default async function IngestionPage({ searchParams }: IngestionPageProps) {
   const session = await requireOperatorSession('/ingestion');
   const filters = (await searchParams) ?? {};
-  const [runs, connectors, connectorIssues, orchestrationSummary] = await Promise.all([
-    getIngestionRuns(session.accessToken),
-    getIngestionConnectors(session.accessToken, {
-      operationalStatus: filters.connectorOperationalStatus,
-      triggerMode: filters.connectorTriggerMode,
-    }),
-    getIngestionConnectorIssues(session.accessToken, {
-      connectorName: filters.issueConnector,
-      severity: filters.issueSeverity,
-      issueType: filters.issueType,
-    }),
-    getIngestionOrchestrationSummary(session.accessToken),
-  ]);
+  let runs;
+  let connectors;
+  let connectorIssues;
+  let orchestrationSummary;
+
+  try {
+    [runs, connectors, connectorIssues, orchestrationSummary] = await Promise.all([
+      getIngestionRuns(session.accessToken),
+      getIngestionConnectors(session.accessToken, {
+        operationalStatus: filters.connectorOperationalStatus,
+        triggerMode: filters.connectorTriggerMode,
+      }),
+      getIngestionConnectorIssues(session.accessToken, {
+        connectorName: filters.issueConnector,
+        severity: filters.issueSeverity,
+        issueType: filters.issueType,
+      }),
+      getIngestionOrchestrationSummary(session.accessToken),
+    ]);
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Ingestion monitor"
+          description="Monitor iniziale delle run di acquisizione. La pagina usa il backend reale e permette il trigger manuale del connector NAS placeholder."
+        >
+          <ServerApiErrorState error={error} />
+        </PageShell>
+      );
+    }
+
+    throw error;
+  }
   const availableConnectors = Array.from(new Set(runs.items.map((run) => run.connectorName))).sort();
   const filteredRuns = runs.items.filter((run) => {
     if (filters.status && run.status !== filters.status) {

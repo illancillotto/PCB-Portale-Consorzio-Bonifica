@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { EmptyState } from '../../components/empty-state';
 import { PageShell } from '../../components/page-shell';
+import { ServerApiErrorState } from '../../components/server-api-error-state';
 import { SearchForm } from '../../components/search-form';
 import { SectionCard } from '../../components/section-card';
-import { getAuditEntitySummaries, searchAll } from '../../lib/api';
+import { getAuditEntitySummaries, isApiError, searchAll } from '../../lib/api';
 import { requireOperatorSession } from '../../lib/auth';
 
 interface SearchPageProps {
@@ -24,15 +25,37 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       }).toString()}`
     : '/search';
   const session = await requireOperatorSession(nextPath);
-  const results = query ? await searchAll(query, session.accessToken) : { items: [], total: 0 };
-  const subjectAuditSummaries = await getAuditEntitySummaries(session.accessToken, {
-    entityType: 'subject',
-    entityIds: results.items.filter((item) => item.type === 'subject').map((item) => item.id),
-  });
-  const parcelAuditSummaries = await getAuditEntitySummaries(session.accessToken, {
-    entityType: 'parcel',
-    entityIds: results.items.filter((item) => item.type === 'parcel').map((item) => item.id),
-  });
+  let results;
+  let subjectAuditSummaries;
+  let parcelAuditSummaries;
+
+  try {
+    results = query ? await searchAll(query, session.accessToken) : { items: [], total: 0 };
+    [subjectAuditSummaries, parcelAuditSummaries] = await Promise.all([
+      getAuditEntitySummaries(session.accessToken, {
+        entityType: 'subject',
+        entityIds: results.items.filter((item) => item.type === 'subject').map((item) => item.id),
+      }),
+      getAuditEntitySummaries(session.accessToken, {
+        entityType: 'parcel',
+        entityIds: results.items.filter((item) => item.type === 'parcel').map((item) => item.id),
+      }),
+    ]);
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Ricerca unificata"
+          description="Accesso trasversale a soggetti e particelle. La ricerca usa gli endpoint reali del backend PCB."
+          actions={<SearchForm defaultValue={query} />}
+        >
+          <ServerApiErrorState error={error} />
+        </PageShell>
+      );
+    }
+
+    throw error;
+  }
   const subjectAuditSummaryMap = new Map(subjectAuditSummaries.items.map((item) => [item.entityId, item]));
   const parcelAuditSummaryMap = new Map(parcelAuditSummaries.items.map((item) => [item.entityId, item]));
   const subjectCount = results.items.filter((item) => item.type === 'subject').length;

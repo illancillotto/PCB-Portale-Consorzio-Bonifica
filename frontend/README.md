@@ -124,6 +124,7 @@ Stato attuale:
 - il proxy operativo frontend riallinea i `401/403` allo stesso schema errore del backend
 - le azioni operative `ingestion` e `matching` classificano ora gli errori in `authentication`, `authorization`, `domain`, `runtime`
 - i pannelli errore operativi mostrano anche `error.code` e `requestId` quando disponibili
+- le viste server-side principali intercettano ora `ApiError` e mostrano pannelli SSR con classificazione `domain/runtime/auth`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

@@ -1,18 +1,38 @@
 import Link from 'next/link';
 import { EmptyState } from '../../components/empty-state';
 import { PageShell } from '../../components/page-shell';
+import { ServerApiErrorState } from '../../components/server-api-error-state';
 import { SearchForm } from '../../components/search-form';
 import { SectionCard } from '../../components/section-card';
-import { getAuditEntitySummaries, getParcels } from '../../lib/api';
+import { getAuditEntitySummaries, getParcels, isApiError } from '../../lib/api';
 import { requireOperatorSession } from '../../lib/auth';
 
 export default async function ParcelsPage() {
   const session = await requireOperatorSession('/parcels');
-  const response = await getParcels(session.accessToken);
-  const auditSummaries = await getAuditEntitySummaries(session.accessToken, {
-    entityType: 'parcel',
-    entityIds: response.items.map((parcel) => parcel.id),
-  });
+  let response;
+  let auditSummaries;
+
+  try {
+    response = await getParcels(session.accessToken);
+    auditSummaries = await getAuditEntitySummaries(session.accessToken, {
+      entityType: 'parcel',
+      entityIds: response.items.map((parcel) => parcel.id),
+    });
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Particelle"
+          description="Vista iniziale del dominio catasto con relazioni ai soggetti master già riconciliate nel database."
+          actions={<SearchForm />}
+        >
+          <ServerApiErrorState error={error} />
+        </PageShell>
+      );
+    }
+
+    throw error;
+  }
   const auditSummaryMap = new Map(auditSummaries.items.map((item) => [item.entityId, item]));
 
   return (
