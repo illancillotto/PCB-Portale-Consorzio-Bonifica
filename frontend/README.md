@@ -137,6 +137,7 @@ Stato attuale:
 - il dettaglio run mostra ora anche `outcomeCode` sui record normalizzati e sui risultati di matching
 - il dettaglio run mostra ora anche i record `raw ingest` con `outcomeCode` strutturato
 - monitor `ingestion` e dettaglio connector mostrano ora anche summary raw ingest strutturati per run e ultima esecuzione
+- monitor `ingestion` e dettaglio connector mostrano ora anche il breakdown outcome del raw layer NAS
 - il dettaglio run distingue anche `resolutionMode` e `requiresManualReview` sui risultati di matching
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

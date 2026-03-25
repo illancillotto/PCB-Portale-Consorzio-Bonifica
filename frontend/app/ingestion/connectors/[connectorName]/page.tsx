@@ -259,6 +259,14 @@ export default async function ConnectorDetailPage({
               {' · '}bucket {connector.latestRun.rawSummary.bucketRecords}
             </p>
           ) : null}
+          {connector.latestRun ? (
+            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+              dir+soggetto {connector.latestRun.rawSummary.outcomeCounters.directorySubjectBucket}
+              {' · '}dir bucket {connector.latestRun.rawSummary.outcomeCounters.directoryBucketOnly}
+              {' · '}file+soggetto {connector.latestRun.rawSummary.outcomeCounters.fileSubjectHint}
+              {' · '}file senza hint {connector.latestRun.rawSummary.outcomeCounters.fileWithoutSubjectHint}
+            </p>
+          ) : null}
           {connector.latestRun?.failureCode ? (
             <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
               {connector.latestRun.failureCode}
@@ -378,6 +386,10 @@ export default async function ConnectorDetailPage({
                   raw {connector.lastCompletedRun.rawSummary.totalRecords} · hint{' '}
                   {connector.lastCompletedRun.rawSummary.subjectHintRecords}
                 </p>
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  dir+soggetto {connector.lastCompletedRun.rawSummary.outcomeCounters.directorySubjectBucket}
+                  {' · '}file+soggetto {connector.lastCompletedRun.rawSummary.outcomeCounters.fileSubjectHint}
+                </p>
                 <Link
                   href={buildIngestionStageHref({
                     connector: connector.connectorName,
@@ -411,6 +423,10 @@ export default async function ConnectorDetailPage({
                 <p className="mt-2 text-xs text-[var(--pcb-muted)]">
                   raw {connector.lastFailedRun.rawSummary.totalRecords} · hint{' '}
                   {connector.lastFailedRun.rawSummary.subjectHintRecords}
+                </p>
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  dir+soggetto {connector.lastFailedRun.rawSummary.outcomeCounters.directorySubjectBucket}
+                  {' · '}file+soggetto {connector.lastFailedRun.rawSummary.outcomeCounters.fileSubjectHint}
                 </p>
                 {connector.lastFailedRun.failureCode ? (
                   <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">

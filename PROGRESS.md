@@ -1490,3 +1490,19 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-25 – Breakdown outcome del raw layer NAS
+
+Completato:
+
+- `rawSummary` espone ora anche i contatori per outcome del layer NAS
+- il monitor `ingestion` mostra il breakdown dei record raw per run e per ultima run del connector
+- il dettaglio connector mostra il breakdown raw su ultima run, ultimo completamento e ultimo fallimento
+- la lettura operativa del layer documentale e` ora piu` utile per capire struttura, bucket e subject hint gia` in fase di capture
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

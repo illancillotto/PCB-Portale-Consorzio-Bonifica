@@ -486,6 +486,13 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                 </p>
               ) : null}
               {connector.latestRun ? (
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  raw dir+soggetto {connector.latestRun.rawSummary.outcomeCounters.directorySubjectBucket} ·
+                  file+soggetto {connector.latestRun.rawSummary.outcomeCounters.fileSubjectHint} ·
+                  file senza hint {connector.latestRun.rawSummary.outcomeCounters.fileWithoutSubjectHint}
+                </p>
+              ) : null}
+              {connector.latestRun ? (
                 <p className="mt-3 text-xs text-[var(--pcb-muted)]">
                   Ultima run {new Date(connector.latestRun.startedAt).toLocaleString('it-IT')} ·{' '}
                   <Link href={`/ingestion/${connector.latestRun.id}`} className="font-semibold text-[var(--pcb-accent)]">
@@ -958,6 +965,12 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                 <p className="mt-2 text-sm text-[var(--pcb-muted)]">
                   raw {run.rawSummary.totalRecords} · dir {run.rawSummary.directoryRecords} · file{' '}
                   {run.rawSummary.fileRecords} · hint {run.rawSummary.subjectHintRecords}
+                </p>
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  dir+soggetto {run.rawSummary.outcomeCounters.directorySubjectBucket} · dir bucket{' '}
+                  {run.rawSummary.outcomeCounters.directoryBucketOnly} · file+soggetto{' '}
+                  {run.rawSummary.outcomeCounters.fileSubjectHint} · file senza hint{' '}
+                  {run.rawSummary.outcomeCounters.fileWithoutSubjectHint}
                 </p>
                 <p className="mt-2 text-sm text-[var(--pcb-muted)]">
                   normalizzati {run.stages.normalization.recordsWritten} · matching{' '}

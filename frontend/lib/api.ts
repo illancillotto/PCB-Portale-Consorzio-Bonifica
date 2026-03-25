@@ -116,6 +116,14 @@ export interface IngestionRun {
     fileRecords: number;
     subjectHintRecords: number;
     bucketRecords: number;
+    outcomeCounters: {
+      directorySubjectBucket: number;
+      directoryBucketOnly: number;
+      directoryStructureOnly: number;
+      fileSubjectHint: number;
+      fileWithoutSubjectHint: number;
+      recordCaptured: number;
+    };
   };
   failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
   failureCode: string | null;
@@ -185,6 +193,14 @@ export interface IngestionConnectorCatalogItem {
       fileRecords: number;
       subjectHintRecords: number;
       bucketRecords: number;
+      outcomeCounters: {
+        directorySubjectBucket: number;
+        directoryBucketOnly: number;
+        directoryStructureOnly: number;
+        fileSubjectHint: number;
+        fileWithoutSubjectHint: number;
+        recordCaptured: number;
+      };
     };
     failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
     failureCode: string | null;
@@ -223,6 +239,14 @@ export interface IngestionConnectorDetail {
       fileRecords: number;
       subjectHintRecords: number;
       bucketRecords: number;
+      outcomeCounters: {
+        directorySubjectBucket: number;
+        directoryBucketOnly: number;
+        directoryStructureOnly: number;
+        fileSubjectHint: number;
+        fileWithoutSubjectHint: number;
+        recordCaptured: number;
+      };
     };
     failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
     failureCode: string | null;
@@ -241,6 +265,14 @@ export interface IngestionConnectorDetail {
       fileRecords: number;
       subjectHintRecords: number;
       bucketRecords: number;
+      outcomeCounters: {
+        directorySubjectBucket: number;
+        directoryBucketOnly: number;
+        directoryStructureOnly: number;
+        fileSubjectHint: number;
+        fileWithoutSubjectHint: number;
+        recordCaptured: number;
+      };
     };
   } | null;
   lastFailedRun: {
@@ -258,6 +290,14 @@ export interface IngestionConnectorDetail {
       fileRecords: number;
       subjectHintRecords: number;
       bucketRecords: number;
+      outcomeCounters: {
+        directorySubjectBucket: number;
+        directoryBucketOnly: number;
+        directoryStructureOnly: number;
+        fileSubjectHint: number;
+        fileWithoutSubjectHint: number;
+        recordCaptured: number;
+      };
     };
     failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
     failureCode: string | null;

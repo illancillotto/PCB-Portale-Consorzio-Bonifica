@@ -101,6 +101,12 @@ interface RawSummaryRow {
   file_records: string | number;
   subject_hint_records: string | number;
   bucket_records: string | number;
+  directory_subject_bucket_records: string | number;
+  directory_bucket_only_records: string | number;
+  directory_structure_only_records: string | number;
+  file_subject_hint_records: string | number;
+  file_without_subject_hint_records: string | number;
+  record_captured_records: string | number;
 }
 
 interface TimestampRow {
@@ -1889,7 +1895,32 @@ export class IngestService {
           )::text AS subject_hint_records,
           COUNT(*) FILTER (
             WHERE COALESCE(NULLIF(payload_jsonb ->> 'bucketLetter', ''), '') <> ''
-          )::text AS bucket_records
+          )::text AS bucket_records,
+          COUNT(*) FILTER (
+            WHERE payload_jsonb ->> 'kind' = 'directory'
+              AND COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') <> ''
+          )::text AS directory_subject_bucket_records,
+          COUNT(*) FILTER (
+            WHERE payload_jsonb ->> 'kind' = 'directory'
+              AND COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') = ''
+              AND COALESCE(NULLIF(payload_jsonb ->> 'bucketLetter', ''), '') <> ''
+          )::text AS directory_bucket_only_records,
+          COUNT(*) FILTER (
+            WHERE payload_jsonb ->> 'kind' = 'directory'
+              AND COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') = ''
+              AND COALESCE(NULLIF(payload_jsonb ->> 'bucketLetter', ''), '') = ''
+          )::text AS directory_structure_only_records,
+          COUNT(*) FILTER (
+            WHERE payload_jsonb ->> 'kind' = 'file'
+              AND COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') <> ''
+          )::text AS file_subject_hint_records,
+          COUNT(*) FILTER (
+            WHERE payload_jsonb ->> 'kind' = 'file'
+              AND COALESCE(NULLIF(payload_jsonb ->> 'potentialSubjectKey', ''), '') = ''
+          )::text AS file_without_subject_hint_records,
+          COUNT(*) FILTER (
+            WHERE COALESCE(NULLIF(payload_jsonb ->> 'kind', ''), '') NOT IN ('directory', 'file')
+          )::text AS record_captured_records
         FROM ingest.ingestion_record_raw
         WHERE ingestion_run_id = $1
       `,
@@ -1910,6 +1941,14 @@ export class IngestService {
       fileRecords: Number(row.file_records ?? 0),
       subjectHintRecords: Number(row.subject_hint_records ?? 0),
       bucketRecords: Number(row.bucket_records ?? 0),
+      outcomeCounters: {
+        directorySubjectBucket: Number(row.directory_subject_bucket_records ?? 0),
+        directoryBucketOnly: Number(row.directory_bucket_only_records ?? 0),
+        directoryStructureOnly: Number(row.directory_structure_only_records ?? 0),
+        fileSubjectHint: Number(row.file_subject_hint_records ?? 0),
+        fileWithoutSubjectHint: Number(row.file_without_subject_hint_records ?? 0),
+        recordCaptured: Number(row.record_captured_records ?? 0),
+      },
     };
   }
 
@@ -1920,6 +1959,14 @@ export class IngestService {
       fileRecords: 0,
       subjectHintRecords: 0,
       bucketRecords: 0,
+      outcomeCounters: {
+        directorySubjectBucket: 0,
+        directoryBucketOnly: 0,
+        directoryStructureOnly: 0,
+        fileSubjectHint: 0,
+        fileWithoutSubjectHint: 0,
+        recordCaptured: 0,
+      },
     };
   }
 

@@ -155,6 +155,7 @@ Schema errori applicativo:
 - i risultati `matching` espongono anche `outcomeCode`, `requiresManualReview` e `resolutionMode`
 - i record `raw ingest` espongono anche `outcomeCode` strutturato via `GET /api/v1/ingestion/runs/{id}/raw-records`
 - le run `ingestion` e il dettaglio connector espongono anche `rawSummary` strutturato derivato da `ingestion_record_raw`
+- `rawSummary` espone anche il breakdown per outcome del layer NAS: `directory_subject_bucket`, `directory_bucket_only`, `directory_structure_only`, `file_subject_hint`, `file_without_subject_hint`
 - anche i domini `auth`, `anagrafiche` e `catasto` espongono codici errore stabili, ad esempio:
   - `auth.authorization_header_missing`
   - `auth.invalid_authorization_header`
