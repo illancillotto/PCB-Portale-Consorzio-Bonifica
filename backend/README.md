@@ -157,6 +157,12 @@ Schema errori applicativo:
   - `anagrafiche.subject_not_found`
   - `anagrafiche.subject_not_found_by_cuua`
   - `catasto.parcel_not_found`
+- anche i domini `gis` e `audit` espongono codici errore stabili per query incoerenti, ad esempio:
+  - `gis.invalid_subject_id_filter`
+  - `gis.invalid_parcel_id_filter`
+  - `audit.entity_type_required`
+  - `audit.entity_ids_required`
+  - `audit.invalid_entity_id_filter`
 
 Il dominio `gis` espone anche lo stato del publication target QGIS Server via `GET /api/v1/gis/publication-status`.
 Il controllo usa `PCB_QGIS_SERVER_URL` e `PCB_QGIS_PROJECT_FILE` per verificare `GetCapabilities` sul route pubblico `/ows/`.

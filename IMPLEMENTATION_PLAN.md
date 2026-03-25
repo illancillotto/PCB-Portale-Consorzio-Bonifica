@@ -532,3 +532,4 @@ Estensioni completate:
 - il monitor `ingestion` copre tutti gli stage applicativi con filtri condivisibili
 - la vista `audit` supporta deep link operativi verso run e soggetti collegati
 - il dettaglio connector riusa i filtri stage del monitor `ingestion`
+- il contratto errori backend copre ora anche `gis` e `audit` con codici di dominio per query incoerenti e identificativi invalidi

@@ -2,6 +2,7 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
 import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
+import { ensureUuidFilter } from '../../core/validation/uuid-filter.validation';
 import { GisService } from '../gis.service';
 import { GisFeatureLinkResponseDto } from '../dto/feature-link-response.dto';
 import { GisLayerResponseDto } from '../dto/layer-response.dto';
@@ -30,6 +31,7 @@ export class GisController {
   async listFeatureLinks(
     @Query() query: ListGisFeatureLinksQueryDto,
   ): Promise<{ items: GisFeatureLinkResponseDto[]; total: number }> {
+    this.ensureScopedQueryFilters(query.subjectId, query.parcelId);
     return this.gisService.listFeatureLinks(query);
   }
 
@@ -37,6 +39,7 @@ export class GisController {
   async listMapFeatures(
     @Query() query: ListGisMapFeaturesQueryDto,
   ): Promise<{ items: GisMapFeatureResponseDto[]; total: number }> {
+    this.ensureScopedQueryFilters(query.subjectId, query.parcelId);
     return this.gisService.listMapFeatures(query);
   }
 
@@ -44,11 +47,26 @@ export class GisController {
   async listSubjectParcelLinks(
     @Query() query: ListGisSubjectParcelLinksQueryDto,
   ): Promise<{ items: GisSubjectParcelLinkResponseDto[]; total: number }> {
+    this.ensureScopedQueryFilters(query.subjectId, query.parcelId);
     return this.gisService.listSubjectParcelLinks(query);
   }
 
   @Get('publication-status')
   async getPublicationStatus(): Promise<GisPublicationStatusResponseDto> {
     return this.gisService.getPublicationStatus();
+  }
+
+  private ensureScopedQueryFilters(subjectId?: string, parcelId?: string) {
+    ensureUuidFilter(subjectId, {
+      fieldName: 'subjectId',
+      errorCode: 'gis.invalid_subject_id_filter',
+      message: 'Invalid subjectId filter for GIS query',
+    });
+
+    ensureUuidFilter(parcelId, {
+      fieldName: 'parcelId',
+      errorCode: 'gis.invalid_parcel_id_filter',
+      message: 'Invalid parcelId filter for GIS query',
+    });
   }
 }

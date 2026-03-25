@@ -1365,3 +1365,18 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-25 – Codici errore di dominio estesi a GIS e Audit
+
+Completato:
+
+- validazione riusabile UUID per filtri operativi in `core/validation`
+- `gis` ora rifiuta `subjectId` e `parcelId` non validi con `error.code` dedicati
+- `audit` ora rifiuta query incoerenti come `entityId` senza `entityType`
+- `audit` ora rifiuta richieste bulk senza `entityIds`
+- `audit` valida anche gli `entityId` UUID-based per `subject`, `parcel`, `ingestion_run` e `matching_result`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
