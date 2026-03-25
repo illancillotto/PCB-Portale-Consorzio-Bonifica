@@ -536,3 +536,4 @@ Estensioni completate:
 - le viste server-side principali e di dettaglio espongono ora errori classificati con `error.code`, `requestId` e azioni contestuali di recupero
 - il viewer GIS e il proxy `GetFeatureInfo` usano ora lo stesso contratto errore operativo del resto del frontend
 - `operations` espone ora anche failure code, status code e target delle integrazioni runtime
+- il dominio `ingestion` espone ora failure metadata strutturati (`failureCode`, `failureStage`) su run e connector issue

@@ -9,6 +9,7 @@ export interface IngestionConnectorIssueResponseDto {
     | 'dry_run_only'
     | 'latest_run_failed'
     | 'no_completed_runs';
+  failureCode: string;
   detail: string;
   latestRunId: string | null;
   latestRunStatus: string | null;

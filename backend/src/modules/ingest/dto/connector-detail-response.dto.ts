@@ -19,6 +19,8 @@ export interface IngestionConnectorDetailResponseDto {
     status: string;
     startedAt: string;
     endedAt: string | null;
+    failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
+    failureCode: string | null;
   } | null;
   lastCompletedRun: {
     id: string;
@@ -38,6 +40,8 @@ export interface IngestionConnectorDetailResponseDto {
     recordsSuccess: number;
     recordsError: number;
     logExcerpt: string;
+    failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
+    failureCode: string | null;
   } | null;
   runCounters: {
     total: number;
@@ -73,6 +77,7 @@ export interface IngestionConnectorDetailResponseDto {
       | 'dry_run_only'
       | 'latest_run_failed'
       | 'no_completed_runs';
+    failureCode: string;
     detail: string;
     latestRunId: string | null;
     latestRunStatus: string | null;

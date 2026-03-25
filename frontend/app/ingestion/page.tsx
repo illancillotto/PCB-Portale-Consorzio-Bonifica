@@ -456,6 +456,12 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
               <p className="mt-2 text-sm text-[var(--pcb-muted)]">
                 Runtime: {connector.executionReadiness.detail}
               </p>
+              {connector.latestRun?.failureCode ? (
+                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
+                  {connector.latestRun.failureCode}
+                  {connector.latestRun.failureStage ? ` · ${connector.latestRun.failureStage}` : ''}
+                </p>
+              ) : null}
               {connector.issueCounters.total > 0 ? (
                 <p className="mt-2 text-sm text-[var(--pcb-muted)]">
                   Issue aperte: {connector.issueCounters.total} · critiche {connector.issueCounters.critical} · warning{' '}
@@ -622,6 +628,8 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                 <p className="mt-3 text-sm text-[var(--pcb-muted)]">{issue.detail}</p>
                 <p className="mt-2 text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
                   {issue.issueType}
+                  {' · '}
+                  {issue.failureCode}
                   {issue.latestRunStatus ? ` · latest ${issue.latestRunStatus}` : ''}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-4 text-sm">
@@ -929,6 +937,12 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                 <p className="mt-4 text-sm text-[var(--pcb-muted)]">
                   {run.logExcerpt || 'Nessun log excerpt disponibile.'}
                 </p>
+                {run.failureCode ? (
+                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
+                    {run.failureCode}
+                    {run.failureStage ? ` · ${run.failureStage}` : ''}
+                  </p>
+                ) : null}
                 <p className="mt-2 text-sm text-[var(--pcb-muted)]">
                   normalizzati {run.stages.normalization.recordsWritten} · matching{' '}
                   {run.stages.matching.resultsWritten}

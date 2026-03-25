@@ -9,6 +9,8 @@ export interface IngestionRunResponseDto {
   recordsSuccess: number;
   recordsError: number;
   logExcerpt: string;
+  failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
+  failureCode: string | null;
   stages: {
     acquisition: {
       status: 'queued' | 'running' | 'completed' | 'failed';

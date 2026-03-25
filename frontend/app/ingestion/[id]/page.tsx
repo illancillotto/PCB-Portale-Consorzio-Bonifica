@@ -211,6 +211,12 @@ export default async function IngestionRunDetailPage({
         <p className="mt-4 text-sm text-[var(--pcb-muted)]">
           {run.logExcerpt || 'Nessun log excerpt disponibile.'}
         </p>
+        {run.failureCode ? (
+          <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
+            {run.failureCode}
+            {run.failureStage ? ` · ${run.failureStage}` : ''}
+          </p>
+        ) : null}
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
             href={`/audit?entityType=ingestion_run&entityId=${run.id}`}

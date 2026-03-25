@@ -110,6 +110,8 @@ export interface IngestionRun {
   recordsSuccess: number;
   recordsError: number;
   logExcerpt: string;
+  failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
+  failureCode: string | null;
   stages: {
     acquisition: {
       status: 'queued' | 'running' | 'completed' | 'failed';
@@ -151,6 +153,8 @@ export interface IngestionConnectorCatalogItem {
     status: string;
     startedAt: string;
     endedAt: string | null;
+    failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
+    failureCode: string | null;
   } | null;
   issueCounters: {
     total: number;
@@ -180,6 +184,8 @@ export interface IngestionConnectorDetail {
     status: string;
     startedAt: string;
     endedAt: string | null;
+    failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
+    failureCode: string | null;
   } | null;
   lastCompletedRun: {
     id: string;
@@ -199,6 +205,8 @@ export interface IngestionConnectorDetail {
     recordsSuccess: number;
     recordsError: number;
     logExcerpt: string;
+    failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
+    failureCode: string | null;
   } | null;
   runCounters: {
     total: number;
@@ -237,6 +245,7 @@ export interface IngestionConnectorIssue {
     | 'dry_run_only'
     | 'latest_run_failed'
     | 'no_completed_runs';
+  failureCode: string;
   detail: string;
   latestRunId: string | null;
   latestRunStatus: string | null;

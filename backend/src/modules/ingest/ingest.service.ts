@@ -130,6 +130,8 @@ interface MatchingRuntimeState {
   normalizedRecordsRead?: number;
 }
 
+type IngestionFailureStage = 'acquisition' | 'post_processing' | 'normalization' | 'matching';
+
 const connectorCatalog: ConnectorCatalogEntry[] = [
   {
     connectorName: 'connector-nas-catasto',
@@ -239,7 +241,9 @@ export class IngestService {
     );
 
     const latestRunByConnector = new Map(
-      latestRunsResult.rows.map((row) => [row.connector_name, row] as const),
+      await Promise.all(
+        latestRunsResult.rows.map(async (row) => [row.connector_name, await this.mapRun(row)] as const),
+      ),
     );
     const issueCountsByConnector = new Map<string, { total: number; critical: number; warning: number }>();
 
@@ -279,8 +283,10 @@ export class IngestService {
             ? {
                 id: latestRun.id,
                 status: latestRun.status,
-                startedAt: new Date(latestRun.started_at).toISOString(),
-                endedAt: latestRun.ended_at ? new Date(latestRun.ended_at).toISOString() : null,
+                startedAt: latestRun.startedAt,
+                endedAt: latestRun.endedAt,
+                failureStage: latestRun.failureStage,
+                failureCode: latestRun.failureCode,
           }
             : null,
           issueCounters,
@@ -348,7 +354,9 @@ export class IngestService {
     );
 
     const latestRunByConnector = new Map(
-      latestRunsResult.rows.map((row) => [row.connector_name, row] as const),
+      await Promise.all(
+        latestRunsResult.rows.map(async (row) => [row.connector_name, await this.mapRun(row)] as const),
+      ),
     );
 
     const items: IngestionConnectorIssueResponseDto[] = [];
@@ -364,6 +372,7 @@ export class IngestService {
           displayName: connector.displayName,
           severity: 'critical',
           issueType: 'not_configured',
+          failureCode: this.resolveConnectorIssueFailureCode('not_configured'),
           detail: readiness.detail,
           latestRunId: latestRun?.id ?? null,
           latestRunStatus: latestRun?.status ?? null,
@@ -378,6 +387,7 @@ export class IngestService {
           displayName: connector.displayName,
           severity: 'critical',
           issueType: 'not_runnable',
+          failureCode: this.resolveConnectorIssueFailureCode('not_runnable'),
           detail: readiness.detail,
           latestRunId: latestRun?.id ?? null,
           latestRunStatus: latestRun?.status ?? null,
@@ -391,6 +401,7 @@ export class IngestService {
           displayName: connector.displayName,
           severity: 'warning',
           issueType: 'dry_run_only',
+          failureCode: this.resolveConnectorIssueFailureCode('dry_run_only'),
           detail: 'Connector eseguibile ma in sola modalita` dry-run.',
           latestRunId: latestRun?.id ?? null,
           latestRunStatus: latestRun?.status ?? null,
@@ -404,7 +415,9 @@ export class IngestService {
           displayName: connector.displayName,
           severity: 'critical',
           issueType: 'latest_run_failed',
-          detail: latestRun.log_excerpt ?? 'Ultima run terminata con stato failed.',
+          failureCode:
+            latestRun.failureCode ?? this.resolveConnectorIssueFailureCode('latest_run_failed'),
+          detail: latestRun.logExcerpt || 'Ultima run terminata con stato failed.',
           latestRunId: latestRun.id,
           latestRunStatus: latestRun.status,
         });
@@ -417,6 +430,7 @@ export class IngestService {
           displayName: connector.displayName,
           severity: 'warning',
           issueType: 'no_completed_runs',
+          failureCode: this.resolveConnectorIssueFailureCode('no_completed_runs'),
           detail: 'Nessuna run completata disponibile per il connector corrente.',
           latestRunId: latestRun?.id ?? null,
           latestRunStatus: latestRun?.status ?? null,
@@ -518,6 +532,8 @@ export class IngestService {
     const latestRun = runsResult.rows[0] ?? null;
     const lastCompletedRun = runsResult.rows.find((row) => row.status === 'completed') ?? null;
     const lastFailedRun = runsResult.rows.find((row) => row.status === 'failed') ?? null;
+    const latestRunMapped = latestRun ? await this.mapRun(latestRun) : null;
+    const lastFailedRunMapped = lastFailedRun ? await this.mapRun(lastFailedRun) : null;
     const executionReadiness = this.getConnectorExecutionReadiness(connectorName);
     const issueCounters = connectorIssues.items.reduce(
       (accumulator, item) => {
@@ -577,6 +593,8 @@ export class IngestService {
             status: latestRun.status,
             startedAt: new Date(latestRun.started_at).toISOString(),
             endedAt: latestRun.ended_at ? new Date(latestRun.ended_at).toISOString() : null,
+            failureStage: latestRunMapped?.failureStage ?? null,
+            failureCode: latestRunMapped?.failureCode ?? null,
           }
         : null,
       lastCompletedRun: lastCompletedRun
@@ -602,6 +620,8 @@ export class IngestService {
             recordsSuccess: lastFailedRun.records_success,
             recordsError: lastFailedRun.records_error,
             logExcerpt: lastFailedRun.log_excerpt ?? '',
+            failureStage: lastFailedRunMapped?.failureStage ?? null,
+            failureCode: lastFailedRunMapped?.failureCode ?? null,
           }
         : null,
       runCounters: {
@@ -1716,6 +1736,12 @@ export class IngestService {
           ? 'running'
           : 'not_started'
         : 'not_started');
+    const failure = this.resolveRunFailure({
+      acquisitionStatus,
+      postProcessingStatus,
+      normalizationStatus,
+      matchingStatus,
+    });
 
     return {
       id: row.id,
@@ -1728,6 +1754,8 @@ export class IngestService {
       recordsSuccess: row.records_success,
       recordsError: row.records_error,
       logExcerpt: row.log_excerpt ?? '',
+      failureStage: failure?.stage ?? null,
+      failureCode: failure?.code ?? null,
       stages: {
         acquisition: {
           status: acquisitionStatus,
@@ -1747,6 +1775,81 @@ export class IngestService {
         },
       },
     };
+  }
+
+  private resolveRunFailure(input: {
+    acquisitionStatus: 'queued' | 'running' | 'completed' | 'failed';
+    postProcessingStatus: 'not_configured' | 'queued' | 'running' | 'completed' | 'failed';
+    normalizationStatus: 'not_started' | 'running' | 'completed' | 'failed';
+    matchingStatus: 'not_started' | 'running' | 'completed' | 'failed';
+  }): { stage: IngestionFailureStage; code: string } | null {
+    if (input.matchingStatus === 'failed') {
+      return {
+        stage: 'matching',
+        code: this.resolveRunFailureCode('matching'),
+      };
+    }
+
+    if (input.normalizationStatus === 'failed') {
+      return {
+        stage: 'normalization',
+        code: this.resolveRunFailureCode('normalization'),
+      };
+    }
+
+    if (input.postProcessingStatus === 'failed') {
+      return {
+        stage: 'post_processing',
+        code: this.resolveRunFailureCode('post_processing'),
+      };
+    }
+
+    if (input.acquisitionStatus === 'failed') {
+      return {
+        stage: 'acquisition',
+        code: this.resolveRunFailureCode('acquisition'),
+      };
+    }
+
+    return null;
+  }
+
+  private resolveRunFailureCode(stage: IngestionFailureStage) {
+    if (stage === 'matching') {
+      return 'ingest.matching_failed';
+    }
+
+    if (stage === 'normalization') {
+      return 'ingest.normalization_failed';
+    }
+
+    if (stage === 'post_processing') {
+      return 'ingest.post_processing_failed';
+    }
+
+    return 'ingest.acquisition_failed';
+  }
+
+  private resolveConnectorIssueFailureCode(
+    issueType: IngestionConnectorIssueResponseDto['issueType'],
+  ) {
+    if (issueType === 'not_configured') {
+      return 'ingest.connector_not_configured';
+    }
+
+    if (issueType === 'not_runnable') {
+      return 'ingest.connector_not_runnable';
+    }
+
+    if (issueType === 'dry_run_only') {
+      return 'ingest.connector_dry_run_only';
+    }
+
+    if (issueType === 'latest_run_failed') {
+      return 'ingest.connector_latest_run_failed';
+    }
+
+    return 'ingest.connector_no_completed_runs';
   }
 
   private async countNormalizedRecords(runId: string) {

@@ -1423,3 +1423,19 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-25 – Failure metadata strutturati nel dominio Ingestion
+
+Completato:
+
+- le run `ingestion` espongono ora `failureStage` e `failureCode`
+- il catalogo connector e il dettaglio connector riportano anche il failure metadata dell’ultima run quando presente
+- le issue dei connector espongono ora `failureCode` strutturato, distinto dal `detail`
+- monitor `ingestion`, dettaglio run e dettaglio connector mostrano questi metadati senza dipendere solo da `logExcerpt`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

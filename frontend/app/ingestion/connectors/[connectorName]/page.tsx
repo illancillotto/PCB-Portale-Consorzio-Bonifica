@@ -251,6 +251,12 @@ export default async function ConnectorDetailPage({
             <strong className="text-[var(--pcb-ink)]">Issue aperte:</strong> {connector.issueCounters.total}
             {' · '}critiche {connector.issueCounters.critical} · warning {connector.issueCounters.warning}
           </p>
+          {connector.latestRun?.failureCode ? (
+            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
+              {connector.latestRun.failureCode}
+              {connector.latestRun.failureStage ? ` · ${connector.latestRun.failureStage}` : ''}
+            </p>
+          ) : null}
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
               href="/audit?sourceModule=ingest"
@@ -390,6 +396,12 @@ export default async function ConnectorDetailPage({
                 <p className="mt-2 text-xs text-[var(--pcb-muted)]">
                   {connector.lastFailedRun.recordsError} errori · {connector.lastFailedRun.logExcerpt || 'senza log'}
                 </p>
+                {connector.lastFailedRun.failureCode ? (
+                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
+                    {connector.lastFailedRun.failureCode}
+                    {connector.lastFailedRun.failureStage ? ` · ${connector.lastFailedRun.failureStage}` : ''}
+                  </p>
+                ) : null}
                 <Link
                   href={buildIngestionStageHref({
                     connector: connector.connectorName,
@@ -531,6 +543,9 @@ export default async function ConnectorDetailPage({
                   <StatusChip label={issue.severity} />
                 </div>
                 <p className="mt-4 text-sm text-[var(--pcb-muted)]">{issue.detail}</p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  {issue.failureCode}
+                </p>
                 {issue.latestRunId ? (
                   <div className="mt-4">
                     <Link

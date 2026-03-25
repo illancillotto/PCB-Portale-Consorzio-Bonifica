@@ -149,6 +149,8 @@ Schema errori applicativo:
   - `ingest.matching_result_missing_subject`
   - `ingest.manual_subject_assignment_failed`
   - `ingest.connector_cli_missing`
+- le run `ingestion` espongono anche `failureStage` e `failureCode` quando una fase applicativa fallisce
+- le issue dei connector espongono anche `failureCode` strutturato, distinto dal testo libero `detail`
 - anche i domini `auth`, `anagrafiche` e `catasto` espongono codici errore stabili, ad esempio:
   - `auth.authorization_header_missing`
   - `auth.invalid_authorization_header`

@@ -132,5 +132,7 @@ Stato attuale:
 - il viewer GIS riusa la classificazione degli errori operativi per `GetFeatureInfo` e mostra retry/azioni operative invece di stringhe grezze
 - `operations` mostra ora anche `failureCode`, `statusCode` e `target` per le integrazioni runtime principali
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
+- il monitor `ingestion`, il dettaglio run e il dettaglio connector mostrano ora `failureCode` e `failureStage` quando un fallimento e` stato classificato dal backend
+- le issue dei connector ingestion mostrano ora anche il `failureCode` strutturato oltre al dettaglio testuale
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata
