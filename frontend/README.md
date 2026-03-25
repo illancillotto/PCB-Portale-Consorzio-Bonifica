@@ -134,5 +134,7 @@ Stato attuale:
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - il monitor `ingestion`, il dettaglio run e il dettaglio connector mostrano ora `failureCode` e `failureStage` quando un fallimento e` stato classificato dal backend
 - le issue dei connector ingestion mostrano ora anche il `failureCode` strutturato oltre al dettaglio testuale
+- il dettaglio run mostra ora anche `outcomeCode` sui record normalizzati e sui risultati di matching
+- il dettaglio run distingue anche `resolutionMode` e `requiresManualReview` sui risultati di matching
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

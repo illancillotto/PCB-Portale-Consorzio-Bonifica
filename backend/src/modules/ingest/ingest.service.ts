@@ -1940,12 +1940,15 @@ export class IngestService {
       ingestionRunId: row.ingestion_run_id,
       sourceRecordId: row.source_record_id,
       normalizationStatus: row.normalization_status,
+      outcomeCode: this.resolveNormalizedOutcomeCode(row.normalized_jsonb),
       normalized: row.normalized_jsonb,
       createdAt: new Date(row.created_at).toISOString(),
     };
   }
 
   private mapMatchingResult(row: MatchingResultRow): MatchingResultResponseDto {
+    const outcomeCode = this.resolveMatchingOutcomeCode(row.decision_status, row.decision_type);
+
     return {
       id: row.id,
       ingestionRunId: row.ingestion_run_id,
@@ -1954,9 +1957,78 @@ export class IngestService {
       matchingScore: Number(row.matching_score),
       decisionType: row.decision_type,
       decisionStatus: row.decision_status,
+      outcomeCode,
+      requiresManualReview: row.decision_status === 'review',
+      resolutionMode:
+        row.decision_status === 'accepted' || row.decision_status === 'rejected'
+          ? 'manual'
+          : 'automatic',
       notes: row.notes,
       createdAt: new Date(row.created_at).toISOString(),
     };
+  }
+
+  private resolveNormalizedOutcomeCode(normalized: Record<string, unknown>) {
+    const recordType = this.readString(normalized.recordType);
+    const filesystem =
+      typeof normalized.filesystem === 'object' && normalized.filesystem !== null
+        ? (normalized.filesystem as Record<string, unknown>)
+        : {};
+    const subjectHints =
+      typeof normalized.subjectHints === 'object' && normalized.subjectHints !== null
+        ? (normalized.subjectHints as Record<string, unknown>)
+        : {};
+
+    const normalizedSubjectKey = this.readString(subjectHints.normalizedSubjectKey);
+    const bucketLetter = this.readString(filesystem.bucketLetter);
+
+    if (recordType === 'directory' && normalizedSubjectKey) {
+      return 'normalize.directory_subject_bucket';
+    }
+
+    if (recordType === 'directory') {
+      return bucketLetter
+        ? 'normalize.directory_bucket_only'
+        : 'normalize.directory_structure_only';
+    }
+
+    if (recordType === 'file' && normalizedSubjectKey) {
+      return 'normalize.document_subject_hint';
+    }
+
+    if (recordType === 'file') {
+      return 'normalize.document_without_subject_hint';
+    }
+
+    return 'normalize.record_normalized';
+  }
+
+  private resolveMatchingOutcomeCode(decisionStatus: string, decisionType: string) {
+    if (decisionStatus === 'accepted') {
+      return 'match.manually_accepted';
+    }
+
+    if (decisionStatus === 'rejected') {
+      return 'match.manually_rejected';
+    }
+
+    if (decisionStatus === 'review') {
+      return 'match.review_required';
+    }
+
+    if (decisionStatus === 'ignored') {
+      return 'match.ignored';
+    }
+
+    if (decisionStatus === 'unmatched') {
+      return decisionType === 'no_candidate' ? 'match.unmatched_no_candidate' : 'match.unmatched';
+    }
+
+    if (decisionStatus === 'matched') {
+      return `match.${decisionType}`;
+    }
+
+    return 'match.unknown';
   }
 
   private async getMatchingResultRow(runId: string, resultId: string) {

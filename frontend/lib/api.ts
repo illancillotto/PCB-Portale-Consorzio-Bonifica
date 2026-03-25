@@ -279,6 +279,7 @@ export interface NormalizedRecord {
   ingestionRunId: string;
   sourceRecordId: string;
   normalizationStatus: string;
+  outcomeCode: string;
   normalized: {
     connectorName?: string;
     sourceSystem?: string;
@@ -309,6 +310,9 @@ export interface MatchingResult {
   matchingScore: number;
   decisionType: string;
   decisionStatus: string;
+  outcomeCode: string;
+  requiresManualReview: boolean;
+  resolutionMode: 'automatic' | 'manual';
   notes: string | null;
   createdAt: string;
 }

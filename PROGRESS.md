@@ -1439,3 +1439,22 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-25 – Outcome metadata strutturati su normalizzazione e matching
+
+Completato:
+
+- i record normalizzati espongono ora `outcomeCode`
+- i risultati di matching espongono ora `outcomeCode`, `requiresManualReview` e `resolutionMode`
+- il dettaglio run mostra questi metadati direttamente nelle sezioni `Normalized records` e `Matching results`
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Nota:
+
+- come nei blocchi precedenti, il primo `lint` frontend e` fallito se lanciato mentre `.next/types` era ancora in rigenerazione; rilanciato a build completata, poi OK

@@ -6,6 +6,9 @@ export interface MatchingResultResponseDto {
   matchingScore: number;
   decisionType: string;
   decisionStatus: string;
+  outcomeCode: string;
+  requiresManualReview: boolean;
+  resolutionMode: 'automatic' | 'manual';
   notes: string | null;
   createdAt: string;
 }

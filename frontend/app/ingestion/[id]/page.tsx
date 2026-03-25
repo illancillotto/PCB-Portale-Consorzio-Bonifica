@@ -401,6 +401,9 @@ export default async function IngestionRunDetailPage({
                     <dd>{new Date(item.createdAt).toLocaleString('it-IT')}</dd>
                   </div>
                 </dl>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
+                  {item.outcomeCode}
+                </p>
               </article>
             ))}
           </div>
@@ -483,6 +486,13 @@ export default async function IngestionRunDetailPage({
                     <dd>{new Date(item.createdAt).toLocaleString('it-IT')}</dd>
                   </div>
                 </dl>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <StatusChip label={item.resolutionMode} />
+                  {item.requiresManualReview ? <StatusChip label="review-required" /> : null}
+                </div>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-accent)]">
+                  {item.outcomeCode}
+                </p>
                 <p className="mt-4 text-sm text-[var(--pcb-muted)]">
                   {item.notes ?? 'Nessuna nota disponibile.'}
                 </p>

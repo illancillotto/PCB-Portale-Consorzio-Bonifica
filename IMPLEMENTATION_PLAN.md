@@ -537,3 +537,4 @@ Estensioni completate:
 - il viewer GIS e il proxy `GetFeatureInfo` usano ora lo stesso contratto errore operativo del resto del frontend
 - `operations` espone ora anche failure code, status code e target delle integrazioni runtime
 - il dominio `ingestion` espone ora failure metadata strutturati (`failureCode`, `failureStage`) su run e connector issue
+- la pipeline `normalized -> matching` espone ora anche outcome metadata strutturati a livello record
