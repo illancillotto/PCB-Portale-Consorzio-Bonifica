@@ -1569,3 +1569,18 @@ Verifiche eseguite:
 
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-25 – Outcome pipeline di Operations collegati a Ingestion
+
+Completato:
+
+- le run `ingestion` espongono ora `normalizedSummary` e `matchingSummary`
+- il monitor `ingestion` supporta ora anche filtri outcome-aware sulle run
+- i contatori outcome di `operations` aprono direttamente il monitor `ingestion` gia` filtrato per outcome e stage coerente
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

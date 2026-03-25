@@ -142,6 +142,7 @@ Stato attuale:
 - il dettaglio run espone ora una vista di riconciliazione pipeline con deep link ai filtri raw, normalized e matching anche per `outcomeCode`
 - `operations` mostra ora anche gli outcome aggregati cross-run della pipeline ingestion
 - `operations` espone ora anche ingressi rapidi alle run piu` rilevanti: fallite, queued e da verificare
+- i contatori outcome in `operations` aprono ora il monitor `ingestion` gia` filtrato per outcome e stage
 - il dettaglio run distingue anche `resolutionMode` e `requiresManualReview` sui risultati di matching
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

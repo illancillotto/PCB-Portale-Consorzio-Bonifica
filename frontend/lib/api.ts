@@ -125,6 +125,14 @@ export interface IngestionRun {
       recordCaptured: number;
     };
   };
+  normalizedSummary: {
+    totalRecords: number;
+    outcomeCounters: Record<string, number>;
+  };
+  matchingSummary: {
+    totalResults: number;
+    outcomeCounters: Record<string, number>;
+  };
   failureStage: 'acquisition' | 'post_processing' | 'normalization' | 'matching' | null;
   failureCode: string | null;
   stages: {

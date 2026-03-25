@@ -19,6 +19,9 @@ interface IngestionPageProps {
   searchParams?: Promise<{
     status?: string;
     connector?: string;
+    rawOutcomeCode?: string;
+    normalizedOutcomeCode?: string;
+    matchingOutcomeCode?: string;
     acquisitionStage?: 'queued' | 'running' | 'completed' | 'failed';
     postProcessingStage?: 'not_configured' | 'queued' | 'running' | 'completed' | 'failed';
     normalizationStage?: 'not_started' | 'running' | 'completed' | 'failed';
@@ -31,9 +34,40 @@ interface IngestionPageProps {
   }>;
 }
 
+function resolveRawOutcomeCounterKey(outcomeCode?: string) {
+  if (outcomeCode === 'raw.directory_subject_bucket') {
+    return 'directorySubjectBucket';
+  }
+
+  if (outcomeCode === 'raw.directory_bucket_only') {
+    return 'directoryBucketOnly';
+  }
+
+  if (outcomeCode === 'raw.directory_structure_only') {
+    return 'directoryStructureOnly';
+  }
+
+  if (outcomeCode === 'raw.file_subject_hint') {
+    return 'fileSubjectHint';
+  }
+
+  if (outcomeCode === 'raw.file_without_subject_hint') {
+    return 'fileWithoutSubjectHint';
+  }
+
+  if (outcomeCode === 'raw.record_captured') {
+    return 'recordCaptured';
+  }
+
+  return null;
+}
+
 function buildRunsFilterHref(filters: {
   status?: string;
   connector?: string;
+  rawOutcomeCode?: string;
+  normalizedOutcomeCode?: string;
+  matchingOutcomeCode?: string;
   acquisitionStage?: 'queued' | 'running' | 'completed' | 'failed';
   postProcessingStage?: 'not_configured' | 'queued' | 'running' | 'completed' | 'failed';
   normalizationStage?: 'not_started' | 'running' | 'completed' | 'failed';
@@ -47,6 +81,18 @@ function buildRunsFilterHref(filters: {
 
   if (filters.connector) {
     params.set('connector', filters.connector);
+  }
+
+  if (filters.rawOutcomeCode) {
+    params.set('rawOutcomeCode', filters.rawOutcomeCode);
+  }
+
+  if (filters.normalizedOutcomeCode) {
+    params.set('normalizedOutcomeCode', filters.normalizedOutcomeCode);
+  }
+
+  if (filters.matchingOutcomeCode) {
+    params.set('matchingOutcomeCode', filters.matchingOutcomeCode);
   }
 
   if (filters.acquisitionStage) {
@@ -161,6 +207,29 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
     }
 
     if (filters.connector && run.connectorName !== filters.connector) {
+      return false;
+    }
+
+    const rawOutcomeCounterKey = resolveRawOutcomeCounterKey(filters.rawOutcomeCode);
+
+    if (
+      rawOutcomeCounterKey &&
+      run.rawSummary.outcomeCounters[rawOutcomeCounterKey] === 0
+    ) {
+      return false;
+    }
+
+    if (
+      filters.normalizedOutcomeCode &&
+      (run.normalizedSummary.outcomeCounters[filters.normalizedOutcomeCode] ?? 0) === 0
+    ) {
+      return false;
+    }
+
+    if (
+      filters.matchingOutcomeCode &&
+      (run.matchingSummary.outcomeCounters[filters.matchingOutcomeCode] ?? 0) === 0
+    ) {
       return false;
     }
 
@@ -945,7 +1014,7 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                   <div>
                     <dt className="font-medium text-[var(--pcb-ink)]">Record</dt>
                     <dd>
-                      {run.recordsSuccess}/{run.recordsTotal} successi, {run.recordsError} errori
+                  {run.recordsSuccess}/{run.recordsTotal} successi, {run.recordsError} errori
                     </dd>
                   </div>
                   <div>
@@ -965,6 +1034,9 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
                 <p className="mt-2 text-sm text-[var(--pcb-muted)]">
                   raw {run.rawSummary.totalRecords} · dir {run.rawSummary.directoryRecords} · file{' '}
                   {run.rawSummary.fileRecords} · hint {run.rawSummary.subjectHintRecords}
+                </p>
+                <p className="mt-2 text-xs text-[var(--pcb-muted)]">
+                  norm {run.normalizedSummary.totalRecords} · match {run.matchingSummary.totalResults}
                 </p>
                 <p className="mt-2 text-xs text-[var(--pcb-muted)]">
                   dir+soggetto {run.rawSummary.outcomeCounters.directorySubjectBucket} · dir bucket{' '}

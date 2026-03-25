@@ -139,6 +139,28 @@ interface OutcomeCountersRow {
   match_unknown: string | number;
 }
 
+interface RunNormalizedOutcomeCountersRow {
+  normalize_directory_subject_bucket: string | number;
+  normalize_directory_bucket_only: string | number;
+  normalize_directory_structure_only: string | number;
+  normalize_document_subject_hint: string | number;
+  normalize_document_without_subject_hint: string | number;
+  normalize_record_normalized: string | number;
+}
+
+interface RunMatchingOutcomeCountersRow {
+  match_manually_accepted: string | number;
+  match_manually_rejected: string | number;
+  match_review_required: string | number;
+  match_ignored: string | number;
+  match_unmatched_no_candidate: string | number;
+  match_unmatched: string | number;
+  match_identifier_exact: string | number;
+  match_source_link_exact: string | number;
+  match_canonical_display_name_exact: string | number;
+  match_unknown: string | number;
+}
+
 interface ConnectorExecutionResult {
   status: string;
   startedAt?: string;
@@ -1977,7 +1999,16 @@ export class IngestService {
 
   private async mapRun(row: IngestionRunRow): Promise<IngestionRunResponseDto> {
     const postProcessingConfig = this.getPostProcessingConfig();
-    const [postProcessingState, normalizationState, matchingState, rawSummary, normalizedCount, matchingCount] =
+    const [
+      postProcessingState,
+      normalizationState,
+      matchingState,
+      rawSummary,
+      normalizedSummary,
+      matchingSummary,
+      normalizedCount,
+      matchingCount,
+    ] =
       await Promise.all([
         this.redisService.getJson<PostProcessingRuntimeState>(
           `pcb:ingest:runs:${row.id}:post-processing`,
@@ -1987,6 +2018,8 @@ export class IngestService {
         ),
         this.redisService.getJson<MatchingRuntimeState>(`pcb:ingest:runs:${row.id}:matching`),
         this.getRawSummaryByRunId(row.id),
+        this.getNormalizedSummaryByRunId(row.id),
+        this.getMatchingSummaryByRunId(row.id),
         this.countNormalizedRecords(row.id),
         this.countMatchingResults(row.id),
       ]);
@@ -2034,6 +2067,8 @@ export class IngestService {
       recordsError: row.records_error,
       logExcerpt: row.log_excerpt ?? '',
       rawSummary,
+      normalizedSummary,
+      matchingSummary,
       failureStage: failure?.stage ?? null,
       failureCode: failure?.code ?? null,
       stages: {
@@ -2194,6 +2229,109 @@ export class IngestService {
         fileWithoutSubjectHint: 0,
         recordCaptured: 0,
       },
+    };
+  }
+
+  private async getNormalizedSummaryByRunId(runId: string) {
+    const result = await this.databaseService.query<RunNormalizedOutcomeCountersRow>(
+      `
+        SELECT
+          COUNT(*) FILTER (
+            WHERE normalized_jsonb ->> 'recordType' = 'directory'
+              AND COALESCE(NULLIF(normalized_jsonb #>> '{subjectHints,normalizedSubjectKey}', ''), '') <> ''
+          )::text AS normalize_directory_subject_bucket,
+          COUNT(*) FILTER (
+            WHERE normalized_jsonb ->> 'recordType' = 'directory'
+              AND COALESCE(NULLIF(normalized_jsonb #>> '{subjectHints,normalizedSubjectKey}', ''), '') = ''
+              AND COALESCE(NULLIF(normalized_jsonb #>> '{filesystem,bucketLetter}', ''), '') <> ''
+          )::text AS normalize_directory_bucket_only,
+          COUNT(*) FILTER (
+            WHERE normalized_jsonb ->> 'recordType' = 'directory'
+              AND COALESCE(NULLIF(normalized_jsonb #>> '{subjectHints,normalizedSubjectKey}', ''), '') = ''
+              AND COALESCE(NULLIF(normalized_jsonb #>> '{filesystem,bucketLetter}', ''), '') = ''
+          )::text AS normalize_directory_structure_only,
+          COUNT(*) FILTER (
+            WHERE normalized_jsonb ->> 'recordType' = 'file'
+              AND COALESCE(NULLIF(normalized_jsonb #>> '{subjectHints,normalizedSubjectKey}', ''), '') <> ''
+          )::text AS normalize_document_subject_hint,
+          COUNT(*) FILTER (
+            WHERE normalized_jsonb ->> 'recordType' = 'file'
+              AND COALESCE(NULLIF(normalized_jsonb #>> '{subjectHints,normalizedSubjectKey}', ''), '') = ''
+          )::text AS normalize_document_without_subject_hint,
+          COUNT(*) FILTER (
+            WHERE COALESCE(NULLIF(normalized_jsonb ->> 'recordType', ''), '') NOT IN ('directory', 'file')
+          )::text AS normalize_record_normalized
+        FROM ingest.ingestion_record_normalized
+        WHERE ingestion_run_id = $1
+      `,
+      [runId],
+    );
+
+    const row = result.rows[0];
+    const outcomeCounters = {
+      'normalize.directory_subject_bucket': Number(row?.normalize_directory_subject_bucket ?? 0),
+      'normalize.directory_bucket_only': Number(row?.normalize_directory_bucket_only ?? 0),
+      'normalize.directory_structure_only': Number(row?.normalize_directory_structure_only ?? 0),
+      'normalize.document_subject_hint': Number(row?.normalize_document_subject_hint ?? 0),
+      'normalize.document_without_subject_hint': Number(row?.normalize_document_without_subject_hint ?? 0),
+      'normalize.record_normalized': Number(row?.normalize_record_normalized ?? 0),
+    };
+
+    return {
+      totalRecords: Object.values(outcomeCounters).reduce((total, value) => total + value, 0),
+      outcomeCounters,
+    };
+  }
+
+  private async getMatchingSummaryByRunId(runId: string) {
+    const result = await this.databaseService.query<RunMatchingOutcomeCountersRow>(
+      `
+        SELECT
+          COUNT(*) FILTER (WHERE decision_status = 'accepted')::text AS match_manually_accepted,
+          COUNT(*) FILTER (WHERE decision_status = 'rejected')::text AS match_manually_rejected,
+          COUNT(*) FILTER (WHERE decision_status = 'review')::text AS match_review_required,
+          COUNT(*) FILTER (WHERE decision_status = 'ignored')::text AS match_ignored,
+          COUNT(*) FILTER (
+            WHERE decision_status = 'unmatched' AND decision_type = 'no_candidate'
+          )::text AS match_unmatched_no_candidate,
+          COUNT(*) FILTER (
+            WHERE decision_status = 'unmatched' AND decision_type <> 'no_candidate'
+          )::text AS match_unmatched,
+          COUNT(*) FILTER (
+            WHERE decision_status = 'matched' AND decision_type = 'identifier_exact'
+          )::text AS match_identifier_exact,
+          COUNT(*) FILTER (
+            WHERE decision_status = 'matched' AND decision_type = 'source_link_exact'
+          )::text AS match_source_link_exact,
+          COUNT(*) FILTER (
+            WHERE decision_status = 'matched' AND decision_type = 'canonical_display_name_exact'
+          )::text AS match_canonical_display_name_exact,
+          COUNT(*) FILTER (
+            WHERE decision_status NOT IN ('accepted', 'rejected', 'review', 'ignored', 'unmatched', 'matched')
+          )::text AS match_unknown
+        FROM ingest.matching_result
+        WHERE ingestion_run_id = $1
+      `,
+      [runId],
+    );
+
+    const row = result.rows[0];
+    const outcomeCounters = {
+      'match.manually_accepted': Number(row?.match_manually_accepted ?? 0),
+      'match.manually_rejected': Number(row?.match_manually_rejected ?? 0),
+      'match.review_required': Number(row?.match_review_required ?? 0),
+      'match.ignored': Number(row?.match_ignored ?? 0),
+      'match.unmatched_no_candidate': Number(row?.match_unmatched_no_candidate ?? 0),
+      'match.unmatched': Number(row?.match_unmatched ?? 0),
+      'match.identifier_exact': Number(row?.match_identifier_exact ?? 0),
+      'match.source_link_exact': Number(row?.match_source_link_exact ?? 0),
+      'match.canonical_display_name_exact': Number(row?.match_canonical_display_name_exact ?? 0),
+      'match.unknown': Number(row?.match_unknown ?? 0),
+    };
+
+    return {
+      totalResults: Object.values(outcomeCounters).reduce((total, value) => total + value, 0),
+      outcomeCounters,
     };
   }
 

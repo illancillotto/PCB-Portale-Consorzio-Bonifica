@@ -160,6 +160,7 @@ Schema errori applicativo:
 - `GET /api/v1/ingestion/runs/{id}/pipeline-summary` espone il riepilogo strutturato `raw -> normalized -> matching`
 - `GET /api/v1/ingestion/runs/{id}/normalized-records` e `matching-results` supportano ora anche il filtro `outcomeCode`
 - `GET /api/v1/ingestion/orchestration-summary` espone ora anche gli outcome aggregati cross-run di `raw`, `normalized` e `matching`
+- le run `ingestion` espongono ora anche `normalizedSummary` e `matchingSummary`, utili per filtri outcome-aware nel monitor
 - anche i domini `auth`, `anagrafiche` e `catasto` espongono codici errore stabili, ad esempio:
   - `auth.authorization_header_missing`
   - `auth.invalid_authorization_header`

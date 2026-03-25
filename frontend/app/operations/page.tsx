@@ -60,6 +60,54 @@ function buildOperationsHref(filters: {
   return queryString ? `/operations?${queryString}` : '/operations';
 }
 
+function buildIngestionOutcomeHref(filters: {
+  rawOutcomeCode?: string;
+  normalizedOutcomeCode?: string;
+  matchingOutcomeCode?: string;
+  acquisitionStage?: 'queued' | 'running' | 'completed' | 'failed';
+  postProcessingStage?: 'not_configured' | 'queued' | 'running' | 'completed' | 'failed';
+  normalizationStage?: 'not_started' | 'running' | 'completed' | 'failed';
+  matchingStage?: 'not_started' | 'running' | 'completed' | 'failed';
+  status?: string;
+}) {
+  const params = new URLSearchParams();
+
+  if (filters.rawOutcomeCode) {
+    params.set('rawOutcomeCode', filters.rawOutcomeCode);
+  }
+
+  if (filters.normalizedOutcomeCode) {
+    params.set('normalizedOutcomeCode', filters.normalizedOutcomeCode);
+  }
+
+  if (filters.matchingOutcomeCode) {
+    params.set('matchingOutcomeCode', filters.matchingOutcomeCode);
+  }
+
+  if (filters.acquisitionStage) {
+    params.set('acquisitionStage', filters.acquisitionStage);
+  }
+
+  if (filters.postProcessingStage) {
+    params.set('postProcessingStage', filters.postProcessingStage);
+  }
+
+  if (filters.normalizationStage) {
+    params.set('normalizationStage', filters.normalizationStage);
+  }
+
+  if (filters.matchingStage) {
+    params.set('matchingStage', filters.matchingStage);
+  }
+
+  if (filters.status) {
+    params.set('status', filters.status);
+  }
+
+  const queryString = params.toString();
+  return queryString ? `/ingestion?${queryString}` : '/ingestion';
+}
+
 export default async function OperationsPage({ searchParams }: OperationsPageProps) {
   const session = await requireOperatorSession('/operations');
   const filters = (await searchParams) ?? {};
@@ -184,13 +232,16 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
             <p className="text-sm text-[var(--pcb-muted)]">Raw outcomes</p>
             <div className="mt-4 grid gap-3">
               {Object.entries(orchestrationSummary.rawOutcomeCounters).map(([key, total]) => (
-                <div
+                <Link
                   key={key}
+                  href={buildIngestionOutcomeHref({
+                    rawOutcomeCode: key,
+                  })}
                   className="flex items-center justify-between rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]"
                 >
                   <span className="break-all">{key}</span>
                   <strong className="text-[var(--pcb-ink)]">{total}</strong>
-                </div>
+                </Link>
               ))}
             </div>
           </article>
@@ -198,13 +249,17 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
             <p className="text-sm text-[var(--pcb-muted)]">Normalized outcomes</p>
             <div className="mt-4 grid gap-3">
               {Object.entries(orchestrationSummary.normalizedOutcomeCounters).map(([key, total]) => (
-                <div
+                <Link
                   key={key}
+                  href={buildIngestionOutcomeHref({
+                    normalizedOutcomeCode: key,
+                    normalizationStage: 'completed',
+                  })}
                   className="flex items-center justify-between rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]"
                 >
                   <span className="break-all">{key}</span>
                   <strong className="text-[var(--pcb-ink)]">{total}</strong>
-                </div>
+                </Link>
               ))}
             </div>
           </article>
@@ -212,13 +267,17 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
             <p className="text-sm text-[var(--pcb-muted)]">Matching outcomes</p>
             <div className="mt-4 grid gap-3">
               {Object.entries(orchestrationSummary.matchingOutcomeCounters).map(([key, total]) => (
-                <div
+                <Link
                   key={key}
+                  href={buildIngestionOutcomeHref({
+                    matchingOutcomeCode: key,
+                    matchingStage: 'completed',
+                  })}
                   className="flex items-center justify-between rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]"
                 >
                   <span className="break-all">{key}</span>
                   <strong className="text-[var(--pcb-ink)]">{total}</strong>
-                </div>
+                </Link>
               ))}
             </div>
           </article>

@@ -545,3 +545,4 @@ Estensioni completate:
 - il dettaglio run espone ora riconciliazione pipeline con deep link outcome-aware tra raw, normalized e matching
 - `operations` espone ora anche gli outcome aggregati cross-run della pipeline ingestion
 - `operations` espone ora anche ingressi operativi diretti alle run piu` rilevanti
+- i contatori outcome in `operations` aprono ora `ingestion` con filtri outcome-aware e stage-aware
