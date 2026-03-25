@@ -10,7 +10,10 @@ import { StatusChip } from '../../../components/status-chip';
 import { requireOperatorSession } from '../../../lib/auth';
 import {
   getAuditSummary,
+  getFilteredMatchingResults,
+  getFilteredNormalizedRecords,
   getIngestionRun,
+  getIngestionPipelineSummary,
   getMatchingResults,
   getNormalizedRecords,
   getRawRecords,
@@ -25,13 +28,21 @@ interface IngestionRunDetailPageProps {
   searchParams?: Promise<{
     rawOutcomeCode?: string;
     normalizedStatus?: string;
+    normalizedOutcomeCode?: string;
     matchingStatus?: string;
+    matchingOutcomeCode?: string;
   }>;
 }
 
 function buildRunDetailFilterHref(
   runId: string,
-  filters: { rawOutcomeCode?: string; normalizedStatus?: string; matchingStatus?: string },
+  filters: {
+    rawOutcomeCode?: string;
+    normalizedStatus?: string;
+    normalizedOutcomeCode?: string;
+    matchingStatus?: string;
+    matchingOutcomeCode?: string;
+  },
 ) {
   const params = new URLSearchParams();
 
@@ -43,8 +54,16 @@ function buildRunDetailFilterHref(
     params.set('normalizedStatus', filters.normalizedStatus);
   }
 
+  if (filters.normalizedOutcomeCode) {
+    params.set('normalizedOutcomeCode', filters.normalizedOutcomeCode);
+  }
+
   if (filters.matchingStatus) {
     params.set('matchingStatus', filters.matchingStatus);
+  }
+
+  if (filters.matchingOutcomeCode) {
+    params.set('matchingOutcomeCode', filters.matchingOutcomeCode);
   }
 
   const queryString = params.toString();
@@ -102,17 +121,25 @@ export default async function IngestionRunDetailPage({
   let normalizedRecords;
   let rawRecords;
   let matchingResults;
+  let pipelineSummary;
   let subjects;
   let runAuditSummary;
   let ingestAuditSummary;
 
   try {
-    [rawRecords, normalizedRecords, matchingResults, subjects, runAuditSummary, ingestAuditSummary] = await Promise.all([
+    [rawRecords, normalizedRecords, matchingResults, pipelineSummary, subjects, runAuditSummary, ingestAuditSummary] = await Promise.all([
       getRawRecords(id, session.accessToken, {
         outcomeCode: filters.rawOutcomeCode,
       }),
-      getNormalizedRecords(id, session.accessToken),
-      getMatchingResults(id, session.accessToken),
+      getFilteredNormalizedRecords(id, session.accessToken, {
+        normalizationStatus: filters.normalizedStatus,
+        outcomeCode: filters.normalizedOutcomeCode,
+      }),
+      getFilteredMatchingResults(id, session.accessToken, {
+        decisionStatus: filters.matchingStatus,
+        outcomeCode: filters.matchingOutcomeCode,
+      }),
+      getIngestionPipelineSummary(id, session.accessToken),
       getSubjects(session.accessToken),
       getAuditSummary(session.accessToken, {
         entityType: 'ingestion_run',
@@ -162,20 +189,6 @@ export default async function IngestionRunDetailPage({
     id: subject.id,
     label: `${subject.currentDisplayName} · ${subject.cuua}`,
   }));
-  const filteredNormalizedRecords = normalizedRecords.items.filter((item) => {
-    if (filters.normalizedStatus && item.normalizationStatus !== filters.normalizedStatus) {
-      return false;
-    }
-
-    return true;
-  });
-  const filteredMatchingResults = matchingResults.items.filter((item) => {
-    if (filters.matchingStatus && item.decisionStatus !== filters.matchingStatus) {
-      return false;
-    }
-
-    return true;
-  });
 
   return (
     <PageShell
@@ -343,12 +356,80 @@ export default async function IngestionRunDetailPage({
         </div>
       </SectionCard>
 
+      <SectionCard title="Riconciliazione pipeline" eyebrow="Summary">
+        <div className="grid gap-4 xl:grid-cols-3">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Raw outcomes</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{pipelineSummary.raw.total}</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {Object.entries(pipelineSummary.raw.outcomeCounters).map(([outcomeCode, total]) => (
+                <Link
+                  key={outcomeCode}
+                  href={buildRunDetailFilterHref(run.id, {
+                    rawOutcomeCode: outcomeCode,
+                    normalizedStatus: filters.normalizedStatus,
+                    normalizedOutcomeCode: filters.normalizedOutcomeCode,
+                    matchingStatus: filters.matchingStatus,
+                    matchingOutcomeCode: filters.matchingOutcomeCode,
+                  })}
+                  className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                >
+                  {outcomeCode} · {total}
+                </Link>
+              ))}
+            </div>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Normalized outcomes</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{pipelineSummary.normalized.total}</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {Object.entries(pipelineSummary.normalized.outcomeCounters).map(([outcomeCode, total]) => (
+                <Link
+                  key={outcomeCode}
+                  href={buildRunDetailFilterHref(run.id, {
+                    rawOutcomeCode: filters.rawOutcomeCode,
+                    normalizedOutcomeCode: outcomeCode,
+                    matchingStatus: filters.matchingStatus,
+                    matchingOutcomeCode: filters.matchingOutcomeCode,
+                  })}
+                  className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                >
+                  {outcomeCode} · {total}
+                </Link>
+              ))}
+            </div>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Matching outcomes</p>
+            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{pipelineSummary.matching.total}</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {Object.entries(pipelineSummary.matching.outcomeCounters).map(([outcomeCode, total]) => (
+                <Link
+                  key={outcomeCode}
+                  href={buildRunDetailFilterHref(run.id, {
+                    rawOutcomeCode: filters.rawOutcomeCode,
+                    normalizedStatus: filters.normalizedStatus,
+                    normalizedOutcomeCode: filters.normalizedOutcomeCode,
+                    matchingOutcomeCode: outcomeCode,
+                  })}
+                  className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                >
+                  {outcomeCode} · {total}
+                </Link>
+              ))}
+            </div>
+          </article>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Raw ingest records" eyebrow="Raw">
         <div className="mb-4 flex flex-wrap gap-3">
           <Link
             href={buildRunDetailFilterHref(run.id, {
               normalizedStatus: filters.normalizedStatus,
+              normalizedOutcomeCode: filters.normalizedOutcomeCode,
               matchingStatus: filters.matchingStatus,
+              matchingOutcomeCode: filters.matchingOutcomeCode,
             })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.rawOutcomeCode
@@ -377,7 +458,9 @@ export default async function IngestionRunDetailPage({
                   href={buildRunDetailFilterHref(run.id, {
                     rawOutcomeCode: outcomeCode,
                     normalizedStatus: filters.normalizedStatus,
+                    normalizedOutcomeCode: filters.normalizedOutcomeCode,
                     matchingStatus: filters.matchingStatus,
+                    matchingOutcomeCode: filters.matchingOutcomeCode,
                   })}
                   className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                     filters.rawOutcomeCode === outcomeCode
@@ -453,6 +536,7 @@ export default async function IngestionRunDetailPage({
             href={buildRunDetailFilterHref(run.id, {
               rawOutcomeCode: filters.rawOutcomeCode,
               matchingStatus: filters.matchingStatus,
+              matchingOutcomeCode: filters.matchingOutcomeCode,
             })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.normalizedStatus
@@ -462,13 +546,15 @@ export default async function IngestionRunDetailPage({
           >
             Tutti
           </Link>
-          {Array.from(new Set(normalizedRecords.items.map((item) => item.normalizationStatus))).map((status) => (
+          {Object.keys(pipelineSummary.normalized.statusCounters).map((status) => (
             <Link
               key={status}
               href={buildRunDetailFilterHref(run.id, {
                 rawOutcomeCode: filters.rawOutcomeCode,
                 normalizedStatus: status,
+                normalizedOutcomeCode: filters.normalizedOutcomeCode,
                 matchingStatus: filters.matchingStatus,
+                matchingOutcomeCode: filters.matchingOutcomeCode,
               })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.normalizedStatus === status
@@ -480,13 +566,49 @@ export default async function IngestionRunDetailPage({
             </Link>
           ))}
         </div>
-        {filteredNormalizedRecords.length === 0 ? (
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildRunDetailFilterHref(run.id, {
+              rawOutcomeCode: filters.rawOutcomeCode,
+              normalizedStatus: filters.normalizedStatus,
+              matchingStatus: filters.matchingStatus,
+              matchingOutcomeCode: filters.matchingOutcomeCode,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.normalizedOutcomeCode
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Outcome tutti
+          </Link>
+          {Object.entries(pipelineSummary.normalized.outcomeCounters).map(([outcomeCode, total]) => (
+            <Link
+              key={outcomeCode}
+              href={buildRunDetailFilterHref(run.id, {
+                rawOutcomeCode: filters.rawOutcomeCode,
+                normalizedStatus: filters.normalizedStatus,
+                normalizedOutcomeCode: outcomeCode,
+                matchingStatus: filters.matchingStatus,
+                matchingOutcomeCode: filters.matchingOutcomeCode,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.normalizedOutcomeCode === outcomeCode
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {outcomeCode} · {total}
+            </Link>
+          ))}
+        </div>
+        {normalizedRecords.items.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">
             Nessun record normalizzato disponibile per questa run.
           </p>
         ) : (
           <div className="grid gap-4">
-            {filteredNormalizedRecords.map((item) => (
+            {normalizedRecords.items.map((item) => (
               <article
                 key={item.id}
                 className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
@@ -538,6 +660,7 @@ export default async function IngestionRunDetailPage({
             href={buildRunDetailFilterHref(run.id, {
               rawOutcomeCode: filters.rawOutcomeCode,
               normalizedStatus: filters.normalizedStatus,
+              normalizedOutcomeCode: filters.normalizedOutcomeCode,
             })}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
               !filters.matchingStatus
@@ -547,13 +670,15 @@ export default async function IngestionRunDetailPage({
           >
             Tutti
           </Link>
-          {Array.from(new Set(matchingResults.items.map((item) => item.decisionStatus))).map((status) => (
+          {Object.keys(pipelineSummary.matching.statusCounters).map((status) => (
             <Link
               key={status}
               href={buildRunDetailFilterHref(run.id, {
                 rawOutcomeCode: filters.rawOutcomeCode,
                 normalizedStatus: filters.normalizedStatus,
+                normalizedOutcomeCode: filters.normalizedOutcomeCode,
                 matchingStatus: status,
+                matchingOutcomeCode: filters.matchingOutcomeCode,
               })}
               className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
                 filters.matchingStatus === status
@@ -565,13 +690,49 @@ export default async function IngestionRunDetailPage({
             </Link>
           ))}
         </div>
-        {filteredMatchingResults.length === 0 ? (
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link
+            href={buildRunDetailFilterHref(run.id, {
+              rawOutcomeCode: filters.rawOutcomeCode,
+              normalizedStatus: filters.normalizedStatus,
+              normalizedOutcomeCode: filters.normalizedOutcomeCode,
+              matchingStatus: filters.matchingStatus,
+            })}
+            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+              !filters.matchingOutcomeCode
+                ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+            }`}
+          >
+            Outcome tutti
+          </Link>
+          {Object.entries(pipelineSummary.matching.outcomeCounters).map(([outcomeCode, total]) => (
+            <Link
+              key={outcomeCode}
+              href={buildRunDetailFilterHref(run.id, {
+                rawOutcomeCode: filters.rawOutcomeCode,
+                normalizedStatus: filters.normalizedStatus,
+                normalizedOutcomeCode: filters.normalizedOutcomeCode,
+                matchingStatus: filters.matchingStatus,
+                matchingOutcomeCode: outcomeCode,
+              })}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                filters.matchingOutcomeCode === outcomeCode
+                  ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                  : 'border-[var(--pcb-line)] bg-white text-[var(--pcb-ink)]'
+              }`}
+            >
+              {outcomeCode} · {total}
+            </Link>
+          ))}
+        </div>
+        {matchingResults.items.length === 0 ? (
           <p className="text-sm text-[var(--pcb-muted)]">
             Nessun risultato di matching disponibile per questa run.
           </p>
         ) : (
           <div className="grid gap-4">
-            {filteredMatchingResults.map((item) => (
+            {matchingResults.items.map((item) => (
               <article
                 key={item.id}
                 className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"

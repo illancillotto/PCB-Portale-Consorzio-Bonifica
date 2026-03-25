@@ -1522,3 +1522,19 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-25 – Riconciliazione pipeline nel dettaglio run
+
+Completato:
+
+- nuovo endpoint `GET /api/v1/ingestion/runs/{id}/pipeline-summary`
+- i layer `normalized` e `matching` supportano ora anche filtri `outcomeCode`
+- il dettaglio run espone una sezione di riconciliazione `raw -> normalized -> matching`
+- i contatori outcome della pipeline generano deep link diretti ai filtri della stessa run
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

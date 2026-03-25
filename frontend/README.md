@@ -139,6 +139,7 @@ Stato attuale:
 - monitor `ingestion` e dettaglio connector mostrano ora anche summary raw ingest strutturati per run e ultima esecuzione
 - monitor `ingestion` e dettaglio connector mostrano ora anche il breakdown outcome del raw layer NAS
 - il dettaglio run supporta ora filtri URL-shareable sul layer raw tramite `rawOutcomeCode`
+- il dettaglio run espone ora una vista di riconciliazione pipeline con deep link ai filtri raw, normalized e matching anche per `outcomeCode`
 - il dettaglio run distingue anche `resolutionMode` e `requiresManualReview` sui risultati di matching
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

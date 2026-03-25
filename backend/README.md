@@ -157,6 +157,8 @@ Schema errori applicativo:
 - le run `ingestion` e il dettaglio connector espongono anche `rawSummary` strutturato derivato da `ingestion_record_raw`
 - `rawSummary` espone anche il breakdown per outcome del layer NAS: `directory_subject_bucket`, `directory_bucket_only`, `directory_structure_only`, `file_subject_hint`, `file_without_subject_hint`
 - `GET /api/v1/ingestion/runs/{id}/raw-records` supporta ora anche il filtro `outcomeCode`
+- `GET /api/v1/ingestion/runs/{id}/pipeline-summary` espone il riepilogo strutturato `raw -> normalized -> matching`
+- `GET /api/v1/ingestion/runs/{id}/normalized-records` e `matching-results` supportano ora anche il filtro `outcomeCode`
 - anche i domini `auth`, `anagrafiche` e `catasto` espongono codici errore stabili, ad esempio:
   - `auth.authorization_header_missing`
   - `auth.invalid_authorization_header`

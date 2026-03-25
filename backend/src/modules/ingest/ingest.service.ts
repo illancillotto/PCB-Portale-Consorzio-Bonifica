@@ -11,6 +11,7 @@ import { IngestionRunResponseDto } from './dto/ingestion-run-response.dto';
 import { IngestionConnectorCatalogResponseDto } from './dto/connector-catalog-response.dto';
 import { IngestionConnectorDetailResponseDto } from './dto/connector-detail-response.dto';
 import { IngestionConnectorIssueResponseDto } from './dto/connector-issue-response.dto';
+import { IngestionPipelineSummaryResponseDto } from './dto/ingestion-pipeline-summary-response.dto';
 import { MatchingResultResponseDto } from './dto/matching-result-response.dto';
 import { NormalizeRunResponseDto } from './dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from './dto/normalized-record-response.dto';
@@ -958,7 +959,10 @@ export class IngestService {
     };
   }
 
-  async listNormalizedRecordsByRunId(id: string) {
+  async listNormalizedRecordsByRunId(
+    id: string,
+    filters?: { normalizationStatus?: string; outcomeCode?: string },
+  ) {
     const run = await this.getRunRowById(id);
 
     if (!run) {
@@ -981,9 +985,14 @@ export class IngestService {
       [id],
     );
 
+    const items = result.rows
+      .map((row) => this.mapNormalizedRecord(row))
+      .filter((item) => !filters?.normalizationStatus || item.normalizationStatus === filters.normalizationStatus)
+      .filter((item) => !filters?.outcomeCode || item.outcomeCode === filters.outcomeCode);
+
     return {
-      items: result.rows.map((row) => this.mapNormalizedRecord(row)),
-      total: result.rows.length,
+      items,
+      total: items.length,
     };
   }
 
@@ -1168,7 +1177,10 @@ export class IngestService {
     };
   }
 
-  async listMatchingResultsByRunId(id: string) {
+  async listMatchingResultsByRunId(
+    id: string,
+    filters?: { decisionStatus?: string; outcomeCode?: string },
+  ) {
     const run = await this.getRunRowById(id);
 
     if (!run) {
@@ -1194,9 +1206,44 @@ export class IngestService {
       [id],
     );
 
+    const items = result.rows
+      .map((row) => this.mapMatchingResult(row))
+      .filter((item) => !filters?.decisionStatus || item.decisionStatus === filters.decisionStatus)
+      .filter((item) => !filters?.outcomeCode || item.outcomeCode === filters.outcomeCode);
+
     return {
-      items: result.rows.map((row) => this.mapMatchingResult(row)),
-      total: result.rows.length,
+      items,
+      total: items.length,
+    };
+  }
+
+  async getPipelineSummaryByRunId(id: string): Promise<IngestionPipelineSummaryResponseDto | null> {
+    const [rawRecords, normalizedRecords, matchingResults] = await Promise.all([
+      this.listRawRecordsByRunId(id),
+      this.listNormalizedRecordsByRunId(id),
+      this.listMatchingResultsByRunId(id),
+    ]);
+
+    if (!rawRecords || !normalizedRecords || !matchingResults) {
+      return null;
+    }
+
+    return {
+      ingestionRunId: id,
+      raw: {
+        total: rawRecords.total,
+        outcomeCounters: this.countBy(rawRecords.items, (item) => item.outcomeCode),
+      },
+      normalized: {
+        total: normalizedRecords.total,
+        statusCounters: this.countBy(normalizedRecords.items, (item) => item.normalizationStatus),
+        outcomeCounters: this.countBy(normalizedRecords.items, (item) => item.outcomeCode),
+      },
+      matching: {
+        total: matchingResults.total,
+        statusCounters: this.countBy(matchingResults.items, (item) => item.decisionStatus),
+        outcomeCounters: this.countBy(matchingResults.items, (item) => item.outcomeCode),
+      },
     };
   }
 
@@ -1994,6 +2041,14 @@ export class IngestService {
     }
 
     return 'ingest.connector_no_completed_runs';
+  }
+
+  private countBy<T>(items: T[], selector: (item: T) => string) {
+    return items.reduce<Record<string, number>>((accumulator, item) => {
+      const key = selector(item);
+      accumulator[key] = (accumulator[key] ?? 0) + 1;
+      return accumulator;
+    }, {});
   }
 
   private async countNormalizedRecords(runId: string) {

@@ -17,7 +17,10 @@ import { IngestionConnectorCatalogResponseDto } from '../dto/connector-catalog-r
 import { IngestionConnectorDetailResponseDto } from '../dto/connector-detail-response.dto';
 import { IngestionConnectorIssueResponseDto } from '../dto/connector-issue-response.dto';
 import { IngestionRunResponseDto } from '../dto/ingestion-run-response.dto';
+import { IngestionPipelineSummaryResponseDto } from '../dto/ingestion-pipeline-summary-response.dto';
+import { ListMatchingResultsQueryDto } from '../dto/list-matching-results-query.dto';
 import { MatchingResultResponseDto } from '../dto/matching-result-response.dto';
+import { ListNormalizedRecordsQueryDto } from '../dto/list-normalized-records-query.dto';
 import { NormalizeRunResponseDto } from '../dto/normalize-run-response.dto';
 import { NormalizedRecordResponseDto } from '../dto/normalized-record-response.dto';
 import { IngestionOrchestrationSummaryResponseDto } from '../dto/orchestration-summary-response.dto';
@@ -136,11 +139,25 @@ export class IngestionController {
     return result;
   }
 
+  @Get('runs/:id/pipeline-summary')
+  async getPipelineSummary(
+    @Param('id') id: string,
+  ): Promise<IngestionPipelineSummaryResponseDto> {
+    const result = await this.ingestService.getPipelineSummaryByRunId(id);
+
+    if (!result) {
+      throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });
+    }
+
+    return result;
+  }
+
   @Get('runs/:id/normalized-records')
   async listNormalizedRecords(
     @Param('id') id: string,
+    @Query() query: ListNormalizedRecordsQueryDto,
   ): Promise<{ items: NormalizedRecordResponseDto[]; total: number }> {
-    const result = await this.ingestService.listNormalizedRecordsByRunId(id);
+    const result = await this.ingestService.listNormalizedRecordsByRunId(id, query);
 
     if (!result) {
       throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });
@@ -163,8 +180,9 @@ export class IngestionController {
   @Get('runs/:id/matching-results')
   async listMatchingResults(
     @Param('id') id: string,
+    @Query() query: ListMatchingResultsQueryDto,
   ): Promise<{ items: MatchingResultResponseDto[]; total: number }> {
-    const result = await this.ingestService.listMatchingResultsByRunId(id);
+    const result = await this.ingestService.listMatchingResultsByRunId(id, query);
 
     if (!result) {
       throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });

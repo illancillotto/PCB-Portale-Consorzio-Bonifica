@@ -166,6 +166,24 @@ export interface RawRecord {
   capturedAt: string;
 }
 
+export interface IngestionPipelineSummary {
+  ingestionRunId: string;
+  raw: {
+    total: number;
+    outcomeCounters: Record<string, number>;
+  };
+  normalized: {
+    total: number;
+    statusCounters: Record<string, number>;
+    outcomeCounters: Record<string, number>;
+  };
+  matching: {
+    total: number;
+    statusCounters: Record<string, number>;
+    outcomeCounters: Record<string, number>;
+  };
+}
+
 export interface IngestionConnectorCatalogItem {
   connectorName: string;
   sourceSystem: string;
@@ -751,6 +769,12 @@ export async function getIngestionRun(id: string, accessToken: string) {
   });
 }
 
+export async function getIngestionPipelineSummary(id: string, accessToken: string) {
+  return apiFetch<IngestionPipelineSummary>(`/ingestion/runs/${id}/pipeline-summary`, {
+    accessToken,
+  });
+}
+
 export async function getRawRecords(
   id: string,
   accessToken: string,
@@ -783,9 +807,59 @@ export async function getNormalizedRecords(id: string, accessToken: string) {
   );
 }
 
+export async function getFilteredNormalizedRecords(
+  id: string,
+  accessToken: string,
+  filters?: { normalizationStatus?: string; outcomeCode?: string },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.normalizationStatus) {
+    params.set('normalizationStatus', filters.normalizationStatus);
+  }
+
+  if (filters?.outcomeCode) {
+    params.set('outcomeCode', filters.outcomeCode);
+  }
+
+  const queryString = params.toString();
+
+  return apiFetch<PaginatedResponse<NormalizedRecord>>(
+    `/ingestion/runs/${id}/normalized-records${queryString ? `?${queryString}` : ''}`,
+    {
+      accessToken,
+    },
+  );
+}
+
 export async function getMatchingResults(id: string, accessToken: string) {
   return apiFetch<PaginatedResponse<MatchingResult>>(
     `/ingestion/runs/${id}/matching-results`,
+    {
+      accessToken,
+    },
+  );
+}
+
+export async function getFilteredMatchingResults(
+  id: string,
+  accessToken: string,
+  filters?: { decisionStatus?: string; outcomeCode?: string },
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.decisionStatus) {
+    params.set('decisionStatus', filters.decisionStatus);
+  }
+
+  if (filters?.outcomeCode) {
+    params.set('outcomeCode', filters.outcomeCode);
+  }
+
+  const queryString = params.toString();
+
+  return apiFetch<PaginatedResponse<MatchingResult>>(
+    `/ingestion/runs/${id}/matching-results${queryString ? `?${queryString}` : ''}`,
     {
       accessToken,
     },
