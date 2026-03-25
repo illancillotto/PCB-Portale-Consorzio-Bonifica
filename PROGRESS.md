@@ -1394,3 +1394,17 @@ Verifiche eseguite:
 
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-25 – Error handling operativo del viewer GIS
+
+Completato:
+
+- `api/qgis/feature-info` riallineato al contratto errori operativo con `error.code`, `requestId` e redirect auth coerente
+- il viewer GIS usa ora la stessa classificazione `authentication/authorization/domain/runtime` dei trigger operativi
+- il pannello `GetFeatureInfo` mostra retry e accesso rapido a `operations` quando il proxy QGIS fallisce
+- il `requestId` del proxy QGIS resta disponibile anche nella diagnostica del viewer
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

@@ -128,6 +128,8 @@ Stato attuale:
 - il proxy `/api/pcb` propaga `x-request-id` verso il backend e lo rende disponibile anche ai pannelli errore frontend
 - anche le viste di dettaglio `subjects/[id]`, `parcels/[id]`, `ingestion/[id]` e `ingestion/connectors/[connectorName]` gestiscono ora `ApiError` senza degradare automaticamente a `notFound()`
 - i pannelli SSR espongono anche azioni contestuali di recupero, ritorno alla lista o accesso rapido a `operations`
+- anche il proxy frontend `api/qgis/feature-info` espone ora payload errore normalizzati con `error.code`, `requestId` e redirect auth coerente
+- il viewer GIS riusa la classificazione degli errori operativi per `GetFeatureInfo` e mostra retry/azioni operative invece di stringhe grezze
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

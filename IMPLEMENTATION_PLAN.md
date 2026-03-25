@@ -534,3 +534,4 @@ Estensioni completate:
 - il dettaglio connector riusa i filtri stage del monitor `ingestion`
 - il contratto errori backend copre ora anche `gis` e `audit` con codici di dominio per query incoerenti e identificativi invalidi
 - le viste server-side principali e di dettaglio espongono ora errori classificati con `error.code`, `requestId` e azioni contestuali di recupero
+- il viewer GIS e il proxy `GetFeatureInfo` usano ora lo stesso contratto errore operativo del resto del frontend

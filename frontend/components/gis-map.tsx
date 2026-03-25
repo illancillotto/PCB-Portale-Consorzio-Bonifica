@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { startTransition, useEffect, useRef, useState } from 'react';
 import type { Map as LeafletMap } from 'leaflet';
+import { OperationalErrorNotice } from './operational-error-notice';
+import { resolveOperationalActionFailure, type OperationalActionFailure } from '../lib/operational-action';
 import type { GisFeatureLink, GisMapFeature, GisSubjectParcelLink } from '../lib/api';
 
 interface QgisFeatureInfoFeature {
@@ -237,13 +239,69 @@ export function GisMap({
     );
   const [featureInfoState, setFeatureInfoState] = useState<{
     loading: boolean;
-    error: string | null;
     features: QgisFeatureInfoFeature[];
   }>({
     loading: false,
-    error: null,
     features: [],
   });
+  const [featureInfoFailure, setFeatureInfoFailure] = useState<OperationalActionFailure | null>(null);
+  const [lastFeatureInfoQuery, setLastFeatureInfoQuery] = useState<string | null>(null);
+
+  async function requestFeatureInfo(params: URLSearchParams) {
+    setLastFeatureInfoQuery(params.toString());
+    setFeatureInfoState({
+      loading: true,
+      features: [],
+    });
+    setFeatureInfoFailure(null);
+
+    const response = await fetch(`/api/qgis/feature-info?${params.toString()}`, {
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      const failure = await resolveOperationalActionFailure(
+        response,
+        {
+          push(href: string) {
+            router.push(href);
+          },
+          refresh() {
+            router.refresh();
+          },
+        },
+        'GetFeatureInfo non disponibile',
+      );
+
+      setFeatureInfoState({
+        loading: false,
+        features: [],
+      });
+      setFeatureInfoFailure(failure);
+      setSelectedFeatureKey(null);
+      return;
+    }
+
+    const data = (await response.json()) as QgisFeatureInfoResponse;
+    const nextFeatures = normalizeFeatureInfoResults(
+      data.features ?? [],
+      selectedSubjectId,
+      selectedParcelId,
+    );
+    const firstFeature = nextFeatures[0];
+
+    setFeatureInfoState({
+      loading: false,
+      features: nextFeatures,
+    });
+    setFeatureInfoFailure(null);
+    setSelectedFeatureKey(
+      getFeatureSelectionKey(
+        asOptionalString(firstFeature?.properties.layer_code),
+        asOptionalString(firstFeature?.properties.id),
+      ),
+    );
+  }
 
   useEffect(() => {
     let map: LeafletMap | null = null;
@@ -301,47 +359,22 @@ export function GisMap({
           i: String(Math.round(point.x)),
           j: String(Math.round(point.y)),
           featureCount: '10',
-        });
-
-        setFeatureInfoState({
-          loading: true,
-          error: null,
-          features: [],
+          returnTo: `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`,
         });
 
         try {
-          const response = await fetch(`/api/qgis/feature-info?${params.toString()}`, {
-            cache: 'no-store',
-          });
-
-          if (!response.ok) {
-            throw new Error(`GetFeatureInfo failed: ${response.status}`);
-          }
-
-          const data = (await response.json()) as QgisFeatureInfoResponse;
-          const nextFeatures = normalizeFeatureInfoResults(
-            data.features ?? [],
-            selectedSubjectId,
-            selectedParcelId,
-          );
-          const firstFeature = nextFeatures[0];
-
+          await requestFeatureInfo(params);
+        } catch {
           setFeatureInfoState({
             loading: false,
-            error: null,
-            features: nextFeatures,
-          });
-          setSelectedFeatureKey(
-            getFeatureSelectionKey(
-              asOptionalString(firstFeature?.properties.layer_code),
-              asOptionalString(firstFeature?.properties.id),
-            ),
-          );
-        } catch (error) {
-          setFeatureInfoState({
-            loading: false,
-            error: error instanceof Error ? error.message : 'GetFeatureInfo non disponibile',
             features: [],
+          });
+          setFeatureInfoFailure({
+            redirected: false,
+            kind: 'runtime',
+            code: 'gis.feature_info_client_failure',
+            message: 'GetFeatureInfo non disponibile dal viewer GIS.',
+            requestId: null,
           });
           setSelectedFeatureKey(null);
         }
@@ -477,9 +510,9 @@ export function GisMap({
     });
     setFeatureInfoState((currentState) => ({
       ...currentState,
-      error: null,
       features: [],
     }));
+    setFeatureInfoFailure(null);
     setSelectedFeatureKey(null);
   }
 
@@ -497,9 +530,9 @@ export function GisMap({
     );
     setFeatureInfoState({
       loading: false,
-      error: null,
       features: [],
     });
+    setFeatureInfoFailure(null);
     setSelectedFeatureKey(null);
   }
 
@@ -644,11 +677,40 @@ export function GisMap({
         {featureInfoState.loading ? (
           <p className="mt-3 text-sm text-[var(--pcb-muted)]">Caricamento feature info...</p>
         ) : null}
-        {featureInfoState.error ? (
-          <p className="mt-3 text-sm text-[#9b3d2e]">{featureInfoState.error}</p>
+        {featureInfoFailure ? (
+          <div className="mt-3 grid gap-3">
+            <OperationalErrorNotice failure={featureInfoFailure} />
+            <div className="flex flex-wrap gap-3">
+              {lastFeatureInfoQuery ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void requestFeatureInfo(new URLSearchParams(lastFeatureInfoQuery)).catch(() => {
+                      setFeatureInfoFailure({
+                        redirected: false,
+                        kind: 'runtime',
+                        code: 'gis.feature_info_client_failure',
+                        message: 'GetFeatureInfo non disponibile dal viewer GIS.',
+                        requestId: null,
+                      });
+                    });
+                  }}
+                  className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+                >
+                  Riprova interrogazione
+                </button>
+              ) : null}
+              <Link
+                href="/operations"
+                className="rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-ink)]"
+              >
+                Apri operations
+              </Link>
+            </div>
+          </div>
         ) : null}
         {!featureInfoState.loading &&
-        !featureInfoState.error &&
+        !featureInfoFailure &&
         featureInfoState.features.length === 0 ? (
           <p className="mt-3 text-sm text-[var(--pcb-muted)]">Nessun risultato ancora caricato.</p>
         ) : null}
