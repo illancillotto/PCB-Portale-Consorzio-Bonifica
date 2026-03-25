@@ -49,7 +49,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           description="Accesso trasversale a soggetti e particelle. La ricerca usa gli endpoint reali del backend PCB."
           actions={<SearchForm defaultValue={query} />}
         >
-          <ServerApiErrorState error={error} />
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: nextPath, label: 'Ricarica ricerca' }}
+            secondaryAction={{ href: '/operations', label: 'Apri operations' }}
+          />
         </PageShell>
       );
     }

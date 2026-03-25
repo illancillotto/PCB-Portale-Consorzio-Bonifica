@@ -26,7 +26,11 @@ export default async function ParcelsPage() {
           description="Vista iniziale del dominio catasto con relazioni ai soggetti master già riconciliate nel database."
           actions={<SearchForm />}
         >
-          <ServerApiErrorState error={error} />
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: '/parcels', label: 'Ricarica lista' }}
+            secondaryAction={{ href: '/operations', label: 'Apri operations' }}
+          />
         </PageShell>
       );
     }

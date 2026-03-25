@@ -1,14 +1,15 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { IngestionRunTrigger } from '../../../../components/ingestion-run-trigger';
 import { PageShell } from '../../../../components/page-shell';
 import { SectionCard } from '../../../../components/section-card';
+import { ServerApiErrorState } from '../../../../components/server-api-error-state';
 import { StatusChip } from '../../../../components/status-chip';
 import { requireOperatorSession } from '../../../../lib/auth';
 import {
   getAuditSummary,
   getIngestionConnectorDetail,
   getIngestionConnectorRuns,
+  isApiError,
 } from '../../../../lib/api';
 
 interface ConnectorDetailPageProps {
@@ -102,30 +103,75 @@ export default async function ConnectorDetailPage({
 
   try {
     connector = await getIngestionConnectorDetail(connectorName, session.accessToken);
-  } catch {
-    notFound();
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Dettaglio connector"
+          description="Dettaglio operativo del connector registrato nel dominio ingestion."
+        >
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{
+              href: `/ingestion/connectors/${encodeURIComponent(connectorName)}`,
+              label: 'Ricarica connector',
+            }}
+            secondaryAction={{ href: '/ingestion', label: 'Torna a ingestion' }}
+          />
+        </PageShell>
+      );
+    }
+
+    throw error;
   }
 
-  const [runs, ingestAuditSummary, lastCompletedRunAuditSummary, lastFailedRunAuditSummary] = await Promise.all([
-    getIngestionConnectorRuns(connector.connectorName, session.accessToken, {
-      status: filters.status,
-    }),
-    getAuditSummary(session.accessToken, {
-      sourceModule: 'ingest',
-    }),
-    connector.lastCompletedRun
-      ? getAuditSummary(session.accessToken, {
-          entityType: 'ingestion_run',
-          entityId: connector.lastCompletedRun.id,
-        })
-      : Promise.resolve(null),
-    connector.lastFailedRun
-      ? getAuditSummary(session.accessToken, {
-          entityType: 'ingestion_run',
-          entityId: connector.lastFailedRun.id,
-        })
-      : Promise.resolve(null),
-  ]);
+  let runs;
+  let ingestAuditSummary;
+  let lastCompletedRunAuditSummary;
+  let lastFailedRunAuditSummary;
+
+  try {
+    [runs, ingestAuditSummary, lastCompletedRunAuditSummary, lastFailedRunAuditSummary] = await Promise.all([
+      getIngestionConnectorRuns(connector.connectorName, session.accessToken, {
+        status: filters.status,
+      }),
+      getAuditSummary(session.accessToken, {
+        sourceModule: 'ingest',
+      }),
+      connector.lastCompletedRun
+        ? getAuditSummary(session.accessToken, {
+            entityType: 'ingestion_run',
+            entityId: connector.lastCompletedRun.id,
+          })
+        : Promise.resolve(null),
+      connector.lastFailedRun
+        ? getAuditSummary(session.accessToken, {
+            entityType: 'ingestion_run',
+            entityId: connector.lastFailedRun.id,
+          })
+        : Promise.resolve(null),
+    ]);
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title={connector.displayName}
+          description="Dettaglio operativo del connector registrato nel dominio ingestion."
+        >
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{
+              href: buildConnectorRunsFilterHref(connector.connectorName, filters),
+              label: 'Ricarica connector',
+            }}
+            secondaryAction={{ href: '/ingestion', label: 'Torna a ingestion' }}
+          />
+        </PageShell>
+      );
+    }
+
+    throw error;
+  }
   const connectorIssues = connector.issues.filter((issue) => {
     if (filters.issueSeverity && issue.severity !== filters.issueSeverity) {
       return false;

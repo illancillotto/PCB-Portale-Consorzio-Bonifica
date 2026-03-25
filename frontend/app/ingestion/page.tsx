@@ -143,7 +143,11 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
           title="Ingestion monitor"
           description="Monitor iniziale delle run di acquisizione. La pagina usa il backend reale e permette il trigger manuale del connector NAS placeholder."
         >
-          <ServerApiErrorState error={error} />
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: '/ingestion', label: 'Ricarica monitor' }}
+            secondaryAction={{ href: '/operations', label: 'Apri operations' }}
+          />
         </PageShell>
       );
     }

@@ -1,19 +1,20 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { IngestionAutoRefresh } from '../../../components/ingestion-auto-refresh';
 import { IngestionStageTrigger } from '../../../components/ingestion-stage-trigger';
 import { MatchingDecisionTrigger } from '../../../components/matching-decision-trigger';
 import { MatchingSubjectAssignment } from '../../../components/matching-subject-assignment';
 import { PageShell } from '../../../components/page-shell';
 import { SectionCard } from '../../../components/section-card';
+import { ServerApiErrorState } from '../../../components/server-api-error-state';
 import { StatusChip } from '../../../components/status-chip';
 import { requireOperatorSession } from '../../../lib/auth';
 import {
   getAuditSummary,
-  getSubjects,
   getIngestionRun,
   getMatchingResults,
   getNormalizedRecords,
+  getSubjects,
+  isApiError,
 } from '../../../lib/api';
 
 interface IngestionRunDetailPageProps {
@@ -73,22 +74,62 @@ export default async function IngestionRunDetailPage({
 
   try {
     run = await getIngestionRun(id, session.accessToken);
-  } catch {
-    notFound();
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Dettaglio run"
+          description="Dettaglio operativo della run ingest con esiti di normalizzazione e matching. Le azioni lavorano sul backend reale."
+        >
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: `/ingestion/${id}`, label: 'Ricarica dettaglio run' }}
+            secondaryAction={{ href: '/ingestion', label: 'Torna a ingestion' }}
+          />
+        </PageShell>
+      );
+    }
+
+    throw error;
   }
 
-  const [normalizedRecords, matchingResults, subjects, runAuditSummary, ingestAuditSummary] = await Promise.all([
-    getNormalizedRecords(id, session.accessToken),
-    getMatchingResults(id, session.accessToken),
-    getSubjects(session.accessToken),
-    getAuditSummary(session.accessToken, {
-      entityType: 'ingestion_run',
-      entityId: run.id,
-    }),
-    getAuditSummary(session.accessToken, {
-      sourceModule: 'ingest',
-    }),
-  ]);
+  let normalizedRecords;
+  let matchingResults;
+  let subjects;
+  let runAuditSummary;
+  let ingestAuditSummary;
+
+  try {
+    [normalizedRecords, matchingResults, subjects, runAuditSummary, ingestAuditSummary] = await Promise.all([
+      getNormalizedRecords(id, session.accessToken),
+      getMatchingResults(id, session.accessToken),
+      getSubjects(session.accessToken),
+      getAuditSummary(session.accessToken, {
+        entityType: 'ingestion_run',
+        entityId: run.id,
+      }),
+      getAuditSummary(session.accessToken, {
+        sourceModule: 'ingest',
+      }),
+    ]);
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title={`Run ${run.connectorName}`}
+          description="Dettaglio operativo della run ingest con esiti di normalizzazione e matching. Le azioni lavorano sul backend reale."
+        >
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: `/ingestion/${id}`, label: 'Ricarica dettaglio run' }}
+            secondaryAction={{ href: '/ingestion', label: 'Torna a ingestion' }}
+          />
+        </PageShell>
+      );
+    }
+
+    throw error;
+  }
 
   const matchedCount = matchingResults.items.filter(
     (item) => item.decisionStatus === 'matched' || item.decisionStatus === 'accepted',

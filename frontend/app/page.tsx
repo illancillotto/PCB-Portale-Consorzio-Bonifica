@@ -97,7 +97,11 @@ export default async function HomePage() {
           description="La dashboard iniziale usa dati reali del backend NestJS e del database PostgreSQL/PostGIS per anagrafiche, catasto e ricerca."
           actions={<SearchForm />}
         >
-          <ServerApiErrorState error={error} />
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: '/', label: 'Ricarica dashboard' }}
+            secondaryAction={{ href: '/operations', label: 'Apri operations' }}
+          />
         </PageShell>
       );
     }

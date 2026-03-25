@@ -106,7 +106,11 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
           title="Operations"
           description="Stato operativo centralizzato delle integrazioni core del Portale Consorzio Bonifica."
         >
-          <ServerApiErrorState error={error} />
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: buildOperationsHref(filters), label: 'Ricarica operations' }}
+            secondaryAction={{ href: '/ingestion', label: 'Apri ingestion' }}
+          />
         </PageShell>
       );
     }

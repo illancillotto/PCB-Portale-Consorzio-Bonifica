@@ -126,6 +126,8 @@ Stato attuale:
 - i pannelli errore operativi mostrano anche `error.code` e `requestId` quando disponibili
 - le viste server-side principali intercettano ora `ApiError` e mostrano pannelli SSR con classificazione `domain/runtime/auth`
 - il proxy `/api/pcb` propaga `x-request-id` verso il backend e lo rende disponibile anche ai pannelli errore frontend
+- anche le viste di dettaglio `subjects/[id]`, `parcels/[id]`, `ingestion/[id]` e `ingestion/connectors/[connectorName]` gestiscono ora `ApiError` senza degradare automaticamente a `notFound()`
+- i pannelli SSR espongono anche azioni contestuali di recupero, ritorno alla lista o accesso rapido a `operations`
 - `operations` consolidata con riepilogo cross-domain su integrazioni, ingestion, audit e GIS
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - mappa GIS completa ancora non integrata

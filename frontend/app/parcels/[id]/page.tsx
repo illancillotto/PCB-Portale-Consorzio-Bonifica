@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { PageShell } from '../../../components/page-shell';
 import { SectionCard } from '../../../components/section-card';
-import { getAuditSummary, getParcel } from '../../../lib/api';
+import { ServerApiErrorState } from '../../../components/server-api-error-state';
+import { getAuditSummary, getParcel, isApiError } from '../../../lib/api';
 import { requireOperatorSession } from '../../../lib/auth';
 
 interface ParcelDetailPageProps {
@@ -26,8 +26,23 @@ export default async function ParcelDetailPage({ params }: ParcelDetailPageProps
         entityId: id,
       }),
     ]);
-  } catch {
-    notFound();
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Scheda particella"
+          description="Vista di dettaglio del dominio catasto con relazioni soggetto-particella e contesto audit."
+        >
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: `/parcels/${id}`, label: 'Ricarica scheda' }}
+            secondaryAction={{ href: '/parcels', label: 'Torna alle particelle' }}
+          />
+        </PageShell>
+      );
+    }
+
+    throw error;
   }
 
   return (

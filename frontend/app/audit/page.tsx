@@ -135,7 +135,11 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
           title="Audit trail"
           description="Eventi operativi e decisioni manuali tracciati dal backend PCB. Vista riservata a operatori autenticati."
         >
-          <ServerApiErrorState error={error} />
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: '/audit', label: 'Ricarica audit' }}
+            secondaryAction={{ href: '/operations', label: 'Apri operations' }}
+          />
         </PageShell>
       );
     }

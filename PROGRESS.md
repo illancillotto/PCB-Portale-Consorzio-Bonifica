@@ -1380,3 +1380,17 @@ Verifiche eseguite:
 
 - `npm run lint --workspace backend`
 - `npm run build --workspace backend`
+
+### 2026-03-25 – Gestione SSR degli errori estesa anche ai dettagli operativi
+
+Completato:
+
+- `ServerApiErrorState` esteso con azioni contestuali di recupero
+- dashboard, search, subjects, parcels, ingestion, audit, operations e gis mostrano ora CTA coerenti per reload e rientro operativo
+- i dettagli `subjects/[id]`, `parcels/[id]`, `ingestion/[id]` e `ingestion/connectors/[connectorName]` non degradano piu` automaticamente a `notFound()` su errore API
+- anche i dettagli operativi espongono `error.code` e `requestId` con navigazione guidata verso lista o monitor
+
+Verifiche eseguite:
+
+- `npm run lint --workspace frontend`
+- `npm run build --workspace frontend`

@@ -37,7 +37,14 @@ export default async function SubjectsPage({ searchParams }: SubjectsPageProps) 
           description="Anagrafe unica centrata sul CUUA. La lista usa dati reali e consente accesso diretto alla scheda soggetto."
           actions={<SearchForm defaultValue={query} />}
         >
-          <ServerApiErrorState error={error} />
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{
+              href: query ? `/subjects?${new URLSearchParams({ q: query }).toString()}` : '/subjects',
+              label: 'Ricarica lista',
+            }}
+            secondaryAction={{ href: '/operations', label: 'Apri operations' }}
+          />
         </PageShell>
       );
     }

@@ -25,6 +25,35 @@ interface GisPageProps {
 
 const validQgisLayers = ['pcb_subject_parcel_links', 'pcb_parcels', 'pcb_subjects'] as const;
 
+function buildGisHref(filters: {
+  subjectId?: string;
+  parcelId?: string;
+  layers?: string;
+  preset?: string;
+}) {
+  const params = new URLSearchParams();
+
+  if (filters.subjectId) {
+    params.set('subjectId', filters.subjectId);
+  }
+
+  if (filters.parcelId) {
+    params.set('parcelId', filters.parcelId);
+  }
+
+  if (filters.layers) {
+    params.set('layers', filters.layers);
+  }
+
+  if (filters.preset) {
+    params.set('preset', filters.preset);
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `/gis?${queryString}` : '/gis';
+}
+
 export default async function GisPage({ searchParams }: GisPageProps) {
   const session = await requireOperatorSession('/gis');
   const filters = searchParams ? await searchParams : {};
@@ -70,7 +99,11 @@ export default async function GisPage({ searchParams }: GisPageProps) {
           title="GIS operativo"
           description="Viewer cartografico iniziale basato su PostGIS reale, catalogo layer PCB e feature georiferite esposte dal backend protetto."
         >
-          <ServerApiErrorState error={error} />
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: buildGisHref(filters), label: 'Ricarica viewer' }}
+            secondaryAction={{ href: '/operations', label: 'Apri operations' }}
+          />
         </PageShell>
       );
     }

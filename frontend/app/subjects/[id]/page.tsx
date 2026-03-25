@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { PageShell } from '../../../components/page-shell';
 import { SectionCard } from '../../../components/section-card';
+import { ServerApiErrorState } from '../../../components/server-api-error-state';
 import { StatusChip } from '../../../components/status-chip';
-import { getAuditSummary, getSubject, getSubjectParcels } from '../../../lib/api';
+import { getAuditSummary, getSubject, getSubjectParcels, isApiError } from '../../../lib/api';
 import { requireOperatorSession } from '../../../lib/auth';
 
 interface SubjectDetailPageProps {
@@ -29,8 +29,23 @@ export default async function SubjectDetailPage({ params }: SubjectDetailPagePro
         entityId: id,
       }),
     ]);
-  } catch {
-    notFound();
+  } catch (error) {
+    if (isApiError(error)) {
+      return (
+        <PageShell
+          title="Scheda soggetto"
+          description="Vista di dettaglio anagrafica CUUA-centric con relazioni catastali e contesto audit."
+        >
+          <ServerApiErrorState
+            error={error}
+            primaryAction={{ href: `/subjects/${id}`, label: 'Ricarica scheda' }}
+            secondaryAction={{ href: '/subjects', label: 'Torna ai soggetti' }}
+          />
+        </PageShell>
+      );
+    }
+
+    throw error;
   }
 
   return (
