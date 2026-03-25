@@ -1584,3 +1584,16 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-25 – Pipeline attention in Operations
+
+Completato:
+
+- `operations` espone ora shortcut dedicati ai principali casi pipeline da verificare
+- i shortcut coprono raw senza subject hint, normalized senza subject hint e matching review/unmatched/rejected
+- ogni shortcut apre direttamente `ingestion` con i filtri outcome-aware gia` impostati
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`

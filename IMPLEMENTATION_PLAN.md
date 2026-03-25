@@ -546,3 +546,4 @@ Estensioni completate:
 - `operations` espone ora anche gli outcome aggregati cross-run della pipeline ingestion
 - `operations` espone ora anche ingressi operativi diretti alle run piu` rilevanti
 - i contatori outcome in `operations` aprono ora `ingestion` con filtri outcome-aware e stage-aware
+- `operations` espone ora anche shortcut `pipeline attention` per i principali casi da verificare nel monitor `ingestion`

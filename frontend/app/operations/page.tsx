@@ -26,6 +26,14 @@ interface OperationsPageProps {
   }>;
 }
 
+interface PipelineAttentionLink {
+  key: string;
+  label: string;
+  stage: 'raw' | 'normalized' | 'matching';
+  total: number;
+  href: string;
+}
+
 function buildOperationsHref(filters: {
   connectorOperationalStatus?: 'healthy' | 'warning' | 'critical';
   connectorTriggerMode?: 'manual' | 'scheduled';
@@ -108,6 +116,73 @@ function buildIngestionOutcomeHref(filters: {
   return queryString ? `/ingestion?${queryString}` : '/ingestion';
 }
 
+function buildPipelineAttentionLinks(summary: {
+  rawOutcomeCounters: Record<string, number>;
+  normalizedOutcomeCounters: Record<string, number>;
+  matchingOutcomeCounters: Record<string, number>;
+}) {
+  const items: PipelineAttentionLink[] = [
+    {
+      key: 'raw.file_without_subject_hint',
+      label: 'File raw senza subject hint',
+      stage: 'raw',
+      total: summary.rawOutcomeCounters['raw.file_without_subject_hint'] ?? 0,
+      href: buildIngestionOutcomeHref({ rawOutcomeCode: 'raw.file_without_subject_hint' }),
+    },
+    {
+      key: 'raw.directory_structure_only',
+      label: 'Directory raw senza bucket o soggetto',
+      stage: 'raw',
+      total: summary.rawOutcomeCounters['raw.directory_structure_only'] ?? 0,
+      href: buildIngestionOutcomeHref({ rawOutcomeCode: 'raw.directory_structure_only' }),
+    },
+    {
+      key: 'normalize.document_without_subject_hint',
+      label: 'Normalized senza subject hint',
+      stage: 'normalized',
+      total: summary.normalizedOutcomeCounters['normalize.document_without_subject_hint'] ?? 0,
+      href: buildIngestionOutcomeHref({
+        normalizedOutcomeCode: 'normalize.document_without_subject_hint',
+        normalizationStage: 'completed',
+      }),
+    },
+    {
+      key: 'match.review_required',
+      label: 'Matching in review',
+      stage: 'matching',
+      total: summary.matchingOutcomeCounters['match.review_required'] ?? 0,
+      href: buildIngestionOutcomeHref({
+        matchingOutcomeCode: 'match.review_required',
+        matchingStage: 'completed',
+      }),
+    },
+    {
+      key: 'match.unmatched_no_candidate',
+      label: 'Matching senza candidato',
+      stage: 'matching',
+      total: summary.matchingOutcomeCounters['match.unmatched_no_candidate'] ?? 0,
+      href: buildIngestionOutcomeHref({
+        matchingOutcomeCode: 'match.unmatched_no_candidate',
+        matchingStage: 'completed',
+      }),
+    },
+    {
+      key: 'match.manually_rejected',
+      label: 'Matching respinti manualmente',
+      stage: 'matching',
+      total: summary.matchingOutcomeCounters['match.manually_rejected'] ?? 0,
+      href: buildIngestionOutcomeHref({
+        matchingOutcomeCode: 'match.manually_rejected',
+        matchingStage: 'completed',
+      }),
+    },
+  ];
+
+  return items
+    .filter((item) => item.total > 0)
+    .sort((left, right) => right.total - left.total || left.label.localeCompare(right.label));
+}
+
 export default async function OperationsPage({ searchParams }: OperationsPageProps) {
   const session = await requireOperatorSession('/operations');
   const filters = (await searchParams) ?? {};
@@ -175,6 +250,7 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         run.status !== 'failed' &&
         (run.stages.matching.status === 'completed' || run.stages.postProcessing.status === 'completed'),
     ) ?? null;
+  const pipelineAttentionLinks = buildPipelineAttentionLinks(orchestrationSummary);
 
   return (
     <PageShell
@@ -282,6 +358,30 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
             </div>
           </article>
         </div>
+      </SectionCard>
+
+      <SectionCard title="Pipeline attention" eyebrow="Ingestion">
+        {pipelineAttentionLinks.length > 0 ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {pipelineAttentionLinks.map((item) => (
+              <Link
+                key={item.key}
+                href={item.href}
+                className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+              >
+                <p className="text-sm text-[var(--pcb-muted)]">{item.label}</p>
+                <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{item.total}</p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  {item.stage}
+                </p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--pcb-muted)]">
+            Nessun outcome di attenzione aperto sui layer raw, normalized o matching.
+          </p>
+        )}
       </SectionCard>
 
       <SectionCard title="Ingressi operativi pipeline" eyebrow="Runs">
