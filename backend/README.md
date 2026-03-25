@@ -147,6 +147,15 @@ Schema errori applicativo:
   - `ingest.matching_result_missing_subject`
   - `ingest.manual_subject_assignment_failed`
   - `ingest.connector_cli_missing`
+- anche i domini `auth`, `anagrafiche` e `catasto` espongono codici errore stabili, ad esempio:
+  - `auth.authorization_header_missing`
+  - `auth.invalid_authorization_header`
+  - `auth.invalid_access_token`
+  - `auth.insufficient_realm_roles`
+  - `auth.keycloak_not_configured`
+  - `anagrafiche.subject_not_found`
+  - `anagrafiche.subject_not_found_by_cuua`
+  - `catasto.parcel_not_found`
 
 Il dominio `gis` espone anche lo stato del publication target QGIS Server via `GET /api/v1/gis/publication-status`.
 Il controllo usa `PCB_QGIS_SERVER_URL` e `PCB_QGIS_PROJECT_FILE` per verificare `GetCapabilities` sul route pubblico `/ows/`.

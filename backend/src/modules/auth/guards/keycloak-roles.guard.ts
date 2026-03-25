@@ -1,10 +1,10 @@
 import {
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { PcbDomainException } from '../../core/errors/pcb-domain.exception';
 import { KEYCLOAK_ROLES_KEY } from '../decorators/roles.decorator';
 
 type AuthenticatedRequest = {
@@ -33,7 +33,11 @@ export class KeycloakRolesGuard implements CanActivate {
     const hasAllRequiredRoles = requiredRoles.every((role) => principalRoles.includes(role));
 
     if (!hasAllRequiredRoles) {
-      throw new ForbiddenException('Insufficient realm roles');
+      throw PcbDomainException.conflict(
+        'auth.insufficient_realm_roles',
+        'Insufficient realm roles',
+        { requiredRoles, principalRoles },
+      );
     }
 
     return true;

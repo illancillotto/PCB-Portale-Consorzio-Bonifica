@@ -1,7 +1,8 @@
-import { Controller, Get, NotFoundException, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
 import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
+import { PcbDomainException } from '../../core/errors/pcb-domain.exception';
 import { AnagraficheService } from '../anagrafiche.service';
 import { ListSubjectsQueryDto } from '../dto/list-subjects-query.dto';
 
@@ -24,7 +25,11 @@ export class SubjectsController {
     const subject = await this.anagraficheService.getByCuua(cuua);
 
     if (!subject) {
-      throw new NotFoundException(`Subject not found for CUUA ${cuua}`);
+      throw PcbDomainException.notFound(
+        'anagrafiche.subject_not_found_by_cuua',
+        `Subject not found for CUUA ${cuua}`,
+        { cuua },
+      );
     }
 
     return subject;
@@ -35,7 +40,11 @@ export class SubjectsController {
     const subject = await this.anagraficheService.getById(id);
 
     if (!subject) {
-      throw new NotFoundException(`Subject not found for id ${id}`);
+      throw PcbDomainException.notFound(
+        'anagrafiche.subject_not_found',
+        `Subject not found for id ${id}`,
+        { subjectId: id },
+      );
     }
 
     return subject;
@@ -46,7 +55,11 @@ export class SubjectsController {
     const history = await this.anagraficheService.getHistory(id);
 
     if (!history) {
-      throw new NotFoundException(`Subject history not found for id ${id}`);
+      throw PcbDomainException.notFound(
+        'anagrafiche.subject_history_not_found',
+        `Subject history not found for id ${id}`,
+        { subjectId: id },
+      );
     }
 
     return history;
@@ -57,7 +70,11 @@ export class SubjectsController {
     const parcels = await this.anagraficheService.getParcels(id);
 
     if (!parcels) {
-      throw new NotFoundException(`Subject parcels not found for id ${id}`);
+      throw PcbDomainException.notFound(
+        'anagrafiche.subject_parcels_not_found',
+        `Subject parcels not found for id ${id}`,
+        { subjectId: id },
+      );
     }
 
     return {

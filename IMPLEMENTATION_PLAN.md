@@ -158,6 +158,7 @@ Stato attuale:
 - completata classificazione dei runtime endpoint tra pubblico tecnico e interno operativo
 - completata uniformazione dei payload errore backend e proxy operativo frontend
 - completata introduzione dei codici errore di dominio iniziali su `ingest`
+- completata estensione dei codici errore di dominio a `auth`, `anagrafiche` e `catasto`
 - da completare eventuali notice ancora più specifici per sessioni degradate
 
 Dipendenze:

@@ -1274,3 +1274,24 @@ Verifiche eseguite:
 
 - `npm run lint --workspace backend`
 - `npm run build --workspace backend`
+
+### 2026-03-25 – Codici errore di dominio per auth e lookup business
+
+Completato:
+
+- estensione dei codici errore di dominio a:
+  - guard/auth service Keycloak
+  - lookup `subjects`
+  - lookup `parcels`
+- copertura dei casi:
+  - header Authorization mancante o invalido
+  - token non valido o emesso per client errato
+  - ruoli realm insufficienti
+  - integrazione Keycloak non configurata
+  - soggetto non trovato
+  - particella non trovata
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`

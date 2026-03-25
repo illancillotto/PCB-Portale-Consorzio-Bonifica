@@ -1,5 +1,6 @@
-import { Injectable, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { PcbDomainException } from '../../core/errors/pcb-domain.exception';
 
 type KeycloakPrincipal = {
   subject: string;
@@ -76,7 +77,10 @@ export class KeycloakService {
 
   async verifyAccessToken(authorizationHeader: string): Promise<KeycloakPrincipal> {
     if (!this.isConfigured()) {
-      throw new ServiceUnavailableException('Keycloak integration is not configured');
+      throw PcbDomainException.serviceUnavailable(
+        'auth.keycloak_not_configured',
+        'Keycloak integration is not configured',
+      );
     }
 
     const token = this.extractBearerToken(authorizationHeader);
@@ -103,7 +107,11 @@ export class KeycloakService {
       const configuredClientId = process.env.PCB_KEYCLOAK_CLIENT_ID;
 
       if (configuredClientId && payload.azp !== configuredClientId) {
-        throw new UnauthorizedException('Token issued for a different client');
+        throw PcbDomainException.badRequest(
+          'auth.token_wrong_client',
+          'Token issued for a different client',
+          { configuredClientId },
+        );
       }
 
       return {
@@ -114,8 +122,15 @@ export class KeycloakService {
         issuedAt: payload.iat ?? null,
         expiresAt: payload.exp ?? null,
       };
-    } catch {
-      throw new UnauthorizedException('Invalid or expired access token');
+    } catch (error) {
+      if (error instanceof PcbDomainException) {
+        throw error;
+      }
+
+      throw PcbDomainException.badRequest(
+        'auth.invalid_access_token',
+        'Invalid or expired access token',
+      );
     }
   }
 
@@ -131,7 +146,10 @@ export class KeycloakService {
     const [scheme, token] = authorizationHeader.split(' ');
 
     if (scheme !== 'Bearer' || !token) {
-      throw new UnauthorizedException('Authorization header must use Bearer token');
+      throw PcbDomainException.badRequest(
+        'auth.invalid_authorization_header',
+        'Authorization header must use Bearer token',
+      );
     }
 
     return token;

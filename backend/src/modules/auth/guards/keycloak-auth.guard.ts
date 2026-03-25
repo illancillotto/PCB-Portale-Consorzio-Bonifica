@@ -2,8 +2,8 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
+import { PcbDomainException } from '../../core/errors/pcb-domain.exception';
 import { KeycloakService } from '../services/keycloak.service';
 
 @Injectable()
@@ -15,7 +15,10 @@ export class KeycloakAuthGuard implements CanActivate {
     const authorizationHeader = request.headers.authorization;
 
     if (!authorizationHeader) {
-      throw new UnauthorizedException('Missing Authorization header');
+      throw PcbDomainException.badRequest(
+        'auth.authorization_header_missing',
+        'Missing Authorization header',
+      );
     }
 
     const principal = await this.keycloakService.verifyAccessToken(authorizationHeader);

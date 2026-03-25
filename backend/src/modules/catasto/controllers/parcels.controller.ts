@@ -1,7 +1,8 @@
-import { Controller, Get, NotFoundException, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
 import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
+import { PcbDomainException } from '../../core/errors/pcb-domain.exception';
 import { CatastoService } from '../catasto.service';
 import { ParcelResponseDto } from '../dto/parcel-response.dto';
 
@@ -24,7 +25,11 @@ export class ParcelsController {
     const parcel = await this.catastoService.getParcelById(id);
 
     if (!parcel) {
-      throw new NotFoundException(`Parcel not found for id ${id}`);
+      throw PcbDomainException.notFound(
+        'catasto.parcel_not_found',
+        `Parcel not found for id ${id}`,
+        { parcelId: id },
+      );
     }
 
     return parcel;
@@ -35,7 +40,11 @@ export class ParcelsController {
     const subjects = await this.catastoService.getParcelSubjects(id);
 
     if (!subjects) {
-      throw new NotFoundException(`Parcel subjects not found for id ${id}`);
+      throw PcbDomainException.notFound(
+        'catasto.parcel_subjects_not_found',
+        `Parcel subjects not found for id ${id}`,
+        { parcelId: id },
+      );
     }
 
     return {
