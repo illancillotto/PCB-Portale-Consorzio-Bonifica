@@ -1249,3 +1249,28 @@ Verifiche eseguite:
 - `npm run build --workspace backend`
 - `npm run lint --workspace frontend`
 - `npm run build --workspace frontend`
+
+### 2026-03-25 – Codici errore di dominio per ingest
+
+Completato:
+
+- introduzione di una eccezione di dominio riusabile con:
+  - `statusCode`
+  - `errorCode`
+  - `message`
+  - `details`
+- applicazione nel dominio `ingest` per:
+  - connector non supportato
+  - connector non eseguibile
+  - run non trovata
+  - matching result non trovato
+  - conferma match senza soggetto
+  - assegnazione manuale a soggetto inesistente
+  - CLI connector mancante
+  - fallimenti di avvio del post-processing
+- controller `ingestion` riallineato per preservare i codici dominio nelle response normalizzate
+
+Verifiche eseguite:
+
+- `npm run lint --workspace backend`
+- `npm run build --workspace backend`

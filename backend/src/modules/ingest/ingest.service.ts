@@ -5,6 +5,7 @@ import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { AuditService } from '../audit/audit.service';
 import { DatabaseService } from '../core/database/database.service';
+import { PcbDomainException } from '../core/errors/pcb-domain.exception';
 import { RedisService } from '../core/redis/redis.service';
 import { IngestionRunResponseDto } from './dto/ingestion-run-response.dto';
 import { IngestionConnectorCatalogResponseDto } from './dto/connector-catalog-response.dto';
@@ -732,13 +733,24 @@ export class IngestService {
 
   async startManualRun(connectorName: string): Promise<StartIngestionRunResponseDto> {
     if (!this.isSupportedConnector(connectorName)) {
-      throw new Error(`Unsupported connector ${connectorName}`);
+      throw PcbDomainException.badRequest(
+        'ingest.connector_unsupported',
+        `Unsupported connector ${connectorName}`,
+        { connectorName },
+      );
     }
 
     const readiness = this.getConnectorExecutionReadiness(connectorName);
 
     if (!readiness.runnable) {
-      throw new Error(`Connector ${connectorName} is not runnable: ${readiness.detail}`);
+      throw PcbDomainException.badRequest(
+        'ingest.connector_not_runnable',
+        `Connector ${connectorName} is not runnable: ${readiness.detail}`,
+        {
+          connectorName,
+          detail: readiness.detail,
+        },
+      );
     }
 
     const runId = randomUUID();
@@ -1131,7 +1143,11 @@ export class IngestService {
     }
 
     if (action === 'confirm-match' && !currentResult.matched_subject_id) {
-      throw new Error('Cannot confirm match without matched_subject_id');
+      throw PcbDomainException.badRequest(
+        'ingest.matching_result_missing_subject',
+        'Cannot confirm match without matched_subject_id',
+        { runId, resultId, action },
+      );
     }
 
     const nextStatus = action === 'confirm-match' ? 'accepted' : 'rejected';
@@ -1192,7 +1208,11 @@ export class IngestService {
     const subjectExists = await this.subjectExists(subjectId);
 
     if (!subjectExists) {
-      throw new Error(`Subject not found for id ${subjectId}`);
+      throw PcbDomainException.notFound(
+        'ingest.assignment_subject_not_found',
+        `Subject not found for id ${subjectId}`,
+        { runId, resultId, subjectId },
+      );
     }
 
     const nextNotes = this.appendDecisionNote(
@@ -1355,7 +1375,11 @@ export class IngestService {
         sourceSystem,
         `Connector CLI non trovato: ${cliPath}`,
       );
-      throw new Error(`Connector CLI not found for ${connectorName}`);
+      throw PcbDomainException.serviceUnavailable(
+        'ingest.connector_cli_missing',
+        `Connector CLI not found for ${connectorName}`,
+        { connectorName, cliPath },
+      );
     }
 
     const child = spawn(process.execPath, [cliPath], {
@@ -1565,7 +1589,11 @@ export class IngestService {
       const normalization = await this.normalizeRun(runId);
 
       if (!normalization) {
-        throw new Error(`Normalization could not start for run ${runId}`);
+        throw PcbDomainException.conflict(
+          'ingest.post_processing_normalization_failed_to_start',
+          `Normalization could not start for run ${runId}`,
+          { runId, connectorName },
+        );
       }
 
       let matchingStatus: 'skipped' | 'completed' = 'skipped';
@@ -1574,7 +1602,11 @@ export class IngestService {
         const matching = await this.runMatching(runId);
 
         if (!matching) {
-          throw new Error(`Matching could not start for run ${runId}`);
+          throw PcbDomainException.conflict(
+            'ingest.post_processing_matching_failed_to_start',
+            `Matching could not start for run ${runId}`,
+            { runId, connectorName },
+          );
         }
 
         matchingStatus = 'completed';

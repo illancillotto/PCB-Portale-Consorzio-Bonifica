@@ -1,7 +1,7 @@
 import {
-  BadRequestException,
   Controller,
   Get,
+  HttpException,
   NotFoundException,
   Param,
   Post,
@@ -11,6 +11,7 @@ import {
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { KeycloakAuthGuard } from '../../auth/guards/keycloak-auth.guard';
 import { KeycloakRolesGuard } from '../../auth/guards/keycloak-roles.guard';
+import { PcbDomainException } from '../../core/errors/pcb-domain.exception';
 import { IngestService } from '../ingest.service';
 import { IngestionConnectorCatalogResponseDto } from '../dto/connector-catalog-response.dto';
 import { IngestionConnectorDetailResponseDto } from '../dto/connector-detail-response.dto';
@@ -59,7 +60,11 @@ export class IngestionController {
     const connector = await this.ingestService.getConnectorDetail(connectorName);
 
     if (!connector) {
-      throw new NotFoundException(`Connector not found for name ${connectorName}`);
+      throw PcbDomainException.notFound(
+        'ingest.connector_not_found',
+        `Connector not found for name ${connectorName}`,
+        { connectorName },
+      );
     }
 
     return connector;
@@ -73,7 +78,11 @@ export class IngestionController {
     const runs = await this.ingestService.listRunsByConnectorName(connectorName, query.status);
 
     if (!runs) {
-      throw new NotFoundException(`Connector not found for name ${connectorName}`);
+      throw PcbDomainException.notFound(
+        'ingest.connector_not_found',
+        `Connector not found for name ${connectorName}`,
+        { connectorName },
+      );
     }
 
     return runs;
@@ -94,7 +103,7 @@ export class IngestionController {
     const run = await this.ingestService.getRunById(id);
 
     if (!run) {
-      throw new NotFoundException(`Ingestion run not found for id ${id}`);
+      throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });
     }
 
     return run;
@@ -105,7 +114,7 @@ export class IngestionController {
     const result = await this.ingestService.normalizeRun(id);
 
     if (!result) {
-      throw new NotFoundException(`Ingestion run not found for id ${id}`);
+      throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });
     }
 
     return result;
@@ -118,7 +127,7 @@ export class IngestionController {
     const result = await this.ingestService.listNormalizedRecordsByRunId(id);
 
     if (!result) {
-      throw new NotFoundException(`Ingestion run not found for id ${id}`);
+      throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });
     }
 
     return result;
@@ -129,7 +138,7 @@ export class IngestionController {
     const result = await this.ingestService.runMatching(id);
 
     if (!result) {
-      throw new NotFoundException(`Ingestion run not found for id ${id}`);
+      throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });
     }
 
     return result;
@@ -142,7 +151,7 @@ export class IngestionController {
     const result = await this.ingestService.listMatchingResultsByRunId(id);
 
     if (!result) {
-      throw new NotFoundException(`Ingestion run not found for id ${id}`);
+      throw PcbDomainException.notFound('ingest.run_not_found', `Ingestion run not found for id ${id}`, { runId: id });
     }
 
     return result;
@@ -155,29 +164,45 @@ export class IngestionController {
     @Param('action') action: 'confirm-match' | 'confirm-no-match',
   ): Promise<MatchingResultResponseDto> {
     if (action !== 'confirm-match' && action !== 'confirm-no-match') {
-      throw new BadRequestException(`Unsupported matching action ${action}`);
+      throw PcbDomainException.badRequest(
+        'ingest.unsupported_matching_action',
+        `Unsupported matching action ${action}`,
+        { action },
+      );
     }
 
     try {
       const result = await this.ingestService.confirmMatchingResult(id, resultId, action);
 
       if (result === null) {
-        throw new NotFoundException(`Ingestion run not found for id ${id}`);
+        throw PcbDomainException.notFound(
+          'ingest.run_not_found',
+          `Ingestion run not found for id ${id}`,
+          { runId: id },
+        );
       }
 
       if (!result) {
-        throw new NotFoundException(`Matching result not found for id ${resultId}`);
+        throw PcbDomainException.notFound(
+          'ingest.matching_result_not_found',
+          `Matching result not found for id ${resultId}`,
+          { runId: id, resultId },
+        );
       }
 
       return result;
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (error instanceof HttpException) {
         throw error;
       }
 
       const message =
         error instanceof Error ? error.message : 'Matching decision could not be applied';
-      throw new BadRequestException(message);
+      throw PcbDomainException.badRequest(
+        'ingest.matching_decision_failed',
+        message,
+        { runId: id, resultId, action },
+      );
     }
   }
 
@@ -195,22 +220,34 @@ export class IngestionController {
       );
 
       if (result === null) {
-        throw new NotFoundException(`Ingestion run not found for id ${id}`);
+        throw PcbDomainException.notFound(
+          'ingest.run_not_found',
+          `Ingestion run not found for id ${id}`,
+          { runId: id },
+        );
       }
 
       if (!result) {
-        throw new NotFoundException(`Matching result not found for id ${resultId}`);
+        throw PcbDomainException.notFound(
+          'ingest.matching_result_not_found',
+          `Matching result not found for id ${resultId}`,
+          { runId: id, resultId },
+        );
       }
 
       return result;
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (error instanceof HttpException) {
         throw error;
       }
 
       const message =
         error instanceof Error ? error.message : 'Manual subject assignment could not be applied';
-      throw new BadRequestException(message);
+      throw PcbDomainException.badRequest(
+        'ingest.manual_subject_assignment_failed',
+        message,
+        { runId: id, resultId, subjectId },
+      );
     }
   }
 
@@ -221,8 +258,16 @@ export class IngestionController {
     try {
       return await this.ingestService.startManualRun(connectorName);
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       const message = error instanceof Error ? error.message : 'Run request could not be started';
-      throw new BadRequestException(message);
+      throw PcbDomainException.badRequest(
+        'ingest.run_request_failed',
+        message,
+        { connectorName },
+      );
     }
   }
 }

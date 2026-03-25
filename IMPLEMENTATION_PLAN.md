@@ -157,6 +157,7 @@ Stato attuale:
 - completata formalizzazione backend della stessa policy su `subjects`, `parcels`, `search`
 - completata classificazione dei runtime endpoint tra pubblico tecnico e interno operativo
 - completata uniformazione dei payload errore backend e proxy operativo frontend
+- completata introduzione dei codici errore di dominio iniziali su `ingest`
 - da completare eventuali notice ancora più specifici per sessioni degradate
 
 Dipendenze:

@@ -139,6 +139,14 @@ Schema errori applicativo:
   - `error.path`
   - `error.timestamp`
   - `error.requestId`
+- il dominio `ingest` espone anche codici errore applicativi stabili, ad esempio:
+  - `ingest.connector_unsupported`
+  - `ingest.connector_not_runnable`
+  - `ingest.run_not_found`
+  - `ingest.matching_result_not_found`
+  - `ingest.matching_result_missing_subject`
+  - `ingest.manual_subject_assignment_failed`
+  - `ingest.connector_cli_missing`
 
 Il dominio `gis` espone anche lo stato del publication target QGIS Server via `GET /api/v1/gis/publication-status`.
 Il controllo usa `PCB_QGIS_SERVER_URL` e `PCB_QGIS_PROJECT_FILE` per verificare `GetCapabilities` sul route pubblico `/ows/`.
