@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "next dev",
+    "dev": "sh -c 'next dev -p \"${PCB_FRONTEND_PORT:-3010}\"'",
     "build": "next build",
-    "start": "next start",
+    "start": "sh -c 'next start -p \"${PCB_FRONTEND_PORT:-3010}\"'",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

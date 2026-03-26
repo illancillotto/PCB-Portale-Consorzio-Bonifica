@@ -12,7 +12,7 @@ export async function POST() {
     maxAge: 0,
   });
 
-  const frontendBaseUrl = process.env.PCB_FRONTEND_BASE_URL ?? 'http://127.0.0.1:3000';
+  const frontendBaseUrl = process.env.PCB_FRONTEND_BASE_URL ?? 'http://127.0.0.1:3010';
 
   return NextResponse.redirect(`${frontendBaseUrl}/login`);
 }

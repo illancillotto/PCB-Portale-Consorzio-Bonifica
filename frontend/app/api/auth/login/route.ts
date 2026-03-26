@@ -6,7 +6,7 @@ const keycloakBaseUrl = process.env.PCB_KEYCLOAK_URL ?? 'http://127.0.0.1:8180';
 const keycloakRealm = process.env.PCB_KEYCLOAK_REALM ?? 'pcb';
 const keycloakClientId = process.env.PCB_KEYCLOAK_CLIENT_ID ?? 'pcb-backend';
 const keycloakClientSecret = process.env.PCB_KEYCLOAK_CLIENT_SECRET ?? 'change-me';
-const backendBaseUrl = process.env.PCB_API_BASE_URL ?? 'http://127.0.0.1:3001/api/v1';
+const backendBaseUrl = process.env.PCB_API_BASE_URL ?? 'http://127.0.0.1:5010/api/v1';
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as

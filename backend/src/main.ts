@@ -44,7 +44,7 @@ async function bootstrap() {
     next();
   });
 
-  const port = Number(process.env.PCB_API_PORT ?? 3001);
+  const port = Number(process.env.PCB_API_PORT ?? 5010);
   const host = process.env.PCB_API_HOST ?? '0.0.0.0';
 
   await app.listen(port, host);

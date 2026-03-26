@@ -33,12 +33,12 @@
       "serviceAccountsEnabled": false,
       "standardFlowEnabled": true,
       "redirectUris": [
-        "http://localhost:3000/*",
-        "http://127.0.0.1:3000/*"
+        "http://localhost:3010/*",
+        "http://127.0.0.1:3010/*"
       ],
       "webOrigins": [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://localhost:3010",
+        "http://127.0.0.1:3010"
       ]
     },
     {
@@ -50,12 +50,12 @@
       "directAccessGrantsEnabled": false,
       "standardFlowEnabled": true,
       "redirectUris": [
-        "http://localhost:3000/*",
-        "http://127.0.0.1:3000/*"
+        "http://localhost:3010/*",
+        "http://127.0.0.1:3010/*"
       ],
       "webOrigins": [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://localhost:3010",
+        "http://127.0.0.1:3010"
       ]
     }
   ],

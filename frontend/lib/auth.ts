@@ -4,7 +4,7 @@ import {
   buildLoginRedirectPath,
 } from './auth-redirect';
 
-const backendBaseUrl = process.env.PCB_API_BASE_URL ?? 'http://127.0.0.1:3001/api/v1';
+const backendBaseUrl = process.env.PCB_API_BASE_URL ?? 'http://127.0.0.1:5010/api/v1';
 
 export const pcbSessionCookieName = 'pcb_session';
 
