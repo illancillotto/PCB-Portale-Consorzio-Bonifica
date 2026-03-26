@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "sh -c 'next dev -p \"${PCB_FRONTEND_PORT:-3010}\"'",
-    "build": "next build",
-    "start": "sh -c 'next start -p \"${PCB_FRONTEND_PORT:-3010}\"'",
+    "dev": "sh -c 'set -a; [ -f ../.env ] && . ../.env; set +a; next dev -p \"${PCB_FRONTEND_PORT:-3010}\"'",
+    "build": "sh -c 'set -a; [ -f ../.env ] && . ../.env; set +a; next build'",
+    "start": "sh -c 'set -a; [ -f ../.env ] && . ../.env; set +a; next start -p \"${PCB_FRONTEND_PORT:-3010}\"'",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

@@ -13,7 +13,7 @@ import { SearchModule } from './modules/search/search.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env'],
+      envFilePath: ['../.env', '.env'],
     }),
     CoreModule,
     AuthModule,
