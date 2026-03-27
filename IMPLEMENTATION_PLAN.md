@@ -129,6 +129,22 @@ Deliverable:
 - shortcut contestuali a `/operations/help` da `ingestion`, `audit` e `gis`
 - link di ritorno rapido a `operations`
 
+### M0.19 – Shortcut help nei dettagli operativi
+
+Obiettivo:
+
+- rendere disponibile l’help center anche nei dettagli più usati durante il troubleshooting
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- shortcut a `/operations/help` in `ingestion/[id]`
+- shortcut a `/operations/help` in `ingestion/connectors/[connectorName]`
+- shortcut a `/operations/help` nelle schede soggetto e particella
+
 ### M1 – Fondazioni repository
 
 Obiettivo:

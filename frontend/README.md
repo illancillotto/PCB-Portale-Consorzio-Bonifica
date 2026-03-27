@@ -180,4 +180,5 @@ Stato attuale:
 - la pagina `/operations/help` include ora anche una checklist `First response` per login, ingestion, GIS e connector NAS
 - la pagina `/operations/help` include ora anche una sezione `Escalation signals` con moduli target e comandi di escalation
 - `ingestion`, `audit` e `gis` espongono ora shortcut contestuali verso `/operations/help`
+- i dettagli `ingestion/[id]`, `ingestion/connectors/[connectorName]`, `subjects/[id]` e `parcels/[id]` espongono ora shortcut verso `/operations/help`
 - mappa GIS completa ancora non integrata

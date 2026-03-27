@@ -1938,3 +1938,20 @@ Verifiche eseguite:
 Output operativo:
 
 - l’help center non e` piu` confinato a `operations` ma raggiungibile anche dai moduli operativi principali
+
+### 2026-03-27 – Shortcut help nei dettagli operativi
+
+Completato:
+
+- sezione `Supporto operativo` in `ingestion/[id]`
+- sezione `Supporto operativo` in `ingestion/connectors/[connectorName]`
+- shortcut `Operations help` nelle schede `subjects/[id]` e `parcels/[id]`
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- il percorso di supporto resta disponibile anche nei punti di troubleshooting puntuale

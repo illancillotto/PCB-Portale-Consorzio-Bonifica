@@ -86,6 +86,12 @@ export default async function ParcelDetailPage({ params }: ParcelDetailPageProps
             >
               Operations
             </Link>
+            <Link
+              href="/operations/help"
+              className="inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
+            >
+              Operations help
+            </Link>
           </div>
         </div>
       }

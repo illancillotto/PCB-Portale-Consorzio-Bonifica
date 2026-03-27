@@ -203,6 +203,32 @@ export default async function IngestionRunDetailPage({
     >
       <IngestionAutoRefresh enabled={autoRefreshEnabled} />
 
+      <SectionCard title="Supporto operativo" eyebrow="Help">
+        <div className="grid gap-3 md:grid-cols-3">
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Operations help</strong>
+            Apri checklist, escalation e riferimenti documentali.
+          </Link>
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Supporto run</strong>
+            Usa first response ed escalation per raw, normalized e matching.
+          </Link>
+          <Link
+            href="/operations"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Torna a operations</strong>
+            Riapri summary runtime e pipeline attention.
+          </Link>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Sintesi run" eyebrow="Ingestion">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
