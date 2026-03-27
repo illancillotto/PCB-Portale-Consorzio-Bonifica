@@ -515,6 +515,19 @@ Stato:
 
 - completato
 
+### Step 0.8
+
+Introdurre un changelog sintetico root per milestone e commit chiave.
+
+Output:
+
+- cronologia breve leggibile
+- collegamento dal README root
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

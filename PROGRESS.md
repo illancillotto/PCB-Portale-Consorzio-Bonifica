@@ -166,6 +166,22 @@ Output operativo:
 - onboarding locale più rapido
 - troubleshooting base standardizzato in root
 
+### 2026-03-27 – Changelog sintetico root
+
+Completato:
+
+- nuovo file `CHANGELOG.md`
+- sintesi cronologica per milestone e commit chiave
+- collegamento esplicito dal `README.md` root
+
+Verifiche eseguite:
+
+- revisione dei commit recenti contro la cronologia locale del repository
+
+Output operativo:
+
+- panoramica storica più leggibile rispetto al solo `PROGRESS.md`
+
 ## Vincoli attivi
 
 - backend modular monolith
