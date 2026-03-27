@@ -72,6 +72,13 @@ Lo script `npm run dev:smoke` verifica:
 - login operatore seed via frontend
 - accesso reale alla vista protetta `operations`
 
+Lo script `npm run dev:smoke:ingestion` verifica:
+
+- token operatore reale da Keycloak
+- trigger reale del connector NAS locale
+- completamento della pipeline `run -> normalize -> match`
+- contatori principali di run e `pipeline-summary`
+
 ## Stato del bootstrap
 
 La milestone corrente prepara:

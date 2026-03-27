@@ -81,6 +81,24 @@ Output operativo:
 - lo smoke locale non si ferma più a `health/discovery`
 - il bootstrap di sviluppo verifica anche auth applicativa e sessione frontend reale
 
+### 2026-03-27 – Smoke operativo ingestion nel bootstrap locale
+
+Completato:
+
+- script `scripts/smoke-ingestion-runtime.sh`
+- script root `npm run dev:smoke:ingestion`
+- verifica automatica di una run reale del connector NAS locale
+- polling fino a completamento della pipeline `acquisition -> postProcessing -> normalization -> matching`
+
+Verifiche eseguite:
+
+- `npm run dev:smoke:ingestion`
+
+Output operativo:
+
+- il bootstrap locale verifica anche il percorso applicativo minimo del dominio `ingest`
+- il sample NAS locale è ora usato anche per smoke test operativi ripetibili
+
 ## Vincoli attivi
 
 - backend modular monolith

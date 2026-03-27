@@ -451,6 +451,19 @@ Stato:
 
 - completato
 
+### Step 0.3
+
+Estendere lo smoke locale alla pipeline `ingestion`.
+
+Output:
+
+- trigger reale di una run locale
+- verifica end-to-end del chaining `run -> normalize -> match`
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

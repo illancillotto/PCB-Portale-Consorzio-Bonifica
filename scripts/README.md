@@ -55,3 +55,24 @@ Override opzionali:
 
 - `PCB_SMOKE_USERNAME`
 - `PCB_SMOKE_PASSWORD`
+
+## `smoke-ingestion-runtime.sh`
+
+Smoke operativo della pipeline locale `ingestion`:
+
+- ottiene un token operatore seed da Keycloak
+- avvia una run reale sul connector `connector-nas-catasto`
+- attende il completamento della run
+- verifica `acquisition -> postProcessing -> normalization -> matching`
+- verifica i contatori principali di `run` e `pipeline-summary`
+
+Uso:
+
+```bash
+bash ./scripts/smoke-ingestion-runtime.sh
+```
+
+Override opzionali:
+
+- `PCB_SMOKE_CONNECTOR_NAME`
+- `PCB_SMOKE_INGEST_TIMEOUT_SECONDS`

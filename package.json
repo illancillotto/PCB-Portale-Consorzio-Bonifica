@@ -12,6 +12,7 @@
     "dev:stack": "docker compose up -d",
     "dev:up": "bash ./scripts/dev-up.sh",
     "dev:smoke": "bash ./scripts/smoke-local-runtime.sh",
+    "dev:smoke:ingestion": "bash ./scripts/smoke-ingestion-runtime.sh",
     "dev:backend": "npm run dev --workspace backend",
     "dev:frontend": "npm run dev --workspace frontend",
     "dev:connectors": "npm run dev --workspace connectors",
