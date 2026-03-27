@@ -186,4 +186,5 @@ Stato attuale:
 - `/operations/help` espone ora anche `Guide disponibili` filtrate per topic con fallback generale
 - `/operations/help` espone ora anche `Related routes` filtrate per topic
 - `/operations/help` espone ora anche un `Topic summary` sintetico in testa alla pagina
+- la dashboard principale espone ora shortcut topic-aware all’help center per `auth`, `ingestion`, `audit` e `gis`
 - mappa GIS completa ancora non integrata

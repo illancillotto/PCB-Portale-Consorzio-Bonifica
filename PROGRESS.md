@@ -2040,3 +2040,20 @@ Verifiche eseguite:
 Output operativo:
 
 - il focus topic dell’help center e` ora leggibile anche senza scorrere la pagina
+
+### 2026-03-27 – Shortcut help topic-aware nella dashboard
+
+Completato:
+
+- sezione `Serve aiuto?` nella dashboard principale
+- shortcut topic-aware a `/operations/help?topic=auth|ingestion|audit|gis`
+- accesso all’help center direttamente dalla home senza passare da `operations`
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- il supporto operativo parte ora anche dalla dashboard principale

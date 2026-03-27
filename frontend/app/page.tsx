@@ -385,6 +385,59 @@ export default async function HomePage() {
               Marker soggetto georiferiti senza sovraccarico cartografico.
             </p>
           </Link>
+          </div>
+      </SectionCard>
+
+      <SectionCard title="Serve aiuto?" eyebrow="Help">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Link
+            href="/operations/help?topic=auth"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+              Auth
+            </p>
+            <p className="mt-2 text-lg font-semibold text-[var(--pcb-ink)]">Aiuto login</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--pcb-muted)]">
+              Scorciatoia al focus auth per login, Keycloak e sessione protetta.
+            </p>
+          </Link>
+          <Link
+            href="/operations/help?topic=ingestion"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+              Ingestion
+            </p>
+            <p className="mt-2 text-lg font-semibold text-[var(--pcb-ink)]">Aiuto pipeline</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--pcb-muted)]">
+              Apri first response, escalation e comandi per run e connector NAS.
+            </p>
+          </Link>
+          <Link
+            href="/operations/help?topic=audit"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+              Audit
+            </p>
+            <p className="mt-2 text-lg font-semibold text-[var(--pcb-ink)]">Aiuto correlazione</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--pcb-muted)]">
+              Vai al focus audit per eventi, entityId, sourceModule e request context.
+            </p>
+          </Link>
+          <Link
+            href="/operations/help?topic=gis"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 transition hover:-translate-y-0.5"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--pcb-muted)]">
+              GIS
+            </p>
+            <p className="mt-2 text-lg font-semibold text-[var(--pcb-ink)]">Aiuto viewer</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--pcb-muted)]">
+              Apri il focus GIS per publication target, WMS e GetFeatureInfo.
+            </p>
+          </Link>
         </div>
       </SectionCard>
     </PageShell>

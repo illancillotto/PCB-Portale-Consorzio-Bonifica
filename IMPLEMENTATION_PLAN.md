@@ -224,6 +224,21 @@ Deliverable:
 - sezione `Topic summary` in testa a `/operations/help`
 - problema tipico, primo comando, prima route e primo documento per topic
 
+### M0.25 – Shortcut help topic-aware nella dashboard
+
+Obiettivo:
+
+- rendere raggiungibile l’help center topic-aware anche dalla home
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- sezione `Serve aiuto?` nella dashboard
+- shortcut diretti ai topic `auth`, `ingestion`, `audit`, `gis`
+
 ### M1 – Fondazioni repository
 
 Obiettivo:
