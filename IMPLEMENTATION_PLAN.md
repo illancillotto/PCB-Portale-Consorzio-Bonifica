@@ -161,6 +161,22 @@ Deliverable:
 - contenuto filtrato per `auth`, `ingestion`, `audit`, `gis`
 - shortcut contestuali riallineati nei moduli operativi
 
+### M0.21 – Related commands topic-aware
+
+Obiettivo:
+
+- mostrare nell’help center il comando più utile per il topic attivo senza costringere a navigare tutta la documentazione
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- sezione `Related commands` in `/operations/help`
+- comandi filtrati per `auth`, `ingestion`, `audit`, `gis`
+- fallback generale con comandi di verifica e log runtime
+
 ### M1 – Fondazioni repository
 
 Obiettivo:

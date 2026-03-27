@@ -154,6 +154,62 @@ const escalationSignals = [
   },
 ];
 
+const relatedCommands: Array<{
+  topic: HelpTopic;
+  label: string;
+  command: string;
+  description: string;
+}> = [
+  {
+    topic: 'general',
+    label: 'Suite completa',
+    command: 'npm run dev:verify',
+    description: 'Valida bootstrap, auth, ingestion e GIS in sequenza controllata.',
+  },
+  {
+    topic: 'general',
+    label: 'Stato servizi',
+    command: 'docker compose ps',
+    description: 'Verifica rapidamente lo stato di Postgres, Redis, Keycloak e QGIS.',
+  },
+  {
+    topic: 'general',
+    label: 'Log stack',
+    command: 'docker compose logs --tail=200',
+    description: 'Recupera i log recenti quando il problema attraversa più domini.',
+  },
+  {
+    topic: 'auth',
+    label: 'Smoke auth',
+    command: 'npm run dev:smoke',
+    description: 'Conferma login seed, discovery Keycloak e accesso a una vista protetta.',
+  },
+  {
+    topic: 'ingestion',
+    label: 'Smoke ingestion',
+    command: 'npm run dev:smoke:ingestion',
+    description: 'Verifica trigger reale, acquisition, post-processing, normalization e matching.',
+  },
+  {
+    topic: 'ingestion',
+    label: 'Prepare runtime locale',
+    command: 'npm run dev:prepare-runtime',
+    description: 'Rigenera sample NAS locale e integra le variabili minime nel `.env`.',
+  },
+  {
+    topic: 'gis',
+    label: 'Smoke GIS',
+    command: 'npm run dev:smoke:gis',
+    description: 'Valida publication status, map-features e GetFeatureInfo end-to-end.',
+  },
+  {
+    topic: 'audit',
+    label: 'Surface API',
+    command: 'sed -n \"1,220p\" docs/API_SURFACE.md',
+    description: 'Rilegge rapidamente endpoint, filtri e shape errore del dominio audit.',
+  },
+];
+
 const topicLabels: Record<HelpTopic, string> = {
   general: 'Generale',
   auth: 'Auth',
@@ -184,6 +240,10 @@ export default async function OperationsHelpPage({ searchParams }: OperationsHel
     topic === 'general'
       ? escalationSignals
       : escalationSignals.filter((item) => item.topic === topic || item.topic === 'general');
+  const filteredRelatedCommands =
+    topic === 'general'
+      ? relatedCommands
+      : relatedCommands.filter((item) => item.topic === topic || item.topic === 'general');
 
   return (
     <PageShell
@@ -303,29 +363,30 @@ export default async function OperationsHelpPage({ searchParams }: OperationsHel
               </div>
             </article>
           ))}
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">Comandi di escalation</h3>
-            <div className="mt-4 space-y-3 text-sm text-[var(--pcb-muted)]">
-              <div className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3">
-                <strong className="block text-[var(--pcb-ink)]">Suite completa</strong>
-                <code className="mt-2 block break-all text-xs text-[var(--pcb-muted)]">
-                  npm run dev:verify
-                </code>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Related commands" eyebrow="CLI">
+        <div className="grid gap-4 lg:grid-cols-2">
+          {filteredRelatedCommands.map((item) => (
+            <article
+              key={`${item.topic}-${item.command}`}
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">{item.label}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--pcb-muted)]">{item.description}</p>
+                </div>
+                <span className="rounded-full border border-[var(--pcb-line)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  {topicLabels[item.topic]}
+                </span>
               </div>
-              <div className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3">
-                <strong className="block text-[var(--pcb-ink)]">Stato servizi</strong>
-                <code className="mt-2 block break-all text-xs text-[var(--pcb-muted)]">
-                  docker compose ps
-                </code>
-              </div>
-              <div className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3">
-                <strong className="block text-[var(--pcb-ink)]">Log stack</strong>
-                <code className="mt-2 block break-all text-xs text-[var(--pcb-muted)]">
-                  docker compose logs --tail=200
-                </code>
-              </div>
-            </div>
-          </article>
+              <code className="mt-4 block rounded-xl bg-[var(--pcb-surface)] px-3 py-2 text-sm text-[var(--pcb-ink)]">
+                {item.command}
+              </code>
+            </article>
+          ))}
         </div>
       </SectionCard>
 

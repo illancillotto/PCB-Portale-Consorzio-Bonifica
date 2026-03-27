@@ -1972,3 +1972,20 @@ Verifiche eseguite:
 Output operativo:
 
 - l’help center apre ora direttamente il contesto corretto invece di partire sempre dalla vista generica
+
+### 2026-03-27 – Related commands topic-aware nell’help center
+
+Completato:
+
+- sezione `Related commands` in `/operations/help`
+- comandi filtrati per topic `auth`, `ingestion`, `audit`, `gis` con fallback generale
+- descrizione breve dell’uso operativo di ciascun comando
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- l’help center mostra ora direttamente il comando più utile per il topic attivo senza richiedere lettura completa della pagina
