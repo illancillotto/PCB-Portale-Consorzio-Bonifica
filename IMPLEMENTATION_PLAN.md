@@ -570,6 +570,21 @@ Stato:
 
 - completato
 
+### Step 0.12
+
+Documentare gli smoke test locali in forma sintetica.
+
+Output:
+
+- prerequisiti
+- copertura
+- output atteso
+- quando usare ogni smoke
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

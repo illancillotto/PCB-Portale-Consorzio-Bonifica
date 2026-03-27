@@ -231,6 +231,22 @@ Output operativo:
 
 - configurazione locale più leggibile rispetto alla sola lettura di `.env.example`
 
+### 2026-03-27 – Smoke tests reference
+
+Completato:
+
+- nuovo file `docs/SMOKE_TESTS.md`
+- raccolta sintetica di `dev:smoke`, `dev:smoke:ingestion`, `dev:smoke:gis`, `dev:verify`
+- collegamento esplicito dal `README.md` root
+
+Verifiche eseguite:
+
+- revisione degli smoke contro gli script locali già esistenti e le verifiche già passate
+
+Output operativo:
+
+- uso dei comandi di verifica più chiaro e standardizzato
+
 ## Vincoli attivi
 
 - backend modular monolith
