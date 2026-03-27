@@ -2107,3 +2107,20 @@ Verifiche eseguite:
 Output operativo:
 
 - quando una vista server-side fallisce, il recupero operativo parte ora anche dal topic help piu` plausibile
+
+### 2026-03-27 – Refactor gerarchia visiva del monitor ingestion
+
+Completato:
+
+- fascia iniziale del monitor `ingestion` riscritta con sezione `Triage rapido`
+- summary secondario compattato in `Monitor in sintesi`
+- supporto operativo spostato in colonna laterale piu` utile e meno invasiva
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- la pagina evidenzia prima i casi che richiedono azione e solo dopo il contesto completo di orchestration

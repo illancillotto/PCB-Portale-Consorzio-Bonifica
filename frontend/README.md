@@ -190,4 +190,5 @@ Stato attuale:
 - la vista `search` espone ora shortcut topic-aware all’help center quando una ricerca e` attiva
 - le viste lista `subjects` e `parcels` espongono ora shortcut topic-aware all’help center
 - i pannelli errore SSR usano ora shortcut topic-aware verso `/operations/help` nelle viste `audit`, `gis`, `ingestion`, `search`, `subjects` e `parcels`
+- la fascia iniziale del monitor `ingestion` e` stata compattata in un layout `triage rapido + monitor in sintesi` per ridurre l’effetto wall-of-data
 - mappa GIS completa ancora non integrata

@@ -952,3 +952,4 @@ Estensioni completate:
 - `operations` espone ora anche shortcut `pipeline attention` per i principali casi da verificare nel monitor `ingestion`
 - il monitor `ingestion` espone ora anche il contesto dei filtri run attivi con reset puntuale e ritorno rapido a `operations`
 - i pannelli errore SSR puntano ora anche all’help center topic-aware, non solo a `operations`
+- il monitor `ingestion` usa ora una gerarchia visiva piu` netta tra triage operativo e summary di contesto

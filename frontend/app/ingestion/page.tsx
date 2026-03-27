@@ -40,6 +40,15 @@ interface ActiveRunFilter {
   clearHref: string;
 }
 
+interface TriageItem {
+  key: string;
+  label: string;
+  total: number;
+  href: string;
+  tone: 'critical' | 'warning' | 'neutral';
+  detail: string;
+}
+
 function resolveRawOutcomeCounterKey(outcomeCode?: string) {
   if (outcomeCode === 'raw.directory_subject_bucket') {
     return 'directorySubjectBucket';
@@ -124,6 +133,18 @@ function buildRunsFilterHref(filters: {
 
 function buildRunFilterLabel(label: string, value: string) {
   return `${label}: ${value}`;
+}
+
+function triageToneClasses(tone: TriageItem['tone']) {
+  if (tone === 'critical') {
+    return 'border-rose-200 bg-rose-50';
+  }
+
+  if (tone === 'warning') {
+    return 'border-amber-200 bg-amber-50';
+  }
+
+  return 'border-[var(--pcb-line)] bg-white';
 }
 
 function buildIssueFilterHref(filters: {
@@ -293,6 +314,49 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
     0,
   );
   const manualConnectors = connectors.items.filter((connector) => connector.triggerMode === 'manual');
+  const triageItems: TriageItem[] = [
+    {
+      key: 'blocked-connectors',
+      label: 'Connector bloccati',
+      total: orchestrationSummary.blockedConnectors,
+      href: buildIssueFilterHref({
+        connectorOperationalStatus: 'critical',
+      }),
+      tone: orchestrationSummary.blockedConnectors > 0 ? 'critical' : 'neutral',
+      detail: 'Richiedono correzione runtime prima di un trigger manuale.',
+    },
+    {
+      key: 'critical-issues',
+      label: 'Issue critiche',
+      total: orchestrationSummary.criticalConnectorIssues,
+      href: buildIssueFilterHref({
+        issueSeverity: 'critical',
+      }),
+      tone: orchestrationSummary.criticalConnectorIssues > 0 ? 'critical' : 'neutral',
+      detail: 'Apri subito il feed issue per capire se il problema è NAS, config o ultima run.',
+    },
+    {
+      key: 'active-runs',
+      label: 'Run attive',
+      total: queuedRuns + runningRuns,
+      href: buildRunsFilterHref({
+        status: queuedRuns > 0 ? 'queued' : runningRuns > 0 ? 'running' : undefined,
+      }),
+      tone: queuedRuns + runningRuns > 0 ? 'warning' : 'neutral',
+      detail: 'Monitoraggio acquisition e post-processing ancora in corso.',
+    },
+    {
+      key: 'review-queue',
+      label: 'Review queue',
+      total: orchestrationSummary.reviewQueue,
+      href: buildRunsFilterHref({
+        matchingOutcomeCode: 'match.review_required',
+        matchingStage: 'completed',
+      }),
+      tone: orchestrationSummary.reviewQueue > 0 ? 'warning' : 'neutral',
+      detail: 'Esiti matching che richiedono ancora decisione operativa.',
+    },
+  ];
   const activeRunFilters: ActiveRunFilter[] = [
     filters.status
       ? {
@@ -379,149 +443,166 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
     >
       <IngestionAutoRefresh enabled={queuedRuns > 0 || runningRuns > 0} />
 
-      <SectionCard title="Supporto operativo" eyebrow="Help">
-        <div className="grid gap-3 md:grid-cols-3">
-          <Link
-            href="/operations/help?topic=ingestion"
-            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
-          >
-            <strong className="block text-[var(--pcb-ink)]">Operations help</strong>
-            Apri checklist, escalation e riferimenti documentali.
-          </Link>
-          <Link
-            href="/operations/help?topic=ingestion"
-            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
-          >
-            <strong className="block text-[var(--pcb-ink)]">First response ingestion</strong>
-            Usa la checklist per run bloccate, connector issue e NAS non eseguibile.
-          </Link>
-          <Link
-            href="/operations"
-            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
-          >
-            <strong className="block text-[var(--pcb-ink)]">Torna a operations</strong>
-            Riapri summary, pipeline attention e quick diagnostics.
-          </Link>
+      <SectionCard title="Triage rapido" eyebrow="Focus">
+        <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+          <div className="grid gap-4 md:grid-cols-2">
+            {triageItems.map((item) => (
+              <article
+                key={item.key}
+                className={`rounded-2xl border p-5 ${triageToneClasses(item.tone)}`}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+                  {item.label}
+                </p>
+                <p className="mt-3 text-4xl font-semibold text-[var(--pcb-ink)]">{item.total}</p>
+                <p className="mt-3 text-sm leading-6 text-[var(--pcb-muted)]">{item.detail}</p>
+                <Link
+                  href={item.href}
+                  className="mt-4 inline-flex rounded-full border border-current px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+                >
+                  Apri focus
+                </Link>
+              </article>
+            ))}
+          </div>
+
+          <div className="grid gap-4">
+            <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+                Trigger manuali
+              </p>
+              <p className="mt-3 text-3xl font-semibold text-[var(--pcb-ink)]">
+                {manualConnectors.length}
+              </p>
+              <p className="mt-3 text-sm leading-6 text-[var(--pcb-muted)]">
+                I trigger restano disponibili in testata. Qui conta capire se il runtime è sano prima
+                di avviare una nuova run.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <StatusChip label={`${orchestrationSummary.runnableConnectors}-runnable`} />
+                <StatusChip label={`${orchestrationSummary.healthyConnectors}-healthy`} />
+                <StatusChip label={`${orchestrationSummary.dryRunConnectors}-dry-run`} />
+              </div>
+            </article>
+
+            <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+                Supporto operativo
+              </p>
+              <div className="mt-4 grid gap-3">
+                <Link
+                  href="/operations/help?topic=ingestion"
+                  className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4 text-sm text-[var(--pcb-muted)]"
+                >
+                  <strong className="block text-[var(--pcb-ink)]">Operations help</strong>
+                  Apri checklist, escalation e riferimenti documentali sul topic ingestion.
+                </Link>
+                <Link
+                  href="/operations"
+                  className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4 text-sm text-[var(--pcb-muted)]"
+                >
+                  <strong className="block text-[var(--pcb-ink)]">Torna a operations</strong>
+                  Riapri quick diagnostics e pipeline attention cross-domain.
+                </Link>
+              </div>
+            </article>
+          </div>
         </div>
       </SectionCard>
 
-      <SectionCard title="Riepilogo operativo" eyebrow="Summary">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <SectionCard title="Monitor in sintesi" eyebrow="Summary">
+        <div className="grid gap-4 xl:grid-cols-3">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Run totali</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{runs.total}</p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Run completate</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{completedRuns}</p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Run in coda</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{queuedRuns}</p>
-            {runningRuns > 0 ? (
-              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
-                {runningRuns} run in esecuzione
-              </p>
-            ) : null}
-            {postProcessingRunning > 0 ? (
-              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
-                {postProcessingRunning} post-processing attivi
-              </p>
-            ) : null}
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Record osservati</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{totalRecords}</p>
-            {failedRuns > 0 ? (
-              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
-                {failedRuns} run con errori
-              </p>
-            ) : null}
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Raw ingest</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{totalRawRecords}</p>
-            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
-              {totalRawSubjectHints} con subject hint
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+              Run e avanzamento
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Totali</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">{runs.total}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Completate</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">{completedRuns}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Queued</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">{queuedRuns}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Running</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">{runningRuns}</p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-[var(--pcb-muted)]">
+              Post-processing attivi {postProcessingRunning} · run fallite {failedRuns}
             </p>
           </article>
-        </div>
-      </SectionCard>
 
-      <SectionCard title="Stato orchestration" eyebrow="Backend">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Connector registrati</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {orchestrationSummary.registeredConnectors}
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+              Runtime connector
             </p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Trigger manuali</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Registrati</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">
+                  {orchestrationSummary.registeredConnectors}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Runnables</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">
+                  {orchestrationSummary.runnableConnectors}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Healthy</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">
+                  {orchestrationSummary.healthyConnectors}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Dry-run</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">
+                  {orchestrationSummary.dryRunConnectors}
+                </p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-[var(--pcb-muted)]">
+              Configurati {orchestrationSummary.configuredConnectors} · persistenti{' '}
+              {orchestrationSummary.persistentConnectors} · trigger manuali{' '}
               {orchestrationSummary.manualConnectors}
             </p>
           </article>
+
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Connector eseguibili</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {orchestrationSummary.runnableConnectors}
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+              Volumi pipeline
             </p>
-            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
-              configurati {orchestrationSummary.configuredConnectors} · persistenti{' '}
-              {orchestrationSummary.persistentConnectors}
-            </p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Review queue</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {orchestrationSummary.reviewQueue}
-            </p>
-            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
-              Ultima run{' '}
-              {orchestrationSummary.latestRunAt
-                ? new Date(orchestrationSummary.latestRunAt).toLocaleString('it-IT')
-                : 'n/d'}
-            </p>
-          </article>
-        </div>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Record normalizzati</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {orchestrationSummary.normalizedRecords}
-            </p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Connector non eseguibili</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {orchestrationSummary.blockedConnectors}
-            </p>
-            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
-              da correggere prima del trigger manuale
-            </p>
-          </article>
-        </div>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Connector healthy</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {orchestrationSummary.healthyConnectors}
-            </p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Issue critiche connector</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {orchestrationSummary.criticalConnectorIssues}
-            </p>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Connector dry-run</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {orchestrationSummary.dryRunConnectors}
-            </p>
-            <p className="mt-2 text-xs text-[var(--pcb-muted)]">
-              warning aperti {orchestrationSummary.warningConnectorIssues}
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Record osservati</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">{totalRecords}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Raw ingest</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">{totalRawRecords}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Subject hint</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">{totalRawSubjectHints}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--pcb-muted)]">Normalizzati</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--pcb-ink)]">
+                  {orchestrationSummary.normalizedRecords}
+                </p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-[var(--pcb-muted)]">
+              Review queue {orchestrationSummary.reviewQueue} · warning aperti{' '}
+              {orchestrationSummary.warningConnectorIssues}
             </p>
           </article>
         </div>
