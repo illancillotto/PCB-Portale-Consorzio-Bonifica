@@ -7,28 +7,39 @@ type HelpTopic = 'general' | 'auth' | 'ingestion' | 'audit' | 'gis';
 
 const helpReferences = [
   {
+    topic: 'general' as HelpTopic,
     title: 'Operations Runbook',
     description:
       'Flussi operativi minimi per login, ingestion manuale, audit, GIS, issue connector e prima diagnosi.',
     path: 'docs/OPERATIONS_RUNBOOK.md',
   },
   {
+    topic: 'general' as HelpTopic,
     title: 'Smoke Tests',
     description:
       'Uso corretto di dev:smoke, dev:smoke:ingestion, dev:smoke:gis e dev:verify con prerequisiti e output atteso.',
     path: 'docs/SMOKE_TESTS.md',
   },
   {
+    topic: 'general' as HelpTopic,
     title: 'Known Issues',
     description:
       'Problemi reali gia` incontrati nel progetto, con sintomi, causa e contromisura applicata.',
     path: 'docs/KNOWN_ISSUES.md',
   },
   {
+    topic: 'audit' as HelpTopic,
     title: 'API Surface',
     description:
       'Endpoint pubblici, endpoint protetti, filtri query principali e route piu` utili per smoke e troubleshooting.',
     path: 'docs/API_SURFACE.md',
+  },
+  {
+    topic: 'auth' as HelpTopic,
+    title: 'Local environment reference',
+    description:
+      'Variabili ambiente usate da frontend, backend, Keycloak e runtime locale nel bootstrap di sviluppo.',
+    path: 'docs/LOCAL_ENV_REFERENCE.md',
   },
 ];
 
@@ -244,6 +255,10 @@ export default async function OperationsHelpPage({ searchParams }: OperationsHel
     topic === 'general'
       ? relatedCommands
       : relatedCommands.filter((item) => item.topic === topic || item.topic === 'general');
+  const filteredHelpReferences =
+    topic === 'general'
+      ? helpReferences
+      : helpReferences.filter((item) => item.topic === topic || item.topic === 'general');
 
   return (
     <PageShell
@@ -270,12 +285,17 @@ export default async function OperationsHelpPage({ searchParams }: OperationsHel
 
       <SectionCard title="Guide disponibili" eyebrow="Help Center">
         <div className="grid gap-4 lg:grid-cols-2">
-          {helpReferences.map((reference) => (
+          {filteredHelpReferences.map((reference) => (
             <article
-              key={reference.path}
+              key={`${reference.topic}-${reference.path}`}
               className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
             >
-              <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">{reference.title}</h3>
+              <div className="flex items-start justify-between gap-4">
+                <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">{reference.title}</h3>
+                <span className="rounded-full border border-[var(--pcb-line)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  {topicLabels[reference.topic]}
+                </span>
+              </div>
               <p className="mt-2 text-sm leading-6 text-[var(--pcb-muted)]">{reference.description}</p>
               <p className="mt-4 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
                 File di riferimento

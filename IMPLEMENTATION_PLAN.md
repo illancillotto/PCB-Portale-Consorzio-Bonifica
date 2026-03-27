@@ -177,6 +177,22 @@ Deliverable:
 - comandi filtrati per `auth`, `ingestion`, `audit`, `gis`
 - fallback generale con comandi di verifica e log runtime
 
+### M0.22 – Related docs topic-aware
+
+Obiettivo:
+
+- mostrare nell’help center i documenti più pertinenti per il topic attivo senza perdere il contesto generale
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- sezione `Guide disponibili` filtrata per topic in `/operations/help`
+- fallback generale per runbook, smoke tests e known issues
+- tagging esplicito dei riferimenti documentali
+
 ### M1 – Fondazioni repository
 
 Obiettivo:

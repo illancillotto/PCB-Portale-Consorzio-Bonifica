@@ -183,4 +183,5 @@ Stato attuale:
 - i dettagli `ingestion/[id]`, `ingestion/connectors/[connectorName]`, `subjects/[id]` e `parcels/[id]` espongono ora shortcut verso `/operations/help`
 - `/operations/help` supporta ora `?topic=auth|ingestion|audit|gis` per aprire l’help center già focalizzato
 - `/operations/help` espone ora anche `Related commands` filtrati per topic
+- `/operations/help` espone ora anche `Guide disponibili` filtrate per topic con fallback generale
 - mappa GIS completa ancora non integrata

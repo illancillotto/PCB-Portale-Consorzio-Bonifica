@@ -1989,3 +1989,20 @@ Verifiche eseguite:
 Output operativo:
 
 - l’help center mostra ora direttamente il comando più utile per il topic attivo senza richiedere lettura completa della pagina
+
+### 2026-03-27 – Related docs topic-aware nell’help center
+
+Completato:
+
+- sezione `Guide disponibili` filtrata per topic in `/operations/help`
+- fallback generale mantenuto per runbook, smoke tests e known issues
+- tagging esplicito dei documenti rispetto al topic corrente
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- l’help center mostra ora subito anche i documenti più pertinenti per il topic attivo
