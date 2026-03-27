@@ -954,3 +954,4 @@ Estensioni completate:
 - i pannelli errore SSR puntano ora anche all’help center topic-aware, non solo a `operations`
 - il monitor `ingestion` usa ora una gerarchia visiva piu` netta tra triage operativo e summary di contesto
 - la vista `operations` usa ora una gerarchia visiva piu` netta tra triage cross-domain e dettaglio operativo esteso
+- l’help center `operations/help` usa ora un above-the-fold piu` orientato alla prima azione utile per topic

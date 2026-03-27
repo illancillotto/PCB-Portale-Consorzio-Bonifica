@@ -2141,3 +2141,20 @@ Verifiche eseguite:
 Output operativo:
 
 - `operations` espone subito priorita`, azioni e contesto minimo senza iniziare con un blocco uniforme di card equivalenti
+
+### 2026-03-27 – Refactor above-the-fold dell’help center operativo
+
+Completato:
+
+- sezione iniziale di `/operations/help` riscritta come `Start here`
+- selezione topic integrata direttamente nella fascia iniziale
+- primo accesso operativo al topic reso piu` immediato con CTA primaria dedicata
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- l’help center richiede meno scanning iniziale e orienta piu` rapidamente verso prima route, primo comando e primo documento

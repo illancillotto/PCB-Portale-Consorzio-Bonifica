@@ -326,6 +326,14 @@ const topicSummary: Record<
   },
 };
 
+const topicFirstActionLabel: Record<HelpTopic, string> = {
+  general: 'Apri operations',
+  auth: 'Apri login',
+  ingestion: 'Apri ingestion',
+  audit: 'Apri audit',
+  gis: 'Apri GIS',
+};
+
 function buildHelpHref(topic?: HelpTopic) {
   return topic && topic !== 'general' ? `/operations/help?topic=${topic}` : '/operations/help';
 }
@@ -366,50 +374,75 @@ export default async function OperationsHelpPage({ searchParams }: OperationsHel
       title="Operations Help"
       description={`Guida sintetica ai riferimenti operativi e tecnici gia\` consolidati nel progetto PCB.${topic !== 'general' ? ` Focus attivo: ${topicLabels[topic]}.` : ''}`}
     >
-      <SectionCard title="Topic summary" eyebrow="Focus">
-        <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
+      <SectionCard title="Start here" eyebrow="Focus">
+        <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Problema tipico</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-[var(--pcb-ink)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+              Problema tipico
+            </p>
+            <p className="mt-3 text-lg font-semibold leading-7 text-[var(--pcb-ink)]">
               {topicSummary[topic].typicalProblem}
             </p>
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <article className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  Primo comando
+                </p>
+                <code className="mt-3 block text-sm text-[var(--pcb-ink)]">
+                  {topicSummary[topic].firstCommand}
+                </code>
+              </article>
+              <article className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  Prima route
+                </p>
+                <code className="mt-3 block text-sm text-[var(--pcb-ink)]">
+                  {topicSummary[topic].firstRoute}
+                </code>
+              </article>
+              <article className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  Primo documento
+                </p>
+                <code className="mt-3 block text-sm text-[var(--pcb-ink)]">
+                  {topicSummary[topic].firstDocument}
+                </code>
+              </article>
+            </div>
           </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Primo comando consigliato</p>
-            <code className="mt-3 block rounded-xl bg-[var(--pcb-surface)] px-3 py-2 text-sm text-[var(--pcb-ink)]">
-              {topicSummary[topic].firstCommand}
-            </code>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Prima route consigliata</p>
-            <code className="mt-3 block rounded-xl bg-[var(--pcb-surface)] px-3 py-2 text-sm text-[var(--pcb-ink)]">
-              {topicSummary[topic].firstRoute}
-            </code>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Primo documento consigliato</p>
-            <code className="mt-3 block rounded-xl bg-[var(--pcb-surface)] px-3 py-2 text-sm text-[var(--pcb-ink)]">
-              {topicSummary[topic].firstDocument}
-            </code>
-          </article>
-        </div>
-      </SectionCard>
 
-      <SectionCard title="Contesto help" eyebrow="Topic">
-        <div className="flex flex-wrap gap-3">
-          {(Object.keys(topicLabels) as HelpTopic[]).map((item) => (
+          <div className="grid gap-4">
+            <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+                Topic attivo
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                {(Object.keys(topicLabels) as HelpTopic[]).map((item) => (
+                  <Link
+                    key={item}
+                    href={buildHelpHref(item)}
+                    className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                      item === topic
+                        ? 'border-[var(--pcb-accent)] bg-[var(--pcb-accent)] text-white'
+                        : 'border-[var(--pcb-line)] text-[var(--pcb-muted)]'
+                    }`}
+                  >
+                    {topicLabels[item]}
+                  </Link>
+                ))}
+              </div>
+            </article>
+
             <Link
-              key={item}
-              href={buildHelpHref(item)}
-              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
-                item === topic
-                  ? 'border-[var(--pcb-accent)] text-[var(--pcb-accent)]'
-                  : 'border-[var(--pcb-line)] text-[var(--pcb-muted)]'
-              }`}
+              href={topicSummary[topic].firstRoute}
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)]"
             >
-              {topicLabels[item]}
+              <strong className="block text-[var(--pcb-ink)]">
+                {topicFirstActionLabel[topic]}
+              </strong>
+              Vai subito al primo punto operativo consigliato per questo topic.
             </Link>
-          ))}
+          </div>
         </div>
       </SectionCard>
 
