@@ -541,6 +541,21 @@ Stato:
 
 - completato
 
+### Step 0.10
+
+Documentare la superficie API effettiva in forma sintetica.
+
+Output:
+
+- endpoint pubblici
+- endpoint protetti
+- query filter principali
+- endpoint più utili per smoke e troubleshooting
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

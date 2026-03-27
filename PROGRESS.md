@@ -198,6 +198,23 @@ Output operativo:
 
 - percorso operativo più chiaro per chi usa il portale, non solo per chi lo sviluppa
 
+### 2026-03-27 – API surface sintetica
+
+Completato:
+
+- nuovo file `docs/API_SURFACE.md`
+- distinzione tra endpoint pubblici, autenticati e protetti
+- sintesi dei filtri query principali e degli endpoint più utili per smoke locale
+- collegamento esplicito dal `README.md` root
+
+Verifiche eseguite:
+
+- revisione della superficie API contro `backend/README.md` e workflow di smoke già validati
+
+Output operativo:
+
+- orientamento più rapido su access policy, endpoint utili e filtri supportati
+
 ## Vincoli attivi
 
 - backend modular monolith
