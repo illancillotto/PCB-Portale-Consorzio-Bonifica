@@ -165,14 +165,14 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
       <SectionCard title="Supporto operativo" eyebrow="Help">
         <div className="grid gap-3 md:grid-cols-3">
           <Link
-            href="/operations/help"
+            href="/operations/help?topic=audit"
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
           >
             <strong className="block text-[var(--pcb-ink)]">Operations help</strong>
             Apri checklist, escalation e riferimenti documentali.
           </Link>
           <Link
-            href="/operations/help"
+            href="/operations/help?topic=audit"
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
           >
             <strong className="block text-[var(--pcb-ink)]">Escalation verso audit</strong>

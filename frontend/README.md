@@ -181,4 +181,5 @@ Stato attuale:
 - la pagina `/operations/help` include ora anche una sezione `Escalation signals` con moduli target e comandi di escalation
 - `ingestion`, `audit` e `gis` espongono ora shortcut contestuali verso `/operations/help`
 - i dettagli `ingestion/[id]`, `ingestion/connectors/[connectorName]`, `subjects/[id]` e `parcels/[id]` espongono ora shortcut verso `/operations/help`
+- `/operations/help` supporta ora `?topic=auth|ingestion|audit|gis` per aprire l’help center già focalizzato
 - mappa GIS completa ancora non integrata

@@ -93,7 +93,7 @@ export default async function SubjectDetailPage({ params }: SubjectDetailPagePro
               Operations
             </Link>
             <Link
-              href="/operations/help"
+              href="/operations/help?topic=audit"
               className="inline-flex rounded-full border border-[var(--pcb-line)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]"
             >
               Operations help

@@ -206,14 +206,14 @@ export default async function IngestionRunDetailPage({
       <SectionCard title="Supporto operativo" eyebrow="Help">
         <div className="grid gap-3 md:grid-cols-3">
           <Link
-            href="/operations/help"
+            href="/operations/help?topic=ingestion"
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
           >
             <strong className="block text-[var(--pcb-ink)]">Operations help</strong>
             Apri checklist, escalation e riferimenti documentali.
           </Link>
           <Link
-            href="/operations/help"
+            href="/operations/help?topic=ingestion"
             className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
           >
             <strong className="block text-[var(--pcb-ink)]">Supporto run</strong>

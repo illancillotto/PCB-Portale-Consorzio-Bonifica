@@ -1955,3 +1955,20 @@ Verifiche eseguite:
 Output operativo:
 
 - il percorso di supporto resta disponibile anche nei punti di troubleshooting puntuale
+
+### 2026-03-27 – Help center topic-aware
+
+Completato:
+
+- `/operations/help` supporta ora `?topic=auth|ingestion|audit|gis`
+- filtro del contenuto `First response` ed `Escalation signals` in base al topic
+- shortcut dai moduli operativi riallineati per aprire l’help center già focalizzato
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- l’help center apre ora direttamente il contesto corretto invece di partire sempre dalla vista generica

@@ -145,6 +145,22 @@ Deliverable:
 - shortcut a `/operations/help` in `ingestion/connectors/[connectorName]`
 - shortcut a `/operations/help` nelle schede soggetto e particella
 
+### M0.20 – Help center topic-aware
+
+Obiettivo:
+
+- aprire l’help center già focalizzato sul dominio corretto invece di usare sempre una vista generica
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- supporto query `topic` in `/operations/help`
+- contenuto filtrato per `auth`, `ingestion`, `audit`, `gis`
+- shortcut contestuali riallineati nei moduli operativi
+
 ### M1 – Fondazioni repository
 
 Obiettivo:

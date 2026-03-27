@@ -3,6 +3,8 @@ import { PageShell } from '../../../components/page-shell';
 import { SectionCard } from '../../../components/section-card';
 import { requireOperatorSession } from '../../../lib/auth';
 
+type HelpTopic = 'general' | 'auth' | 'ingestion' | 'audit' | 'gis';
+
 const helpReferences = [
   {
     title: 'Operations Runbook',
@@ -32,6 +34,7 @@ const helpReferences = [
 
 const firstResponseItems = [
   {
+    topic: 'auth' as HelpTopic,
     title: 'Login non disponibile',
     checks: [
       'Apri la discovery di Keycloak e verifica che risponda correttamente.',
@@ -50,6 +53,7 @@ const firstResponseItems = [
     ],
   },
   {
+    topic: 'ingestion' as HelpTopic,
     title: 'Ingestion bloccata o non avviabile',
     checks: [
       'Apri `Ingestion` e verifica issue connector e stato dell’ultima run.',
@@ -68,6 +72,7 @@ const firstResponseItems = [
     ],
   },
   {
+    topic: 'gis' as HelpTopic,
     title: 'GIS non disponibile o GetFeatureInfo fallisce',
     checks: [
       'Verifica `publication status` in `GIS` e controlla che QGIS risponda al `GetCapabilities`.',
@@ -86,6 +91,7 @@ const firstResponseItems = [
     ],
   },
   {
+    topic: 'ingestion' as HelpTopic,
     title: 'Connector NAS non eseguibile',
     checks: [
       'Verifica in `Operations` o `Ingestion` se il connector ha issue `not_runnable` o `not_configured`.',
@@ -107,6 +113,7 @@ const firstResponseItems = [
 
 const escalationSignals = [
   {
+    topic: 'audit' as HelpTopic,
     title: 'Passa ad Audit',
     signals: [
       'La run o il matching si sono completati ma l’esito non è coerente con quanto atteso.',
@@ -116,6 +123,7 @@ const escalationSignals = [
     href: '/audit',
   },
   {
+    topic: 'ingestion' as HelpTopic,
     title: 'Passa a Ingestion',
     signals: [
       'Vedi run `queued`, `running`, `failed` o `review` e serve il dettaglio di pipeline.',
@@ -125,6 +133,7 @@ const escalationSignals = [
     href: '/ingestion',
   },
   {
+    topic: 'gis' as HelpTopic,
     title: 'Passa a GIS',
     signals: [
       'QGIS risponde al `GetCapabilities` ma il problema riguarda map features, viewer o `GetFeatureInfo`.',
@@ -134,6 +143,7 @@ const escalationSignals = [
     href: '/gis',
   },
   {
+    topic: 'general' as HelpTopic,
     title: 'Passa ai log o alla verify suite',
     signals: [
       'Il problema attraversa più domini e non si chiude con un singolo controllo UI.',
@@ -144,14 +154,60 @@ const escalationSignals = [
   },
 ];
 
-export default async function OperationsHelpPage() {
-  await requireOperatorSession('/operations/help');
+const topicLabels: Record<HelpTopic, string> = {
+  general: 'Generale',
+  auth: 'Auth',
+  ingestion: 'Ingestion',
+  audit: 'Audit',
+  gis: 'GIS',
+};
+
+function buildHelpHref(topic?: HelpTopic) {
+  return topic && topic !== 'general' ? `/operations/help?topic=${topic}` : '/operations/help';
+}
+
+interface OperationsHelpPageProps {
+  searchParams?: Promise<{
+    topic?: string;
+  }>;
+}
+
+export default async function OperationsHelpPage({ searchParams }: OperationsHelpPageProps) {
+  const params = (await searchParams) ?? {};
+  const topic = (params.topic && params.topic in topicLabels ? params.topic : 'general') as HelpTopic;
+  await requireOperatorSession(buildHelpHref(topic));
+  const filteredFirstResponseItems =
+    topic === 'general'
+      ? firstResponseItems
+      : firstResponseItems.filter((item) => item.topic === topic);
+  const filteredEscalationSignals =
+    topic === 'general'
+      ? escalationSignals
+      : escalationSignals.filter((item) => item.topic === topic || item.topic === 'general');
 
   return (
     <PageShell
       title="Operations Help"
-      description="Guida sintetica ai riferimenti operativi e tecnici gia` consolidati nel progetto PCB."
+      description={`Guida sintetica ai riferimenti operativi e tecnici gia\` consolidati nel progetto PCB.${topic !== 'general' ? ` Focus attivo: ${topicLabels[topic]}.` : ''}`}
     >
+      <SectionCard title="Contesto help" eyebrow="Topic">
+        <div className="flex flex-wrap gap-3">
+          {(Object.keys(topicLabels) as HelpTopic[]).map((item) => (
+            <Link
+              key={item}
+              href={buildHelpHref(item)}
+              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                item === topic
+                  ? 'border-[var(--pcb-accent)] text-[var(--pcb-accent)]'
+                  : 'border-[var(--pcb-line)] text-[var(--pcb-muted)]'
+              }`}
+            >
+              {topicLabels[item]}
+            </Link>
+          ))}
+        </div>
+      </SectionCard>
+
       <SectionCard title="Guide disponibili" eyebrow="Help Center">
         <div className="grid gap-4 lg:grid-cols-2">
           {helpReferences.map((reference) => (
@@ -174,7 +230,7 @@ export default async function OperationsHelpPage() {
 
       <SectionCard title="First response" eyebrow="Checklist">
         <div className="grid gap-4 lg:grid-cols-2">
-          {firstResponseItems.map((item) => (
+          {filteredFirstResponseItems.map((item) => (
             <article
               key={item.title}
               className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
@@ -229,7 +285,7 @@ export default async function OperationsHelpPage() {
 
       <SectionCard title="Escalation signals" eyebrow="Next step">
         <div className="grid gap-4 lg:grid-cols-2">
-          {escalationSignals.map((item) => (
+          {filteredEscalationSignals.map((item) => (
             <article
               key={item.title}
               className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
