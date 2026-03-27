@@ -438,6 +438,19 @@ Stato:
 
 - completato
 
+### Step 0.2
+
+Estendere lo smoke locale all'autenticazione applicativa reale.
+
+Output:
+
+- login seed operatore verificato via frontend
+- accesso a una vista protetta verificato nello smoke standard
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

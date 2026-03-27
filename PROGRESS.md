@@ -64,6 +64,23 @@ Output operativo:
 - bring-up locale fino a stack, dipendenze e build connectors in un solo comando
 - smoke check locale ripetibile per backend, frontend, Keycloak e QGIS
 
+### 2026-03-27 – Smoke auth end-to-end nel bootstrap locale
+
+Completato:
+
+- estensione di `scripts/smoke-local-runtime.sh` con login seed operatore reale
+- verifica automatica di accesso alla vista protetta `operations`
+- documentazione allineata sullo smoke end-to-end applicativo
+
+Verifiche eseguite:
+
+- `npm run dev:smoke`
+
+Output operativo:
+
+- lo smoke locale non si ferma più a `health/discovery`
+- il bootstrap di sviluppo verifica anche auth applicativa e sessione frontend reale
+
 ## Vincoli attivi
 
 - backend modular monolith

@@ -69,6 +69,8 @@ Lo script `npm run dev:smoke` verifica:
 - frontend login
 - Keycloak discovery
 - QGIS `GetCapabilities`
+- login operatore seed via frontend
+- accesso reale alla vista protetta `operations`
 
 ## Stato del bootstrap
 

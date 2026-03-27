@@ -38,9 +38,20 @@ Smoke check del runtime locale attivo:
 - frontend login
 - Keycloak discovery
 - QGIS GetCapabilities
+- login operatore seed via frontend
+- accesso a `operations` con sessione reale
 
 Uso:
 
 ```bash
 bash ./scripts/smoke-local-runtime.sh
 ```
+
+Credenziali smoke di default:
+
+- `pcb.operator / pcb.operator`
+
+Override opzionali:
+
+- `PCB_SMOKE_USERNAME`
+- `PCB_SMOKE_PASSWORD`
