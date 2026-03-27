@@ -599,6 +599,19 @@ Stato:
 
 - completato
 
+### Step 0.14
+
+Portare i riferimenti documentali principali dentro la UI operativa.
+
+Output:
+
+- sezione help nella vista `operations`
+- pagina protetta di orientamento documentale
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

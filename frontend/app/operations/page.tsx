@@ -302,6 +302,30 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         </div>
       </SectionCard>
 
+      <SectionCard title="Guide operative" eyebrow="Help">
+        <div className="grid gap-4 xl:grid-cols-4">
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white px-4 py-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Help center</strong>
+            Apri il riepilogo guidato di runbook, smoke, known issues e API surface.
+          </Link>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white px-4 py-4 text-sm text-[var(--pcb-muted)]">
+            <strong className="block text-[var(--pcb-ink)]">Operations runbook</strong>
+            Riferimento: <code>docs/OPERATIONS_RUNBOOK.md</code>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white px-4 py-4 text-sm text-[var(--pcb-muted)]">
+            <strong className="block text-[var(--pcb-ink)]">Smoke tests</strong>
+            Riferimento: <code>docs/SMOKE_TESTS.md</code>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white px-4 py-4 text-sm text-[var(--pcb-muted)]">
+            <strong className="block text-[var(--pcb-ink)]">Known issues / API</strong>
+            Riferimenti: <code>docs/KNOWN_ISSUES.md</code> e <code>docs/API_SURFACE.md</code>
+          </article>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Pipeline outcomes" eyebrow="Ingestion">
         <div className="grid gap-4 xl:grid-cols-3">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">

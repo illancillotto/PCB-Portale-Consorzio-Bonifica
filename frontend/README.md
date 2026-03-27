@@ -175,4 +175,5 @@ Stato attuale:
 - il monitor `ingestion` espone ora il contesto dei filtri run attivi con reset puntuale e ritorno rapido a `operations`
 - il dettaglio run distingue anche `resolutionMode` e `requiresManualReview` sui risultati di matching
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
+- la vista `operations` espone ora anche una sezione help e una pagina protetta `/operations/help` con riferimenti a runbook, smoke, known issues e API surface
 - mappa GIS completa ancora non integrata

@@ -263,6 +263,23 @@ Output operativo:
 
 - minore rischio di riscoprire problemi già risolti
 
+### 2026-03-27 – Help center in operations
+
+Completato:
+
+- sezione `Guide operative` nella vista `operations`
+- nuova pagina protetta `frontend/app/operations/help/page.tsx`
+- riferimenti interni a runbook, smoke tests, known issues e API surface
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- il portale espone ora anche un entry point guidato ai documenti operativi principali
+
 ## Vincoli attivi
 
 - backend modular monolith
