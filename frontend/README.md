@@ -178,4 +178,5 @@ Stato attuale:
 - la vista `operations` espone ora anche una sezione help e una pagina protetta `/operations/help` con riferimenti a runbook, smoke, known issues e API surface
 - la vista `operations` espone ora anche una sezione `Quick diagnostics` con URL runtime e comandi rapidi di triage locale
 - la pagina `/operations/help` include ora anche una checklist `First response` per login, ingestion, GIS e connector NAS
+- la pagina `/operations/help` include ora anche una sezione `Escalation signals` con moduli target e comandi di escalation
 - mappa GIS completa ancora non integrata

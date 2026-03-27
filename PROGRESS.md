@@ -1903,3 +1903,20 @@ Verifiche eseguite:
 Output operativo:
 
 - il portale offre ora un percorso di triage iniziale leggibile senza uscire dall’help center operativo
+
+### 2026-03-27 – Escalation signals in Operations Help
+
+Completato:
+
+- sezione `Escalation signals` nella pagina `/operations/help`
+- criteri pratici per passare da triage locale a `audit`, `ingestion`, `gis` o log runtime
+- comandi di escalation rapida: `dev:verify`, `docker compose ps`, `docker compose logs --tail=200`
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- l’help center guida ora anche il passaggio dal controllo iniziale alla diagnosi approfondita

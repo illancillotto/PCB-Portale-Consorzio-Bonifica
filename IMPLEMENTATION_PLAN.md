@@ -98,6 +98,22 @@ Deliverable:
 - copertura minima per login, ingestion, GIS e connector NAS
 - shortcut diretti ai moduli o ai target runtime utili al triage
 
+### M0.17 – Escalation signals in Operations Help
+
+Obiettivo:
+
+- chiarire quando fermare il triage locale e passare al modulo o al livello diagnostico successivo
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- sezione `Escalation signals` nella pagina `/operations/help`
+- criteri pratici di escalation verso `audit`, `ingestion`, `gis`
+- comandi rapidi per verify e log runtime
+
 ### M1 – Fondazioni repository
 
 Obiettivo:

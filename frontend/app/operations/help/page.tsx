@@ -105,6 +105,45 @@ const firstResponseItems = [
   },
 ];
 
+const escalationSignals = [
+  {
+    title: 'Passa ad Audit',
+    signals: [
+      'La run o il matching si sono completati ma l’esito non è coerente con quanto atteso.',
+      'Serve capire se una decisione manuale o un post-processing è già stato eseguito.',
+      'Hai bisogno di correlare `requestId`, `ingestionRunId` o modulo sorgente.',
+    ],
+    href: '/audit',
+  },
+  {
+    title: 'Passa a Ingestion',
+    signals: [
+      'Vedi run `queued`, `running`, `failed` o `review` e serve il dettaglio di pipeline.',
+      'Devi distinguere raw, normalized e matching outcome sulla stessa run.',
+      'Il connector mostra issue operative o una run recente è fallita.',
+    ],
+    href: '/ingestion',
+  },
+  {
+    title: 'Passa a GIS',
+    signals: [
+      'QGIS risponde al `GetCapabilities` ma il problema riguarda map features, viewer o `GetFeatureInfo`.',
+      'Serve verificare `publication status`, layer attivi o una feature specifica.',
+      'Il guasto sembra nel proxy GIS frontend e non solo nel publication target.',
+    ],
+    href: '/gis',
+  },
+  {
+    title: 'Passa ai log o alla verify suite',
+    signals: [
+      'Il problema attraversa più domini e non si chiude con un singolo controllo UI.',
+      'Health, login o publication target sono intermittenti.',
+      'Serve distinguere rapidamente problema di stack, runtime locale o regressione applicativa.',
+    ],
+    href: '/operations',
+  },
+];
+
 export default async function OperationsHelpPage() {
   await requireOperatorSession('/operations/help');
 
@@ -185,6 +224,52 @@ export default async function OperationsHelpPage() {
               </div>
             </article>
           ))}
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Escalation signals" eyebrow="Next step">
+        <div className="grid gap-4 lg:grid-cols-2">
+          {escalationSignals.map((item) => (
+            <article
+              key={item.title}
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+            >
+              <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">{item.title}</h3>
+              <ul className="mt-4 space-y-2 text-sm leading-6 text-[var(--pcb-muted)]">
+                {item.signals.map((signal) => (
+                  <li key={signal}>- {signal}</li>
+                ))}
+              </ul>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link href={item.href} className="text-sm font-semibold text-[var(--pcb-accent)]">
+                  Apri modulo
+                </Link>
+              </div>
+            </article>
+          ))}
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">Comandi di escalation</h3>
+            <div className="mt-4 space-y-3 text-sm text-[var(--pcb-muted)]">
+              <div className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3">
+                <strong className="block text-[var(--pcb-ink)]">Suite completa</strong>
+                <code className="mt-2 block break-all text-xs text-[var(--pcb-muted)]">
+                  npm run dev:verify
+                </code>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3">
+                <strong className="block text-[var(--pcb-ink)]">Stato servizi</strong>
+                <code className="mt-2 block break-all text-xs text-[var(--pcb-muted)]">
+                  docker compose ps
+                </code>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3">
+                <strong className="block text-[var(--pcb-ink)]">Log stack</strong>
+                <code className="mt-2 block break-all text-xs text-[var(--pcb-muted)]">
+                  docker compose logs --tail=200
+                </code>
+              </div>
+            </div>
+          </article>
         </div>
       </SectionCard>
 
