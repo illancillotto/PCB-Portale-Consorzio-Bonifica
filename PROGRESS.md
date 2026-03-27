@@ -1869,3 +1869,20 @@ Verifiche eseguite:
 
 - `npm run build --workspace frontend`
 - `npm run lint --workspace frontend`
+
+### 2026-03-27 – Quick diagnostics in Operations
+
+Completato:
+
+- sezione `Quick diagnostics` nella vista `operations`
+- URL runtime chiave per frontend, backend health, Keycloak discovery e QGIS `GetCapabilities`
+- comandi rapidi di triage locale per bootstrap, verify, smoke ingestion e stato stack Docker
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- il portale espone ora un punto di triage immediato senza uscire dalla UI operativa

@@ -34,6 +34,59 @@ interface PipelineAttentionLink {
   href: string;
 }
 
+interface DiagnosticLink {
+  label: string;
+  href: string;
+}
+
+interface DiagnosticCommand {
+  label: string;
+  command: string;
+}
+
+const frontendBaseUrl = process.env.PCB_FRONTEND_BASE_URL ?? 'http://127.0.0.1:3010';
+const backendBaseUrl = process.env.PCB_API_BASE_URL ?? 'http://127.0.0.1:5010/api/v1';
+const keycloakBaseUrl = process.env.PCB_KEYCLOAK_URL ?? 'http://localhost:8180';
+const qgisBaseUrl = process.env.PCB_QGIS_SERVER_URL ?? 'http://localhost:8090/ows/';
+
+const diagnosticLinks: DiagnosticLink[] = [
+  {
+    label: 'Frontend login',
+    href: `${frontendBaseUrl}/login`,
+  },
+  {
+    label: 'Backend health',
+    href: `${backendBaseUrl}/health`,
+  },
+  {
+    label: 'Keycloak discovery',
+    href: `${keycloakBaseUrl}/realms/pcb/.well-known/openid-configuration`,
+  },
+  {
+    label: 'QGIS GetCapabilities',
+    href: `${qgisBaseUrl}?SERVICE=WMS&REQUEST=GetCapabilities&MAP=/io/projects/pcb.qgs`,
+  },
+];
+
+const diagnosticCommands: DiagnosticCommand[] = [
+  {
+    label: 'Bootstrap locale completo',
+    command: 'npm run dev:up',
+  },
+  {
+    label: 'Suite completa di verifica',
+    command: 'npm run dev:verify',
+  },
+  {
+    label: 'Smoke ingestion',
+    command: 'npm run dev:smoke:ingestion',
+  },
+  {
+    label: 'Stato stack Docker',
+    command: 'docker compose ps',
+  },
+];
+
 function buildOperationsHref(filters: {
   connectorOperationalStatus?: 'healthy' | 'warning' | 'critical';
   connectorTriggerMode?: 'manual' | 'scheduled';
@@ -322,6 +375,46 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white px-4 py-4 text-sm text-[var(--pcb-muted)]">
             <strong className="block text-[var(--pcb-ink)]">Known issues / API</strong>
             Riferimenti: <code>docs/KNOWN_ISSUES.md</code> e <code>docs/API_SURFACE.md</code>
+          </article>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Quick diagnostics" eyebrow="Triage">
+        <div className="grid gap-4 xl:grid-cols-2">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm font-semibold text-[var(--pcb-ink)]">URL chiave</p>
+            <div className="mt-4 grid gap-3">
+              {diagnosticLinks.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+                >
+                  <strong className="block text-[var(--pcb-ink)]">{item.label}</strong>
+                  <code className="mt-2 block break-all text-xs text-[var(--pcb-muted)]">
+                    {item.href}
+                  </code>
+                </a>
+              ))}
+            </div>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm font-semibold text-[var(--pcb-ink)]">Comandi rapidi</p>
+            <div className="mt-4 grid gap-3">
+              {diagnosticCommands.map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]"
+                >
+                  <strong className="block text-[var(--pcb-ink)]">{item.label}</strong>
+                  <code className="mt-2 block break-all text-xs text-[var(--pcb-muted)]">
+                    {item.command}
+                  </code>
+                </div>
+              ))}
+            </div>
           </article>
         </div>
       </SectionCard>

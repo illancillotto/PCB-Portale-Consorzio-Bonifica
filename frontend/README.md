@@ -176,4 +176,5 @@ Stato attuale:
 - il dettaglio run distingue anche `resolutionMode` e `requiresManualReview` sui risultati di matching
 - sync inverso viewer -> pannello risultati per le feature GeoJSON PCB
 - la vista `operations` espone ora anche una sezione help e una pagina protetta `/operations/help` con riferimenti a runbook, smoke, known issues e API surface
+- la vista `operations` espone ora anche una sezione `Quick diagnostics` con URL runtime e comandi rapidi di triage locale
 - mappa GIS completa ancora non integrata

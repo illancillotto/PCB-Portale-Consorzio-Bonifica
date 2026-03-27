@@ -66,6 +66,22 @@ Non completato:
 
 ## Milestone operative
 
+### M0.15 – Quick diagnostics in Operations
+
+Obiettivo:
+
+- esporre nella UI operativa i riferimenti più immediati per triage tecnico locale
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- sezione `Quick diagnostics` nella vista `operations`
+- URL runtime chiave per frontend, backend, Keycloak e QGIS
+- comandi rapidi per bootstrap e verifica locale
+
 ### M1 – Fondazioni repository
 
 Obiettivo:
