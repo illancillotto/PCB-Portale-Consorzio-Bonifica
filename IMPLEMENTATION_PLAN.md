@@ -556,6 +556,20 @@ Stato:
 
 - completato
 
+### Step 0.11
+
+Documentare le variabili ambiente locali rilevanti.
+
+Output:
+
+- default
+- scopo
+- impatto operativo
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

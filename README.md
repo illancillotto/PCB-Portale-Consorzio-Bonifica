@@ -28,6 +28,7 @@ Checklist operativa rapida:
 - [CHANGELOG.md](/home/cbo/CursorProjects/PCB-Portale-Consorzio-Bonifica/CHANGELOG.md)
 - [docs/OPERATIONS_RUNBOOK.md](/home/cbo/CursorProjects/PCB-Portale-Consorzio-Bonifica/docs/OPERATIONS_RUNBOOK.md)
 - [docs/API_SURFACE.md](/home/cbo/CursorProjects/PCB-Portale-Consorzio-Bonifica/docs/API_SURFACE.md)
+- [docs/LOCAL_ENV_REFERENCE.md](/home/cbo/CursorProjects/PCB-Portale-Consorzio-Bonifica/docs/LOCAL_ENV_REFERENCE.md)
 
 ## Avvio locale
 

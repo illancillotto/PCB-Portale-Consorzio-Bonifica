@@ -215,6 +215,22 @@ Output operativo:
 
 - orientamento più rapido su access policy, endpoint utili e filtri supportati
 
+### 2026-03-27 – Local environment reference
+
+Completato:
+
+- nuovo file `docs/LOCAL_ENV_REFERENCE.md`
+- riferimento sintetico per le variabili ambiente realmente usate in bootstrap, auth, ingestion e GIS
+- collegamento esplicito dal `README.md` root
+
+Verifiche eseguite:
+
+- revisione delle variabili contro `.env.example`, script locali e consumer `backend/frontend/connectors`
+
+Output operativo:
+
+- configurazione locale più leggibile rispetto alla sola lettura di `.env.example`
+
 ## Vincoli attivi
 
 - backend modular monolith
