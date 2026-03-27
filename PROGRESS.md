@@ -1886,3 +1886,20 @@ Verifiche eseguite:
 Output operativo:
 
 - il portale espone ora un punto di triage immediato senza uscire dalla UI operativa
+
+### 2026-03-27 – First response checklist in Operations Help
+
+Completato:
+
+- checklist `First response` nella pagina `/operations/help`
+- coperti i casi: login non disponibile, ingestion bloccata, GIS non disponibile, connector NAS non eseguibile
+- aggiunti shortcut diretti a viste e target esterni utili alla prima diagnosi
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- il portale offre ora un percorso di triage iniziale leggibile senza uscire dall’help center operativo

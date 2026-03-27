@@ -82,6 +82,22 @@ Deliverable:
 - URL runtime chiave per frontend, backend, Keycloak e QGIS
 - comandi rapidi per bootstrap e verifica locale
 
+### M0.16 – First response checklist in Operations Help
+
+Obiettivo:
+
+- fornire nel portale una checklist di prima diagnosi per i guasti operativi più probabili
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- checklist `First response` nella pagina `/operations/help`
+- copertura minima per login, ingestion, GIS e connector NAS
+- shortcut diretti ai moduli o ai target runtime utili al triage
+
 ### M1 – Fondazioni repository
 
 Obiettivo:
