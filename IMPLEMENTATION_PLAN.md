@@ -114,6 +114,21 @@ Deliverable:
 - criteri pratici di escalation verso `audit`, `ingestion`, `gis`
 - comandi rapidi per verify e log runtime
 
+### M0.18 – Shortcut all’help center dai moduli operativi
+
+Obiettivo:
+
+- rendere l’help center operativo raggiungibile direttamente dai moduli piu` usati
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- shortcut contestuali a `/operations/help` da `ingestion`, `audit` e `gis`
+- link di ritorno rapido a `operations`
+
 ### M1 – Fondazioni repository
 
 Obiettivo:

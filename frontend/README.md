@@ -179,4 +179,5 @@ Stato attuale:
 - la vista `operations` espone ora anche una sezione `Quick diagnostics` con URL runtime e comandi rapidi di triage locale
 - la pagina `/operations/help` include ora anche una checklist `First response` per login, ingestion, GIS e connector NAS
 - la pagina `/operations/help` include ora anche una sezione `Escalation signals` con moduli target e comandi di escalation
+- `ingestion`, `audit` e `gis` espongono ora shortcut contestuali verso `/operations/help`
 - mappa GIS completa ancora non integrata

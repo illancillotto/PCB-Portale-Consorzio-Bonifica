@@ -378,6 +378,32 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
     >
       <IngestionAutoRefresh enabled={queuedRuns > 0 || runningRuns > 0} />
 
+      <SectionCard title="Supporto operativo" eyebrow="Help">
+        <div className="grid gap-3 md:grid-cols-3">
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Operations help</strong>
+            Apri checklist, escalation e riferimenti documentali.
+          </Link>
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">First response ingestion</strong>
+            Usa la checklist per run bloccate, connector issue e NAS non eseguibile.
+          </Link>
+          <Link
+            href="/operations"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Torna a operations</strong>
+            Riapri summary, pipeline attention e quick diagnostics.
+          </Link>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Riepilogo operativo" eyebrow="Summary">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">

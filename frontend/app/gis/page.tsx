@@ -5,6 +5,7 @@ import { ServerApiErrorState } from '../../components/server-api-error-state';
 import { SectionCard } from '../../components/section-card';
 import { StatusChip } from '../../components/status-chip';
 import { requireOperatorSession } from '../../lib/auth';
+import Link from 'next/link';
 import {
   getGisFeatureLinks,
   getFilteredGisSubjectParcelLinks,
@@ -117,6 +118,32 @@ export default async function GisPage({ searchParams }: GisPageProps) {
       title="GIS operativo"
       description="Viewer cartografico iniziale basato su PostGIS reale, catalogo layer PCB e feature georiferite esposte dal backend protetto."
     >
+      <SectionCard title="Supporto operativo" eyebrow="Help">
+        <div className="grid gap-3 md:grid-cols-3">
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Operations help</strong>
+            Apri checklist, escalation e riferimenti documentali.
+          </Link>
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">First response GIS</strong>
+            Usa il percorso per publication status, GetCapabilities e failure di GetFeatureInfo.
+          </Link>
+          <Link
+            href="/operations"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Torna a operations</strong>
+            Riapri summary runtime e quick diagnostics.
+          </Link>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Viewer mappa" eyebrow="Map">
         <div className="grid gap-4">
           {selectedSubjectId || selectedParcelId ? (

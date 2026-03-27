@@ -1920,3 +1920,21 @@ Verifiche eseguite:
 Output operativo:
 
 - l’help center guida ora anche il passaggio dal controllo iniziale alla diagnosi approfondita
+
+### 2026-03-27 – Shortcut contestuali all’help center operativo
+
+Completato:
+
+- sezione `Supporto operativo` in `ingestion`
+- sezione `Supporto operativo` in `audit`
+- sezione `Supporto operativo` in `gis`
+- collegamento esplicito a `/operations/help` e ritorno rapido a `operations`
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- l’help center non e` piu` confinato a `operations` ma raggiungibile anche dai moduli operativi principali

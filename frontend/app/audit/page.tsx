@@ -162,6 +162,32 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
       title="Audit trail"
       description="Eventi operativi e decisioni manuali tracciati dal backend PCB. Vista riservata a operatori autenticati."
     >
+      <SectionCard title="Supporto operativo" eyebrow="Help">
+        <div className="grid gap-3 md:grid-cols-3">
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Operations help</strong>
+            Apri checklist, escalation e riferimenti documentali.
+          </Link>
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Escalation verso audit</strong>
+            Usa i segnali di escalation per correlare run, entita` e requestId.
+          </Link>
+          <Link
+            href="/operations"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-4 text-sm text-[var(--pcb-muted)]"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Torna a operations</strong>
+            Riapri summary runtime e collegamenti cross-domain.
+          </Link>
+        </div>
+      </SectionCard>
+
       {activeFilters.length > 0 ? (
         <SectionCard title="Contesto attivo" eyebrow="Filters">
           <div className="flex flex-wrap gap-3">
