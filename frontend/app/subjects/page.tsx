@@ -59,6 +59,39 @@ export default async function SubjectsPage({ searchParams }: SubjectsPageProps) 
       description="Anagrafe unica centrata sul CUUA. La lista usa dati reali e consente accesso diretto alla scheda soggetto."
       actions={<SearchForm defaultValue={query} />}
     >
+      <SectionCard title="Serve aiuto?" eyebrow="Help">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <Link
+            href="/operations/help?topic=audit"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Aiuto audit</strong>
+            Correlazione di eventi e entity context sui soggetti.
+          </Link>
+          <Link
+            href="/operations/help?topic=gis"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Aiuto GIS</strong>
+            Focus su viewer e relazioni soggetto-particella.
+          </Link>
+          <Link
+            href="/operations/help?topic=ingestion"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Aiuto ingestion</strong>
+            Quando il problema deriva da matching, source links o pipeline ingest.
+          </Link>
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Help center completo</strong>
+            Apri indice generale con summary, route, guide e comandi.
+          </Link>
+        </div>
+      </SectionCard>
+
       <SectionCard title={query ? `Risultati per "${query}"` : 'Elenco soggetti'} eyebrow="Anagrafiche">
         {response.items.length === 0 ? (
           <EmptyState

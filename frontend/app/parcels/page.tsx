@@ -45,6 +45,39 @@ export default async function ParcelsPage() {
       description="Vista iniziale del dominio catasto con relazioni ai soggetti master già riconciliate nel database."
       actions={<SearchForm />}
     >
+      <SectionCard title="Serve aiuto?" eyebrow="Help">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <Link
+            href="/operations/help?topic=audit"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Aiuto audit</strong>
+            Correlazione di eventi e entity context sulle particelle.
+          </Link>
+          <Link
+            href="/operations/help?topic=gis"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Aiuto GIS</strong>
+            Focus su publication target, viewer e verifiche cartografiche contestuali.
+          </Link>
+          <Link
+            href="/operations/help?topic=ingestion"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Aiuto ingestion</strong>
+            Quando la particella deriva da una pipeline o da una riconciliazione da verificare.
+          </Link>
+          <Link
+            href="/operations/help"
+            className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+          >
+            <strong className="block text-[var(--pcb-ink)]">Help center completo</strong>
+            Apri indice generale con summary, route, guide e comandi.
+          </Link>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Elenco particelle" eyebrow="Catasto">
         {response.items.length === 0 ? (
           <EmptyState

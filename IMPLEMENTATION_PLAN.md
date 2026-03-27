@@ -254,6 +254,21 @@ Deliverable:
 - sezione `Serve aiuto?` nella vista `search`
 - shortcut diretti ai topic `audit`, `gis`, `ingestion` e help center completo
 
+### M0.27 – Shortcut help topic-aware nelle liste business
+
+Obiettivo:
+
+- chiudere il cerchio sugli entry point business principali con accesso diretto al supporto operativo
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- sezione `Serve aiuto?` nelle viste `subjects` e `parcels`
+- shortcut diretti ai topic `audit`, `gis`, `ingestion` e help center completo
+
 ### M1 – Fondazioni repository
 
 Obiettivo:

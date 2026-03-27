@@ -2073,3 +2073,20 @@ Verifiche eseguite:
 Output operativo:
 
 - la ricerca applicativa puo` ora instradare subito verso il focus di supporto corretto
+
+### 2026-03-27 – Shortcut help topic-aware nelle liste business
+
+Completato:
+
+- sezione `Serve aiuto?` nella vista `subjects`
+- sezione `Serve aiuto?` nella vista `parcels`
+- shortcut topic-aware a `audit`, `gis`, `ingestion` e help center completo
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- tutti gli ingressi business principali espongono ora accesso immediato al supporto operativo
