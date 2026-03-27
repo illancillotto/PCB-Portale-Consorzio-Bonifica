@@ -528,6 +528,19 @@ Stato:
 
 - completato
 
+### Step 0.9
+
+Introdurre un runbook operativo corto per uso del portale.
+
+Output:
+
+- flussi operativi minimi documentati
+- diagnosi iniziale standardizzata
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

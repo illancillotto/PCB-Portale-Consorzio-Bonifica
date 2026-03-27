@@ -182,6 +182,22 @@ Output operativo:
 
 - panoramica storica più leggibile rispetto al solo `PROGRESS.md`
 
+### 2026-03-27 – Operations runbook
+
+Completato:
+
+- nuovo file `docs/OPERATIONS_RUNBOOK.md`
+- runbook operativo sintetico per login, ingestion, audit, GIS, issue connector e prima diagnosi
+- collegamento esplicito dal `README.md` root
+
+Verifiche eseguite:
+
+- revisione dei flussi contro le viste e gli smoke già validati localmente
+
+Output operativo:
+
+- percorso operativo più chiaro per chi usa il portale, non solo per chi lo sviluppa
+
 ## Vincoli attivi
 
 - backend modular monolith
