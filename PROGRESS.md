@@ -2057,3 +2057,19 @@ Verifiche eseguite:
 Output operativo:
 
 - il supporto operativo parte ora anche dalla dashboard principale
+
+### 2026-03-27 – Shortcut help topic-aware nella ricerca
+
+Completato:
+
+- sezione `Serve aiuto?` nella vista `search` quando una ricerca e` attiva
+- shortcut topic-aware a `audit`, `gis`, `ingestion` e help center completo
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- la ricerca applicativa puo` ora instradare subito verso il focus di supporto corretto

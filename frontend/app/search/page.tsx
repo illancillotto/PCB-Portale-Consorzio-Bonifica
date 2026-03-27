@@ -105,6 +105,41 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </SectionCard>
       ) : null}
 
+      {query ? (
+        <SectionCard title="Serve aiuto?" eyebrow="Help">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <Link
+              href="/operations/help?topic=audit"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+            >
+              <strong className="block text-[var(--pcb-ink)]">Aiuto audit</strong>
+              Correlazione di entita`, eventi, source module e request context.
+            </Link>
+            <Link
+              href="/operations/help?topic=gis"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+            >
+              <strong className="block text-[var(--pcb-ink)]">Aiuto GIS</strong>
+              Focus viewer, publication target e GetFeatureInfo quando il risultato richiede verifica cartografica.
+            </Link>
+            <Link
+              href="/operations/help?topic=ingestion"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+            >
+              <strong className="block text-[var(--pcb-ink)]">Aiuto ingestion</strong>
+              Run, pipeline e connector NAS quando il problema emerge da una ricerca applicativa.
+            </Link>
+            <Link
+              href="/operations/help"
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5 text-sm text-[var(--pcb-muted)] transition hover:-translate-y-0.5"
+            >
+              <strong className="block text-[var(--pcb-ink)]">Help center completo</strong>
+              Apri l’indice generale con topic summary, guide, comandi e route correlate.
+            </Link>
+          </div>
+        </SectionCard>
+      ) : null}
+
       <SectionCard title={query ? `Risultati per "${query}"` : 'Inserisci un criterio di ricerca'} eyebrow="Search">
         {!query ? (
           <EmptyState

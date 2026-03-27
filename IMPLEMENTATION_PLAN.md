@@ -239,6 +239,21 @@ Deliverable:
 - sezione `Serve aiuto?` nella dashboard
 - shortcut diretti ai topic `auth`, `ingestion`, `audit`, `gis`
 
+### M0.26 – Shortcut help topic-aware nella ricerca
+
+Obiettivo:
+
+- rendere disponibile l’help center topic-aware anche nel punto di analisi dei risultati applicativi
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- sezione `Serve aiuto?` nella vista `search`
+- shortcut diretti ai topic `audit`, `gis`, `ingestion` e help center completo
+
 ### M1 – Fondazioni repository
 
 Obiettivo:
