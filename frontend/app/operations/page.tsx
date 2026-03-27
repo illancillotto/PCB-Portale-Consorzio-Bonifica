@@ -44,6 +44,15 @@ interface DiagnosticCommand {
   command: string;
 }
 
+interface OperationsTriageItem {
+  key: string;
+  label: string;
+  total: number | string;
+  detail: string;
+  href: string;
+  tone: 'critical' | 'warning' | 'neutral';
+}
+
 const frontendBaseUrl = process.env.PCB_FRONTEND_BASE_URL ?? 'http://127.0.0.1:3010';
 const backendBaseUrl = process.env.PCB_API_BASE_URL ?? 'http://127.0.0.1:5010/api/v1';
 const keycloakBaseUrl = process.env.PCB_KEYCLOAK_URL ?? 'http://localhost:8180';
@@ -86,6 +95,18 @@ const diagnosticCommands: DiagnosticCommand[] = [
     command: 'docker compose ps',
   },
 ];
+
+function triageToneClasses(tone: OperationsTriageItem['tone']) {
+  if (tone === 'critical') {
+    return 'border-rose-200 bg-rose-50';
+  }
+
+  if (tone === 'warning') {
+    return 'border-amber-200 bg-amber-50';
+  }
+
+  return 'border-[var(--pcb-line)] bg-white';
+}
 
 function buildOperationsHref(filters: {
   connectorOperationalStatus?: 'healthy' | 'warning' | 'critical';
@@ -304,86 +325,163 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
         (run.stages.matching.status === 'completed' || run.stages.postProcessing.status === 'completed'),
     ) ?? null;
   const pipelineAttentionLinks = buildPipelineAttentionLinks(orchestrationSummary);
+  const degradedIntegrations = integrations.items.filter((item) => item.statusLabel !== 'ok').length;
+  const triageItems: OperationsTriageItem[] = [
+    {
+      key: 'runtime',
+      label: 'Runtime degradato',
+      total: degradedIntegrations,
+      detail: 'Servizi non OK tra PostgreSQL, Redis, Keycloak e QGIS.',
+      href: '#runtime-integrations',
+      tone: degradedIntegrations > 0 ? 'critical' : 'neutral',
+    },
+    {
+      key: 'connector-issues',
+      label: 'Issue connector',
+      total: connectorIssues.total,
+      detail: 'Feed operativo per NAS non eseguibile, failure recenti e problemi di configurazione.',
+      href: '#connector-attention',
+      tone:
+        orchestrationSummary.criticalConnectorIssues > 0
+          ? 'critical'
+          : connectorIssues.total > 0
+            ? 'warning'
+            : 'neutral',
+    },
+    {
+      key: 'queued-runs',
+      label: 'Run da seguire',
+      total: queuedRuns + failedRuns,
+      detail: 'Somma di run in coda e fallite che richiedono triage o follow-up operativo.',
+      href: queuedRuns > 0 ? '/ingestion?status=queued' : failedRuns > 0 ? '/ingestion?status=failed' : '/ingestion',
+      tone: failedRuns > 0 ? 'critical' : queuedRuns > 0 ? 'warning' : 'neutral',
+    },
+    {
+      key: 'gis-status',
+      label: 'Publication GIS',
+      total: publicationStatus.statusLabel,
+      detail: 'Stato del publication target QGIS e disponibilita` delle relazioni cartografiche.',
+      href: publicationStatus.available ? '/gis' : '/operations/help?topic=gis',
+      tone: publicationStatus.available ? 'neutral' : 'warning',
+    },
+  ];
 
   return (
     <PageShell
       title="Operations"
       description="Stato operativo centralizzato delle integrazioni core del Portale Consorzio Bonifica."
     >
-      <SectionCard title="Riepilogo operativo" eyebrow="Overview">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <SectionCard title="Triage rapido" eyebrow="Overview">
+        <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+          <div className="grid gap-4 md:grid-cols-2">
+            {triageItems.map((item) => (
+              <article
+                key={item.key}
+                className={`rounded-2xl border p-5 ${triageToneClasses(item.tone)}`}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+                  {item.label}
+                </p>
+                <p className="mt-3 text-4xl font-semibold text-[var(--pcb-ink)]">{item.total}</p>
+                <p className="mt-3 text-sm leading-6 text-[var(--pcb-muted)]">{item.detail}</p>
+                <Link
+                  href={item.href}
+                  className="mt-4 inline-flex rounded-full border border-current px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+                >
+                  Apri focus
+                </Link>
+              </article>
+            ))}
+          </div>
+
+          <div className="grid gap-4">
+            <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+                Supporto operativo
+              </p>
+              <div className="mt-4 grid gap-3">
+                <Link
+                  href="/operations/help"
+                  className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4 text-sm text-[var(--pcb-muted)]"
+                >
+                  <strong className="block text-[var(--pcb-ink)]">Help center</strong>
+                  Apri runbook, smoke, known issues e API surface gia` focalizzati sul triage.
+                </Link>
+                <Link
+                  href="/ingestion"
+                  className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] p-4 text-sm text-[var(--pcb-muted)]"
+                >
+                  <strong className="block text-[var(--pcb-ink)]">Apri ingestion</strong>
+                  Vai subito al monitor pipeline per seguire run, issue e review queue.
+                </Link>
+              </div>
+            </article>
+
+            <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+                Quick diagnostics
+              </p>
+              <div className="mt-4 grid gap-3">
+                {diagnosticCommands.slice(0, 3).map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-2xl border border-[var(--pcb-line)] bg-[var(--pcb-wash)] px-4 py-3 text-sm text-[var(--pcb-muted)]"
+                  >
+                    <strong className="block text-[var(--pcb-ink)]">{item.label}</strong>
+                    <code className="mt-2 block break-all text-xs text-[var(--pcb-muted)]">
+                      {item.command}
+                    </code>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </div>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Pulse operativo" eyebrow="Summary">
+        <div className="grid gap-4 xl:grid-cols-4">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Integrazioni OK</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {integrations.items.filter((item) => item.statusLabel === 'ok').length}/
-              {integrations.items.length}
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+              Integrazioni
+            </p>
+            <p className="mt-3 text-3xl font-semibold text-[var(--pcb-ink)]">
+              {integrations.items.filter((item) => item.statusLabel === 'ok').length}/{integrations.items.length}
+            </p>
+            <p className="mt-3 text-sm text-[var(--pcb-muted)]">Servizi runtime in stato OK.</p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+              Ingestion
+            </p>
+            <p className="mt-3 text-3xl font-semibold text-[var(--pcb-ink)]">{queuedRuns}</p>
+            <p className="mt-3 text-sm text-[var(--pcb-muted)]">
+              run queued · {failedRuns} fallite · review queue {orchestrationSummary.reviewQueue}
             </p>
           </article>
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Run ingestione in coda</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{queuedRuns}</p>
-            {failedRuns > 0 ? (
-              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
-                {failedRuns} run fallite
-              </p>
-            ) : null}
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Audit system operator</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+              Audit
+            </p>
+            <p className="mt-3 text-3xl font-semibold text-[var(--pcb-ink)]">
               {auditSummary.systemOperatorEvents}
             </p>
+            <p className="mt-3 text-sm text-[var(--pcb-muted)]">Eventi `system_operator` tracciati.</p>
           </article>
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Issue connector</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">{connectorIssues.total}</p>
-            {orchestrationSummary.criticalConnectorIssues > 0 ? (
-              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9b3d2e]">
-                {orchestrationSummary.criticalConnectorIssues} critiche
-              </p>
-            ) : null}
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm text-[var(--pcb-muted)]">Relazioni GIS</p>
-            <p className="mt-2 text-3xl font-semibold text-[var(--pcb-ink)]">
-              {subjectParcelLinks.total}
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pcb-muted)]">
+              GIS
             </p>
-            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
-              QGIS {publicationStatus.statusLabel}
+            <p className="mt-3 text-3xl font-semibold text-[var(--pcb-ink)]">{subjectParcelLinks.total}</p>
+            <p className="mt-3 text-sm text-[var(--pcb-muted)]">
+              relazioni GIS · publication target {publicationStatus.statusLabel}
             </p>
           </article>
         </div>
-      </SectionCard>
-
-      <SectionCard title="Guide operative" eyebrow="Help">
-        <div className="grid gap-4 xl:grid-cols-4">
-          <Link
-            href="/operations/help"
-            className="rounded-2xl border border-[var(--pcb-line)] bg-white px-4 py-4 text-sm text-[var(--pcb-muted)]"
-          >
-            <strong className="block text-[var(--pcb-ink)]">Help center</strong>
-            Apri il riepilogo guidato di runbook, smoke, known issues e API surface.
-          </Link>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white px-4 py-4 text-sm text-[var(--pcb-muted)]">
-            <strong className="block text-[var(--pcb-ink)]">Operations runbook</strong>
-            Riferimento: <code>docs/OPERATIONS_RUNBOOK.md</code>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white px-4 py-4 text-sm text-[var(--pcb-muted)]">
-            <strong className="block text-[var(--pcb-ink)]">Smoke tests</strong>
-            Riferimento: <code>docs/SMOKE_TESTS.md</code>
-          </article>
-          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white px-4 py-4 text-sm text-[var(--pcb-muted)]">
-            <strong className="block text-[var(--pcb-ink)]">Known issues / API</strong>
-            Riferimenti: <code>docs/KNOWN_ISSUES.md</code> e <code>docs/API_SURFACE.md</code>
-          </article>
-        </div>
-      </SectionCard>
-
-      <SectionCard title="Quick diagnostics" eyebrow="Triage">
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="mt-4 grid gap-4 xl:grid-cols-2">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm font-semibold text-[var(--pcb-ink)]">URL chiave</p>
-            <div className="mt-4 grid gap-3">
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
               {diagnosticLinks.map((item) => (
                 <a
                   key={item.label}
@@ -401,19 +499,24 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
             </div>
           </article>
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
-            <p className="text-sm font-semibold text-[var(--pcb-ink)]">Comandi rapidi</p>
-            <div className="mt-4 grid gap-3">
-              {diagnosticCommands.map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]"
-                >
-                  <strong className="block text-[var(--pcb-ink)]">{item.label}</strong>
-                  <code className="mt-2 block break-all text-xs text-[var(--pcb-muted)]">
-                    {item.command}
-                  </code>
-                </div>
-              ))}
+            <p className="text-sm font-semibold text-[var(--pcb-ink)]">Documentazione essenziale</p>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <div className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]">
+                <strong className="block text-[var(--pcb-ink)]">Runbook</strong>
+                <code className="mt-2 block text-xs">docs/OPERATIONS_RUNBOOK.md</code>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]">
+                <strong className="block text-[var(--pcb-ink)]">Smoke tests</strong>
+                <code className="mt-2 block text-xs">docs/SMOKE_TESTS.md</code>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]">
+                <strong className="block text-[var(--pcb-ink)]">Known issues</strong>
+                <code className="mt-2 block text-xs">docs/KNOWN_ISSUES.md</code>
+              </div>
+              <div className="rounded-2xl border border-[var(--pcb-line)] px-4 py-3 text-sm text-[var(--pcb-muted)]">
+                <strong className="block text-[var(--pcb-ink)]">API surface</strong>
+                <code className="mt-2 block text-xs">docs/API_SURFACE.md</code>
+              </div>
             </div>
           </article>
         </div>
@@ -618,6 +721,7 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
       </SectionCard>
 
       <SectionCard title="Integrazioni runtime" eyebrow="System">
+        <div id="runtime-integrations" />
         <div className="grid gap-4 md:grid-cols-2">
           {integrations.items.map((item) => (
             <article key={item.key} className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
@@ -694,6 +798,7 @@ export default async function OperationsPage({ searchParams }: OperationsPagePro
       </SectionCard>
 
       <SectionCard title="Connector attention" eyebrow="Ingestion">
+        <div id="connector-attention" />
         <div className="mb-4 grid gap-4 md:grid-cols-3">
           <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
             <p className="text-sm text-[var(--pcb-muted)]">Connector healthy</p>

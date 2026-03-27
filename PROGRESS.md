@@ -2124,3 +2124,20 @@ Verifiche eseguite:
 Output operativo:
 
 - la pagina evidenzia prima i casi che richiedono azione e solo dopo il contesto completo di orchestration
+
+### 2026-03-27 – Refactor gerarchia visiva della pagina operations
+
+Completato:
+
+- fascia iniziale di `operations` riscritta con sezione `Triage rapido`
+- summary secondario compattato in `Pulse operativo`
+- quick diagnostics e documentazione essenziale riportati sopra il fold, ma con peso piu` ordinato
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- `operations` espone subito priorita`, azioni e contesto minimo senza iniziare con un blocco uniforme di card equivalenti
