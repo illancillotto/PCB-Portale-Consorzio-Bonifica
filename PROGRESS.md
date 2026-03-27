@@ -2023,3 +2023,20 @@ Verifiche eseguite:
 Output operativo:
 
 - l’help center collega ora anche alle viste corrette del portale, non solo a documenti e comandi
+
+### 2026-03-27 – Topic summary nell’help center
+
+Completato:
+
+- sezione `Topic summary` in testa a `/operations/help`
+- per ogni topic: problema tipico, primo comando, prima route e primo documento consigliato
+- ridotto il tempo di orientamento iniziale nel focus `auth`, `ingestion`, `audit`, `gis`
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- il focus topic dell’help center e` ora leggibile anche senza scorrere la pagina

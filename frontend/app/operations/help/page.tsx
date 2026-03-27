@@ -285,6 +285,47 @@ const topicLabels: Record<HelpTopic, string> = {
   gis: 'GIS',
 };
 
+const topicSummary: Record<
+  HelpTopic,
+  {
+    typicalProblem: string;
+    firstCommand: string;
+    firstRoute: string;
+    firstDocument: string;
+  }
+> = {
+  general: {
+    typicalProblem: 'Guasto trasversale o non ancora attribuito a un dominio preciso.',
+    firstCommand: 'npm run dev:verify',
+    firstRoute: '/operations',
+    firstDocument: 'docs/OPERATIONS_RUNBOOK.md',
+  },
+  auth: {
+    typicalProblem: 'Login non disponibile, sessione non valida o redirect protetto non coerente.',
+    firstCommand: 'npm run dev:smoke',
+    firstRoute: '/login',
+    firstDocument: 'docs/LOCAL_ENV_REFERENCE.md',
+  },
+  ingestion: {
+    typicalProblem: 'Run bloccata, connector NAS non eseguibile o pipeline raw/normalized/matching incoerente.',
+    firstCommand: 'npm run dev:smoke:ingestion',
+    firstRoute: '/ingestion',
+    firstDocument: 'docs/OPERATIONS_RUNBOOK.md',
+  },
+  audit: {
+    typicalProblem: 'Serve correlare eventi, modulo sorgente, entityId o request context per capire cosa e` successo.',
+    firstCommand: 'sed -n "1,220p" docs/API_SURFACE.md',
+    firstRoute: '/audit',
+    firstDocument: 'docs/API_SURFACE.md',
+  },
+  gis: {
+    typicalProblem: 'Publication target non coerente, `GetFeatureInfo` fallisce o il viewer non riflette i layer attesi.',
+    firstCommand: 'npm run dev:smoke:gis',
+    firstRoute: '/gis',
+    firstDocument: 'docs/SMOKE_TESTS.md',
+  },
+};
+
 function buildHelpHref(topic?: HelpTopic) {
   return topic && topic !== 'general' ? `/operations/help?topic=${topic}` : '/operations/help';
 }
@@ -325,6 +366,35 @@ export default async function OperationsHelpPage({ searchParams }: OperationsHel
       title="Operations Help"
       description={`Guida sintetica ai riferimenti operativi e tecnici gia\` consolidati nel progetto PCB.${topic !== 'general' ? ` Focus attivo: ${topicLabels[topic]}.` : ''}`}
     >
+      <SectionCard title="Topic summary" eyebrow="Focus">
+        <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Problema tipico</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-[var(--pcb-ink)]">
+              {topicSummary[topic].typicalProblem}
+            </p>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Primo comando consigliato</p>
+            <code className="mt-3 block rounded-xl bg-[var(--pcb-surface)] px-3 py-2 text-sm text-[var(--pcb-ink)]">
+              {topicSummary[topic].firstCommand}
+            </code>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Prima route consigliata</p>
+            <code className="mt-3 block rounded-xl bg-[var(--pcb-surface)] px-3 py-2 text-sm text-[var(--pcb-ink)]">
+              {topicSummary[topic].firstRoute}
+            </code>
+          </article>
+          <article className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5">
+            <p className="text-sm text-[var(--pcb-muted)]">Primo documento consigliato</p>
+            <code className="mt-3 block rounded-xl bg-[var(--pcb-surface)] px-3 py-2 text-sm text-[var(--pcb-ink)]">
+              {topicSummary[topic].firstDocument}
+            </code>
+          </article>
+        </div>
+      </SectionCard>
+
       <SectionCard title="Contesto help" eyebrow="Topic">
         <div className="flex flex-wrap gap-3">
           {(Object.keys(topicLabels) as HelpTopic[]).map((item) => (

@@ -209,6 +209,21 @@ Deliverable:
 - route filtrate per `auth`, `ingestion`, `audit`, `gis`
 - fallback generale con `operations` e help center completo
 
+### M0.24 – Topic summary nell’help center
+
+Obiettivo:
+
+- dare un orientamento immediato sul topic attivo senza richiedere scorrimento della pagina
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- sezione `Topic summary` in testa a `/operations/help`
+- problema tipico, primo comando, prima route e primo documento per topic
+
 ### M1 – Fondazioni repository
 
 Obiettivo:
