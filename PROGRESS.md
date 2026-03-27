@@ -117,6 +117,22 @@ Output operativo:
 - il bootstrap locale copre anche la catena GIS `backend -> QGIS -> proxy frontend`
 - la verifica non usa coordinate hardcoded ma una feature reale dell'ambiente locale
 
+### 2026-03-27 – Suite unica di verifica locale
+
+Completato:
+
+- script `scripts/verify-local-runtime.sh`
+- script root `npm run dev:verify`
+- orchestrazione sequenziale di smoke base, ingestion e GIS
+
+Verifiche eseguite:
+
+- `npm run dev:verify`
+
+Output operativo:
+
+- il bootstrap locale arriva a validazione operativa completa con un solo comando
+
 ## Vincoli attivi
 
 - backend modular monolith

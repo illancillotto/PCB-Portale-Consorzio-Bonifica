@@ -92,3 +92,17 @@ Uso:
 ```bash
 bash ./scripts/smoke-gis-runtime.sh
 ```
+
+## `verify-local-runtime.sh`
+
+Suite completa di verifica locale:
+
+- esegue `smoke-local-runtime.sh`
+- esegue `smoke-ingestion-runtime.sh`
+- esegue `smoke-gis-runtime.sh`
+
+Uso:
+
+```bash
+bash ./scripts/verify-local-runtime.sh
+```

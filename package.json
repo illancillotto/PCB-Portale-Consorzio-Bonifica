@@ -14,6 +14,7 @@
     "dev:smoke": "bash ./scripts/smoke-local-runtime.sh",
     "dev:smoke:ingestion": "bash ./scripts/smoke-ingestion-runtime.sh",
     "dev:smoke:gis": "bash ./scripts/smoke-gis-runtime.sh",
+    "dev:verify": "bash ./scripts/verify-local-runtime.sh",
     "dev:backend": "npm run dev --workspace backend",
     "dev:frontend": "npm run dev --workspace frontend",
     "dev:connectors": "npm run dev --workspace connectors",

@@ -35,7 +35,7 @@ Poi avviare backend e frontend in sessioni separate:
 ```bash
 npm run dev:backend
 npm run dev:frontend
-npm run dev:smoke
+npm run dev:verify
 ```
 
 URL attesi:
@@ -85,6 +85,12 @@ Lo script `npm run dev:smoke:gis` verifica:
 - `map-features` autenticato
 - login seed via frontend
 - `GetFeatureInfo` end-to-end sul proxy frontend usando una feature reale
+
+Lo script `npm run dev:verify` esegue in sequenza:
+
+- `npm run dev:smoke`
+- `npm run dev:smoke:ingestion`
+- `npm run dev:smoke:gis`
 
 ## Stato del bootstrap
 

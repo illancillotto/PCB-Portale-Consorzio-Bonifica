@@ -477,6 +477,18 @@ Stato:
 
 - completato
 
+### Step 0.5
+
+Unificare le verifiche locali in una suite unica.
+
+Output:
+
+- un solo comando per validare stack, auth, ingestion e GIS
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.
