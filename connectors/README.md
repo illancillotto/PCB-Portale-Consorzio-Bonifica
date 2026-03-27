@@ -17,6 +17,36 @@ Bootstrap iniziale con struttura pronta per:
 - connettori browser-based Capacitas
 - connettori HyperSIC e INAZ
 
+## Comandi
+
+Bootstrap locale consigliato dal root:
+
+```bash
+npm run dev:up
+```
+
+Comandi utili:
+
+```bash
+npm run build --workspace connectors
+npm run dev --workspace connectors
+npm run run:nas-catasto --workspace connectors
+```
+
+Verifiche locali utili dal root:
+
+```bash
+npm run dev:smoke:ingestion
+npm run dev:verify
+```
+
+Prerequisiti runtime locali:
+
+- `.env` preparato da `npm run dev:prepare-runtime`
+- sample NAS locale pronto in `/tmp/pcb-nas-sample`
+- backend PCB attivo su `5010`
+- Postgres locale attivo se si usa persistenza `ingest`
+
 ## Connector NAS catasto
 
 Implementazione attuale:
@@ -42,6 +72,14 @@ Esecuzione:
 
 ```bash
 PCB_NAS_CATASTO_ROOT=/percorso/ARCHIVIO npm run run:nas-catasto --workspace connectors
+```
+
+Esecuzione locale standard con sample preparato automaticamente:
+
+```bash
+npm run dev:prepare-runtime
+npm run build --workspace connectors
+PCB_NAS_CATASTO_ROOT=/tmp/pcb-nas-sample npm run run:nas-catasto --workspace connectors
 ```
 
 Nota:

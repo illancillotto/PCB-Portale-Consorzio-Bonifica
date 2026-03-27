@@ -133,6 +133,22 @@ Output operativo:
 
 - il bootstrap locale arriva a validazione operativa completa con un solo comando
 
+### 2026-03-27 – README package allineati al bootstrap locale
+
+Completato:
+
+- `backend/README.md` riallineato a `dev:up`, `dev:smoke`, `dev:smoke:ingestion`, `dev:verify`
+- `frontend/README.md` riallineato a `dev:up`, `dev:smoke`, `dev:smoke:gis`, `dev:verify`
+- `connectors/README.md` riallineato a bootstrap locale, sample NAS e smoke `ingestion`
+
+Verifiche eseguite:
+
+- revisione dei comandi e prerequisiti rispetto ai workflow locali già validati
+
+Output operativo:
+
+- la disciplina di avvio e verifica locale è ora coerente anche nei README dei package
+
 ## Vincoli attivi
 
 - backend modular monolith

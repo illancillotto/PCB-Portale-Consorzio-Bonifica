@@ -11,9 +11,37 @@ Frontend Next.js per gli operatori interni PCB.
 ## Comandi
 
 ```bash
+npm run dev:prepare-runtime
+npm run dev:stack
 npm install
-npm run dev
+npm run dev --workspace frontend
 ```
+
+Bootstrap locale consigliato dal root:
+
+```bash
+npm run dev:up
+npm run dev --workspace frontend
+```
+
+Verifiche locali utili dal root:
+
+```bash
+npm run dev:smoke
+npm run dev:smoke:gis
+npm run dev:verify
+```
+
+URL locale atteso:
+
+- frontend: `http://127.0.0.1:3010`
+
+Prerequisiti runtime locali:
+
+- backend PCB attivo su `5010`
+- Keycloak locale attivo su `8180`
+- QGIS Server locale attivo su `8090`
+- sample NAS locale preparato da `npm run dev:prepare-runtime`
 
 ## Note
 

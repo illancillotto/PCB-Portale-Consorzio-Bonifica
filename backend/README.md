@@ -25,9 +25,38 @@ Backend NestJS organizzato come modular monolith.
 ## Comandi
 
 ```bash
+npm run dev:prepare-runtime
+npm run dev:stack
 npm install
-npm run dev
+npm run build --workspace connectors
+npm run dev --workspace backend
 ```
+
+Bootstrap locale consigliato dal root:
+
+```bash
+npm run dev:up
+npm run dev --workspace backend
+```
+
+Verifiche locali utili dal root:
+
+```bash
+npm run dev:smoke
+npm run dev:smoke:ingestion
+npm run dev:verify
+```
+
+Endpoint locale atteso:
+
+- backend health: `http://127.0.0.1:5010/api/v1/health`
+
+Prerequisiti runtime locali:
+
+- Postgres/PostGIS via `docker compose`
+- Redis via `docker compose`
+- Keycloak via `docker compose`
+- `connectors/dist` buildato per trigger reali `ingestion`
 
 ## Endpoint iniziali
 

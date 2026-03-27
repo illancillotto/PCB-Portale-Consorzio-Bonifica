@@ -489,6 +489,18 @@ Stato:
 
 - completato
 
+### Step 0.6
+
+Allineare i README dei package al bootstrap locale reale.
+
+Output:
+
+- backend/frontend/connectors documentati con gli stessi comandi root e prerequisiti runtime
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.
