@@ -44,6 +44,26 @@ Output operativo:
 - avvio locale non dipende più da setup manuale non tracciato
 - sample NAS di sviluppo sempre riproducibile
 
+### 2026-03-27 – Bring-up completo di sviluppo e smoke check locale
+
+Completato:
+
+- script `scripts/dev-up.sh`
+- script `scripts/smoke-local-runtime.sh`
+- script root `npm run dev:up`
+- script root `npm run dev:smoke`
+- README root e `scripts/README.md` riallineati al bootstrap completo
+
+Verifiche eseguite:
+
+- `npm run dev:up`
+- `npm run dev:smoke`
+
+Output operativo:
+
+- bring-up locale fino a stack, dipendenze e build connectors in un solo comando
+- smoke check locale ripetibile per backend, frontend, Keycloak e QGIS
+
 ## Vincoli attivi
 
 - backend modular monolith

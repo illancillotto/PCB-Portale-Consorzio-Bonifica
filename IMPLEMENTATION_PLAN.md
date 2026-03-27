@@ -425,6 +425,19 @@ Stato:
 
 - completato
 
+### Step 0.1
+
+Chiudere il bring-up locale con uno smoke check ripetibile.
+
+Output:
+
+- script unico per prerequisiti locali
+- smoke check standardizzato del runtime attivo
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

@@ -27,10 +27,7 @@ Bootstrap iniziale del repository per la piattaforma interna PCB, coerente con l
 Bootstrap locale consigliato:
 
 ```bash
-npm run dev:prepare-runtime
-docker compose up -d
-npm install
-npm run build --workspace connectors
+npm run dev:up
 ```
 
 Poi avviare backend e frontend in sessioni separate:
@@ -38,6 +35,7 @@ Poi avviare backend e frontend in sessioni separate:
 ```bash
 npm run dev:backend
 npm run dev:frontend
+npm run dev:smoke
 ```
 
 URL attesi:
@@ -57,6 +55,20 @@ Lo script `npm run dev:prepare-runtime`:
 - crea `.env` da `.env.example` se manca
 - prepara un sample NAS locale idempotente in `/tmp/pcb-nas-sample`
 - aggiunge le variabili locali minime per porte e `PCB_NAS_CATASTO_ROOT` se assenti
+
+Lo script `npm run dev:up`:
+
+- esegue `dev:prepare-runtime`
+- avvia `docker compose`
+- installa le dipendenze workspace
+- builda i connectors
+
+Lo script `npm run dev:smoke` verifica:
+
+- backend health
+- frontend login
+- Keycloak discovery
+- QGIS `GetCapabilities`
 
 ## Stato del bootstrap
 
