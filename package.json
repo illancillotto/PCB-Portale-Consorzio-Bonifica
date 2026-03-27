@@ -8,6 +8,8 @@
     "connectors"
   ],
   "scripts": {
+    "dev:prepare-runtime": "bash ./scripts/prepare-local-runtime.sh",
+    "dev:stack": "docker compose up -d",
     "dev:backend": "npm run dev --workspace backend",
     "dev:frontend": "npm run dev --workspace frontend",
     "dev:connectors": "npm run dev --workspace connectors",

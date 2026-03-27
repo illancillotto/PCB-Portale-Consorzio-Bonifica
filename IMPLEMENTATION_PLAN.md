@@ -412,6 +412,19 @@ Dipendenze:
 
 ## Piano immediato raccomandato
 
+### Step 0
+
+Stabilizzare l'avvio locale con bootstrap ripetibile.
+
+Output:
+
+- script locale per `.env` e sample NAS
+- istruzioni root riallineate al runtime reale
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

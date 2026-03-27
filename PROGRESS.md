@@ -19,7 +19,30 @@ Regole operative:
   - `docker compose up -d pcb-redis`
   - backend avviabile
   - API core testate contro database reale
-  - Redis operativo e verificato lato backend
+- Redis operativo e verificato lato backend
+
+### 2026-03-27 – Bootstrap runtime locale ripetibile
+
+Completato:
+
+- script idempotente `scripts/prepare-local-runtime.sh`
+- script root `npm run dev:prepare-runtime`
+- script root `npm run dev:stack`
+- bootstrap automatico del sample NAS locale in `/tmp/pcb-nas-sample`
+- README root riallineato all'avvio reale verificato del progetto
+
+Verifiche eseguite:
+
+- `npm run dev:prepare-runtime`
+- verifica `.env` presente e coerente con:
+  - `PCB_BACKEND_PORT=5010`
+  - `PCB_FRONTEND_PORT=3010`
+  - `PCB_NAS_CATASTO_ROOT=/tmp/pcb-nas-sample`
+
+Output operativo:
+
+- avvio locale non dipende più da setup manuale non tracciato
+- sample NAS di sviluppo sempre riproducibile
 
 ## Vincoli attivi
 

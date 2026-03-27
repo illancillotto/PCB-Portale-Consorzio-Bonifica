@@ -24,25 +24,39 @@ Bootstrap iniziale del repository per la piattaforma interna PCB, coerente con l
 
 ## Avvio locale
 
-1. Copiare `.env.example` in `.env` e adattare i valori necessari.
-2. Avviare i servizi base:
+Bootstrap locale consigliato:
 
 ```bash
+npm run dev:prepare-runtime
 docker compose up -d
-```
-
-3. Installare le dipendenze workspace:
-
-```bash
 npm install
+npm run build --workspace connectors
 ```
 
-4. Avviare backend e frontend in sessioni separate:
+Poi avviare backend e frontend in sessioni separate:
 
 ```bash
-npm run dev --workspace backend
-npm run dev --workspace frontend
+npm run dev:backend
+npm run dev:frontend
 ```
+
+URL attesi:
+
+- frontend: `http://127.0.0.1:3010`
+- backend health: `http://127.0.0.1:5010/api/v1/health`
+- Keycloak: `http://127.0.0.1:8180`
+- QGIS Server: `http://127.0.0.1:8090/ows/`
+
+Credenziali seed:
+
+- `pcb.operator / pcb.operator`
+- `pcb.admin / pcb.admin`
+
+Lo script `npm run dev:prepare-runtime`:
+
+- crea `.env` da `.env.example` se manca
+- prepara un sample NAS locale idempotente in `/tmp/pcb-nas-sample`
+- aggiunge le variabili locali minime per porte e `PCB_NAS_CATASTO_ROOT` se assenti
 
 ## Stato del bootstrap
 
@@ -56,8 +70,6 @@ La milestone corrente prepara:
 
 Non include ancora:
 
-- persistenza applicativa reale
-- matching engine
-- scheda soggetto completa
-- connector NAS operativo
-- autenticazione Keycloak end-to-end
+- documentale avanzato
+- connettori ulteriori oltre il NAS bootstrap
+- workflow business avanzati oltre il perimetro operativo attuale
