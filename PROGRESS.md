@@ -2006,3 +2006,20 @@ Verifiche eseguite:
 Output operativo:
 
 - l’help center mostra ora subito anche i documenti più pertinenti per il topic attivo
+
+### 2026-03-27 – Related routes topic-aware nell’help center
+
+Completato:
+
+- sezione `Related routes` in `/operations/help`
+- route del portale filtrate per topic con fallback generale
+- collegamento diretto alle viste operative più pertinenti per auth, ingestion, audit e GIS
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- l’help center collega ora anche alle viste corrette del portale, non solo a documenti e comandi

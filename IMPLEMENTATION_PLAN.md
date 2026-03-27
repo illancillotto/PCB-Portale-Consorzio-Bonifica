@@ -193,6 +193,22 @@ Deliverable:
 - fallback generale per runbook, smoke tests e known issues
 - tagging esplicito dei riferimenti documentali
 
+### M0.23 – Related routes topic-aware
+
+Obiettivo:
+
+- mostrare nell’help center anche le viste del portale più pertinenti per il topic attivo
+
+Stato:
+
+- completata
+
+Deliverable:
+
+- sezione `Related routes` in `/operations/help`
+- route filtrate per `auth`, `ingestion`, `audit`, `gis`
+- fallback generale con `operations` e help center completo
+
 ### M1 – Fondazioni repository
 
 Obiettivo:

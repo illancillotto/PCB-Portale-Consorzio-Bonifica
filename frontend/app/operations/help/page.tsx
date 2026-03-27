@@ -221,6 +221,62 @@ const relatedCommands: Array<{
   },
 ];
 
+const relatedRoutes: Array<{
+  topic: HelpTopic;
+  label: string;
+  href: string;
+  description: string;
+}> = [
+  {
+    topic: 'general',
+    label: 'Operations',
+    href: '/operations',
+    description: 'Riapre il quadro operativo centrale con summary runtime, issue e pipeline attention.',
+  },
+  {
+    topic: 'general',
+    label: 'Operations help',
+    href: '/operations/help',
+    description: 'Torna alla vista help completa senza filtro topic.',
+  },
+  {
+    topic: 'auth',
+    label: 'Login',
+    href: '/login',
+    description: 'Verifica direttamente la vista di accesso e il resume del redirect protetto.',
+  },
+  {
+    topic: 'ingestion',
+    label: 'Ingestion monitor',
+    href: '/ingestion',
+    description: 'Apre run, connector, issue operative e filtri pipeline-aware.',
+  },
+  {
+    topic: 'ingestion',
+    label: 'Operations',
+    href: '/operations',
+    description: 'Riapre pipeline attention, quick diagnostics e shortcut alle run rilevanti.',
+  },
+  {
+    topic: 'audit',
+    label: 'Audit trail',
+    href: '/audit',
+    description: 'Apre il trail eventi filtrabile per modulo, attore, entità e request context.',
+  },
+  {
+    topic: 'gis',
+    label: 'GIS operativo',
+    href: '/gis',
+    description: 'Apre viewer, publication status, WMS e GetFeatureInfo.',
+  },
+  {
+    topic: 'gis',
+    label: 'Operations',
+    href: '/operations',
+    description: 'Riapre integrazioni runtime e quick diagnostics per il publication target.',
+  },
+];
+
 const topicLabels: Record<HelpTopic, string> = {
   general: 'Generale',
   auth: 'Auth',
@@ -255,6 +311,10 @@ export default async function OperationsHelpPage({ searchParams }: OperationsHel
     topic === 'general'
       ? relatedCommands
       : relatedCommands.filter((item) => item.topic === topic || item.topic === 'general');
+  const filteredRelatedRoutes =
+    topic === 'general'
+      ? relatedRoutes
+      : relatedRoutes.filter((item) => item.topic === topic || item.topic === 'general');
   const filteredHelpReferences =
     topic === 'general'
       ? helpReferences
@@ -406,6 +466,31 @@ export default async function OperationsHelpPage({ searchParams }: OperationsHel
                 {item.command}
               </code>
             </article>
+          ))}
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Related routes" eyebrow="Portal">
+        <div className="grid gap-4 lg:grid-cols-2">
+          {filteredRelatedRoutes.map((item) => (
+            <Link
+              key={`${item.topic}-${item.href}-${item.label}`}
+              href={item.href}
+              className="rounded-2xl border border-[var(--pcb-line)] bg-white p-5"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-[var(--pcb-ink)]">{item.label}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--pcb-muted)]">{item.description}</p>
+                </div>
+                <span className="rounded-full border border-[var(--pcb-line)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--pcb-muted)]">
+                  {topicLabels[item.topic]}
+                </span>
+              </div>
+              <code className="mt-4 block rounded-xl bg-[var(--pcb-surface)] px-3 py-2 text-sm text-[var(--pcb-ink)]">
+                {item.href}
+              </code>
+            </Link>
           ))}
         </div>
       </SectionCard>

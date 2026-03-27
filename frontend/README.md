@@ -184,4 +184,5 @@ Stato attuale:
 - `/operations/help` supporta ora `?topic=auth|ingestion|audit|gis` per aprire l’help center già focalizzato
 - `/operations/help` espone ora anche `Related commands` filtrati per topic
 - `/operations/help` espone ora anche `Guide disponibili` filtrate per topic con fallback generale
+- `/operations/help` espone ora anche `Related routes` filtrate per topic
 - mappa GIS completa ancora non integrata
