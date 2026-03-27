@@ -501,6 +501,20 @@ Stato:
 
 - completato
 
+### Step 0.7
+
+Introdurre una checklist root per onboarding e troubleshooting.
+
+Output:
+
+- percorso `day 1`
+- percorso `day 2`
+- troubleshooting base standardizzato
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

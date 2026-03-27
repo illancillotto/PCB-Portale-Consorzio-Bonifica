@@ -22,6 +22,10 @@ Bootstrap iniziale del repository per la piattaforma interna PCB, coerente con l
 - `infra/` bootstrap infrastrutturale locale
 - `docs/` documentazione di progetto
 
+Checklist operativa rapida:
+
+- [DEVELOPER_CHECKLIST.md](/home/cbo/CursorProjects/PCB-Portale-Consorzio-Bonifica/DEVELOPER_CHECKLIST.md)
+
 ## Avvio locale
 
 Bootstrap locale consigliato:

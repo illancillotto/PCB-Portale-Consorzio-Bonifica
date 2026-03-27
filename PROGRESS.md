@@ -149,6 +149,23 @@ Output operativo:
 
 - la disciplina di avvio e verifica locale è ora coerente anche nei README dei package
 
+### 2026-03-27 – Developer checklist root
+
+Completato:
+
+- nuovo file `DEVELOPER_CHECKLIST.md`
+- checklist sintetica `day 1 / day 2 / troubleshooting`
+- collegamento esplicito dal `README.md` root
+
+Verifiche eseguite:
+
+- revisione dei passi contro i comandi root già validati (`dev:up`, `dev:verify`)
+
+Output operativo:
+
+- onboarding locale più rapido
+- troubleshooting base standardizzato in root
+
 ## Vincoli attivi
 
 - backend modular monolith
