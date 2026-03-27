@@ -79,6 +79,13 @@ Lo script `npm run dev:smoke:ingestion` verifica:
 - completamento della pipeline `run -> normalize -> match`
 - contatori principali di run e `pipeline-summary`
 
+Lo script `npm run dev:smoke:gis` verifica:
+
+- `publication-status` autenticato
+- `map-features` autenticato
+- login seed via frontend
+- `GetFeatureInfo` end-to-end sul proxy frontend usando una feature reale
+
 ## Stato del bootstrap
 
 La milestone corrente prepara:

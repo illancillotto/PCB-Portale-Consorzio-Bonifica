@@ -99,6 +99,24 @@ Output operativo:
 - il bootstrap locale verifica anche il percorso applicativo minimo del dominio `ingest`
 - il sample NAS locale è ora usato anche per smoke test operativi ripetibili
 
+### 2026-03-27 – Smoke operativo GIS nel bootstrap locale
+
+Completato:
+
+- script `scripts/smoke-gis-runtime.sh`
+- script root `npm run dev:smoke:gis`
+- verifica autenticata di `publication-status` e `map-features`
+- verifica `GetFeatureInfo` end-to-end tramite proxy frontend su una feature reale
+
+Verifiche eseguite:
+
+- `npm run dev:smoke:gis`
+
+Output operativo:
+
+- il bootstrap locale copre anche la catena GIS `backend -> QGIS -> proxy frontend`
+- la verifica non usa coordinate hardcoded ma una feature reale dell'ambiente locale
+
 ## Vincoli attivi
 
 - backend modular monolith

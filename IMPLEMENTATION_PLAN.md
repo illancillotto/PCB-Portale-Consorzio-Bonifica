@@ -464,6 +464,19 @@ Stato:
 
 - completato
 
+### Step 0.4
+
+Estendere lo smoke locale alla catena GIS applicativa.
+
+Output:
+
+- verifica autenticata dei principali endpoint GIS
+- verifica `GetFeatureInfo` end-to-end tramite proxy frontend
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

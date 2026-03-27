@@ -76,3 +76,19 @@ Override opzionali:
 
 - `PCB_SMOKE_CONNECTOR_NAME`
 - `PCB_SMOKE_INGEST_TIMEOUT_SECONDS`
+
+## `smoke-gis-runtime.sh`
+
+Smoke operativo della catena GIS locale:
+
+- ottiene un token operatore seed da Keycloak
+- verifica `publication-status` autenticato
+- verifica `map-features` autenticato
+- esegue login frontend seed
+- richiama `GetFeatureInfo` tramite proxy frontend su una feature reale derivata da `map-features`
+
+Uso:
+
+```bash
+bash ./scripts/smoke-gis-runtime.sh
+```
