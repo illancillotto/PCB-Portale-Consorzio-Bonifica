@@ -951,3 +951,4 @@ Estensioni completate:
 - i contatori outcome in `operations` aprono ora `ingestion` con filtri outcome-aware e stage-aware
 - `operations` espone ora anche shortcut `pipeline attention` per i principali casi da verificare nel monitor `ingestion`
 - il monitor `ingestion` espone ora anche il contesto dei filtri run attivi con reset puntuale e ritorno rapido a `operations`
+- i pannelli errore SSR puntano ora anche all’help center topic-aware, non solo a `operations`

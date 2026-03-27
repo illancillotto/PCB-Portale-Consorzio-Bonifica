@@ -51,6 +51,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="audit"
             primaryAction={{ href: nextPath, label: 'Ricarica ricerca' }}
             secondaryAction={{ href: '/operations', label: 'Apri operations' }}
           />

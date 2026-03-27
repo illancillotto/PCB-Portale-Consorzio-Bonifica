@@ -108,6 +108,7 @@ export default async function IngestionRunDetailPage({
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="ingestion"
             primaryAction={{ href: `/ingestion/${id}`, label: 'Ricarica dettaglio run' }}
             secondaryAction={{ href: '/ingestion', label: 'Torna a ingestion' }}
           />
@@ -158,6 +159,7 @@ export default async function IngestionRunDetailPage({
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="ingestion"
             primaryAction={{ href: `/ingestion/${id}`, label: 'Ricarica dettaglio run' }}
             secondaryAction={{ href: '/ingestion', label: 'Torna a ingestion' }}
           />

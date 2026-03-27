@@ -38,6 +38,7 @@ export default async function SubjectDetailPage({ params }: SubjectDetailPagePro
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="audit"
             primaryAction={{ href: `/subjects/${id}`, label: 'Ricarica scheda' }}
             secondaryAction={{ href: '/subjects', label: 'Torna ai soggetti' }}
           />

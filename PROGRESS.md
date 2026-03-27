@@ -2090,3 +2090,20 @@ Verifiche eseguite:
 Output operativo:
 
 - tutti gli ingressi business principali espongono ora accesso immediato al supporto operativo
+
+### 2026-03-27 – Help topic-aware nei pannelli errore SSR
+
+Completato:
+
+- `ServerApiErrorState` esteso con shortcut automatico all’help center
+- topic mirati nelle viste `audit`, `gis`, `ingestion`, `search`, `subjects` e `parcels`
+- fallback generale all’help center completo nelle altre viste SSR
+
+Verifiche eseguite:
+
+- `npm run build --workspace frontend`
+- `npm run lint --workspace frontend`
+
+Output operativo:
+
+- quando una vista server-side fallisce, il recupero operativo parte ora anche dal topic help piu` plausibile

@@ -102,6 +102,7 @@ export default async function GisPage({ searchParams }: GisPageProps) {
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="gis"
             primaryAction={{ href: buildGisHref(filters), label: 'Ricarica viewer' }}
             secondaryAction={{ href: '/operations', label: 'Apri operations' }}
           />

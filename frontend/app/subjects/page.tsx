@@ -39,6 +39,7 @@ export default async function SubjectsPage({ searchParams }: SubjectsPageProps) 
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="audit"
             primaryAction={{
               href: query ? `/subjects?${new URLSearchParams({ q: query }).toString()}` : '/subjects',
               label: 'Ricarica lista',

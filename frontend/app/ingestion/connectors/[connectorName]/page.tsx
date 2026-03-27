@@ -112,6 +112,7 @@ export default async function ConnectorDetailPage({
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="ingestion"
             primaryAction={{
               href: `/ingestion/connectors/${encodeURIComponent(connectorName)}`,
               label: 'Ricarica connector',
@@ -160,6 +161,7 @@ export default async function ConnectorDetailPage({
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="ingestion"
             primaryAction={{
               href: buildConnectorRunsFilterHref(connector.connectorName, filters),
               label: 'Ricarica connector',

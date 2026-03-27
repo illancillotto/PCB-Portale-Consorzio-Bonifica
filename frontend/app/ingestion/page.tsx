@@ -201,6 +201,7 @@ export default async function IngestionPage({ searchParams }: IngestionPageProps
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="ingestion"
             primaryAction={{ href: '/ingestion', label: 'Ricarica monitor' }}
             secondaryAction={{ href: '/operations', label: 'Apri operations' }}
           />

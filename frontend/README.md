@@ -189,4 +189,5 @@ Stato attuale:
 - la dashboard principale espone ora shortcut topic-aware all’help center per `auth`, `ingestion`, `audit` e `gis`
 - la vista `search` espone ora shortcut topic-aware all’help center quando una ricerca e` attiva
 - le viste lista `subjects` e `parcels` espongono ora shortcut topic-aware all’help center
+- i pannelli errore SSR usano ora shortcut topic-aware verso `/operations/help` nelle viste `audit`, `gis`, `ingestion`, `search`, `subjects` e `parcels`
 - mappa GIS completa ancora non integrata

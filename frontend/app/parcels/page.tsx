@@ -28,6 +28,7 @@ export default async function ParcelsPage() {
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="audit"
             primaryAction={{ href: '/parcels', label: 'Ricarica lista' }}
             secondaryAction={{ href: '/operations', label: 'Apri operations' }}
           />

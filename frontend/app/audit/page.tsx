@@ -137,6 +137,7 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="audit"
             primaryAction={{ href: '/audit', label: 'Ricarica audit' }}
             secondaryAction={{ href: '/operations', label: 'Apri operations' }}
           />

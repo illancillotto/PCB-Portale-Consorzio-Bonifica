@@ -35,6 +35,7 @@ export default async function ParcelDetailPage({ params }: ParcelDetailPageProps
         >
           <ServerApiErrorState
             error={error}
+            helpTopic="audit"
             primaryAction={{ href: `/parcels/${id}`, label: 'Ricarica scheda' }}
             secondaryAction={{ href: '/parcels', label: 'Torna alle particelle' }}
           />

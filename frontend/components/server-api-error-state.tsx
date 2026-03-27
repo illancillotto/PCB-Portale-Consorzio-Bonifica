@@ -6,10 +6,13 @@ interface ServerApiErrorAction {
   label: string;
 }
 
+type HelpTopic = 'auth' | 'ingestion' | 'audit' | 'gis';
+
 interface ServerApiErrorStateProps {
   error: ApiError;
   primaryAction?: ServerApiErrorAction;
   secondaryAction?: ServerApiErrorAction;
+  helpTopic?: HelpTopic;
 }
 
 const toneByKind: Record<
@@ -46,12 +49,24 @@ export function ServerApiErrorState({
   error,
   primaryAction,
   secondaryAction,
+  helpTopic,
 }: ServerApiErrorStateProps) {
   const tone = toneByKind[error.kind];
   const loginHref =
     error.kind === 'authentication' && primaryAction
       ? `/login?next=${encodeURIComponent(primaryAction.href)}&reason=session`
       : null;
+  const resolvedHelpTopic = helpTopic ?? (error.kind === 'authentication' ? 'auth' : null);
+  const helpHref = resolvedHelpTopic
+    ? `/operations/help?topic=${encodeURIComponent(resolvedHelpTopic)}`
+    : '/operations/help';
+  const helpLabelByTopic: Record<HelpTopic, string> = {
+    auth: 'Apri help auth',
+    ingestion: 'Apri help ingestion',
+    audit: 'Apri help audit',
+    gis: 'Apri help GIS',
+  };
+  const helpLabel = resolvedHelpTopic ? helpLabelByTopic[resolvedHelpTopic] : 'Apri help center';
 
   return (
     <div className={`rounded-[28px] border p-6 ${tone.container}`}>
@@ -90,6 +105,12 @@ export function ServerApiErrorState({
             {secondaryAction.label}
           </Link>
         ) : null}
+        <Link
+          href={helpHref}
+          className="rounded-full border border-current px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+        >
+          {helpLabel}
+        </Link>
       </div>
     </div>
   );
