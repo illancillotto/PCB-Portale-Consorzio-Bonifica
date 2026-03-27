@@ -30,6 +30,7 @@ Checklist operativa rapida:
 - [docs/API_SURFACE.md](/home/cbo/CursorProjects/PCB-Portale-Consorzio-Bonifica/docs/API_SURFACE.md)
 - [docs/LOCAL_ENV_REFERENCE.md](/home/cbo/CursorProjects/PCB-Portale-Consorzio-Bonifica/docs/LOCAL_ENV_REFERENCE.md)
 - [docs/SMOKE_TESTS.md](/home/cbo/CursorProjects/PCB-Portale-Consorzio-Bonifica/docs/SMOKE_TESTS.md)
+- [docs/KNOWN_ISSUES.md](/home/cbo/CursorProjects/PCB-Portale-Consorzio-Bonifica/docs/KNOWN_ISSUES.md)
 
 ## Avvio locale
 

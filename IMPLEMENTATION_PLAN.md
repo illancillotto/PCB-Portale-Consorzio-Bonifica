@@ -585,6 +585,20 @@ Stato:
 
 - completato
 
+### Step 0.13
+
+Raccogliere i problemi noti gia` risolti in un documento root.
+
+Output:
+
+- sintomo
+- causa
+- fix o contromisura
+
+Stato:
+
+- completato
+
 ### Step A
 
 Collegare il frontend alle API reali.

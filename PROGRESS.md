@@ -247,6 +247,22 @@ Output operativo:
 
 - uso dei comandi di verifica più chiaro e standardizzato
 
+### 2026-03-27 – Known issues root
+
+Completato:
+
+- nuovo file `docs/KNOWN_ISSUES.md`
+- raccolta dei problemi reali già incontrati e risolti durante l’evoluzione del progetto
+- collegamento esplicito dal `README.md` root
+
+Verifiche eseguite:
+
+- revisione della cronologia commit e dei fix runtime già effettivamente applicati
+
+Output operativo:
+
+- minore rischio di riscoprire problemi già risolti
+
 ## Vincoli attivi
 
 - backend modular monolith
